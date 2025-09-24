@@ -55,17 +55,73 @@ class AppLogic:
             messagebox.showinfo("Éxito", f"Caja abierta por {usuario_nuevo}.")
 
     def _actualizar_estado_controles_venta(self):
-        """Activa o desactiva los controles de venta."""
+        """Activa o desactiva los controles de la pestaña de ventas."""
         estado = "normal" if self.app.modo_venta_activo else "disabled"
-        # Actualizaría los botones de la pestaña de ventas a través del controlador
-        # self.app.ventas_tab.set_controls_state(estado)
-        print(f"Controles de venta puestos en estado: {estado}")
+        tab = self.app.ventas_tab
+        # Esto asegura que los widgets existan antes de intentar configurarlos
+        if hasattr(tab, 'entry_codigo'):
+            tab.entry_codigo.config(state=estado)
+            tab.btn_buscar_nombre.config(state=estado)
+            tab.btn_prod_comun.config(state=estado)
     
     def cerrar_aplicacion_seguro(self):
-        """Verifica la caja antes de cerrar."""
-        caja_abierta = False # db.verificar_caja_abierta() # Lógica de DB
-        if caja_abierta:
-            if messagebox.askyesno("Confirmar Cierre", "La caja del día está abierta. ¿Desea cerrar de todos modos?"):
+        """Verifica el estado de la caja antes de cerrar."""
+        # caja_abierta = db.verificar_caja_abierta() # Lógica de DB real
+        caja_abierta_simulacion = True # Simulación
+        if caja_abierta_simulacion and self.app.modo_venta_activo:
+            if messagebox.askyesno("Confirmar Cierre", "La caja del día aún está abierta. ¿Desea cerrar de todos modos?", parent=self.app):
                 self.app.destroy()
         else:
             self.app.destroy()
+    
+    def mostrar_ventana_soporte(self):
+        """Muestra la ventana emergente de Soporte Técnico."""
+        ventana_soporte = Toplevel(self.app)
+        ventana_soporte.title("Soporte Técnico")
+        ventana_soporte.transient(self.app)
+        ventana_soporte.grab_set()
+        ventana_soporte.resizable(False, False)
+
+        frame_principal = ttk.Frame(ventana_soporte, padding=15)
+        frame_principal.pack(fill="both", expand=True)
+        frame_texto = ttk.Frame(frame_principal)
+        frame_texto.pack(side="left", fill="both", expand=True, padx=(0, 15))
+        frame_qr = ttk.Frame(frame_principal)
+        frame_qr.pack(side="right")
+        
+        ttk.Label(frame_texto, text="Soporte Técnico", font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(0, 10))
+        ttk.Label(frame_texto, text="Para consultas o problemas, puedes:", font=("Segoe UI", 10)).pack(anchor="w")
+
+        lbl_email = ttk.Label(frame_texto, text="Enviar un correo electrónico", font=("Segoe UI", 10, "underline"), foreground="#6495ED", cursor="hand2")
+        lbl_email.pack(anchor="w", pady=5)
+        lbl_email.bind("<Button-1>", lambda e: webbrowser.open("mailto:sistema.app.dominguez@gmail.com"))
+
+        ttk.Label(frame_texto, text="o escanear el código para chatear por WhatsApp.", font=("Segoe UI", 10)).pack(anchor="w")
+        ttk.Label(frame_texto, text="\nVersión del Software: 1.0.0", font=("Segoe UI", 9, "italic")).pack(anchor="w", pady=(10, 0))
+
+        try:
+            # Asumiendo que ruta_recurso ahora es un método del controlador App
+            qr_path = self.app.ruta_recurso("icons/whatsapp_qr.png")
+            qr_image_original = tk.PhotoImage(file=qr_path)
+            qr_image = qr_image_original.subsample(3, 3)
+            lbl_qr = ttk.Label(frame_qr, image=qr_image)
+            lbl_qr.image = qr_image 
+            lbl_qr.pack()
+        except tk.TclError:
+            ttk.Label(frame_qr, text="Error al cargar QR").pack()
+        
+        # Aquí necesitaríamos una función de utilidad para centrar, la crearemos después
+        # utils.centrar_ventana(ventana_soporte, self.app)
+
+    def actualizar_alertas_stock(self):
+        """Actualiza el botón de alertas de stock en la UI principal."""
+        # Esta función obtendría los productos con stock bajo de la DB
+        # productos = db.obtener_productos_a_reponer()
+        productos = [("123", "Producto A", 2)] # Simulación
+        conteo = len(productos)
+
+        if conteo > 0 and hasattr(self.app, 'btn_alerta_stock'):
+            self.app.btn_alerta_stock.config(text=f"⚠ {conteo} Alerta{'s' if conteo > 1 else ''}", style="danger.TButton")
+            self.app.btn_alerta_stock.place(relx=1.0, rely=0, x=-5, y=-5, anchor="ne")
+        elif hasattr(self.app, 'btn_alerta_stock'):
+            self.app.btn_alerta_stock.place_forget()
