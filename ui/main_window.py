@@ -23,7 +23,9 @@ from logic.estadisticas_logic import EstadisticasLogic
 from logic.configuracion_logic import ConfigLogic
 
 # --- Utilidades ---
+from utilities import helpers
 from utilities.helpers import ruta_recurso
+
 
 class App(Window):
     """
@@ -67,7 +69,7 @@ class App(Window):
         """Configura los atributos principales de la ventana."""
         self.title("GestiaShop - Sistema de Gestión")
         self.attributes("-fullscreen", True)
-        self.iconphoto(True, tk.PhotoImage(file=ruta_recurso('icons/icono_app.ico')))
+        self.iconphoto(True, tk.PhotoImage(file=ruta_recurso('icons/icono_app.png')))
 
     def _crear_header(self):
         """Crea el encabezado de la aplicación con nombre, fecha y hora."""
@@ -128,12 +130,13 @@ class App(Window):
     
     # --- MÉTODOS DE ACTUALIZACIÓN DE UI PRINCIPAL ---
     def actualizar_fecha_hora(self):
-        """Actualiza el reloj y la fecha del encabezado cada minuto."""
+       
         ahora = datetime.now()
         self.lbl_hora.config(text=ahora.strftime("%H:%M"))
-        self.lbl_fecha.config(text=self.app_logic.formatear_fecha_es(ahora))
+        # Llama directamente a la función importada desde helpers
+        self.lbl_fecha.config(text=helpers.formatear_fecha_es(ahora)) 
         self.after(60000, self.actualizar_fecha_hora)
-    
+        
     def actualizar_titulo_app(self):
         """Actualiza el título de la ventana y el nombre del comercio."""
         nombre = self.configuracion.get("nombre_comercio", "GestiaShop")
