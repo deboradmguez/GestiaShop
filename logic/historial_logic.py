@@ -1,8 +1,7 @@
 import tkinter as tk
 from datetime import date, datetime
 from ..ui.utilities.dialogs import ConfirmacionDialog
-
-# from ..database import database_manager as db
+from ..database import database_manager as db_manager
 # from ..services import report_generator as report # Para generar PDF
 
 class HistorialLogic:
@@ -17,13 +16,15 @@ class HistorialLogic:
         Obtiene los datos del historial para la fecha seleccionada en la UI
         y actualiza la vista (tabla y totales).
         """
-        fecha_str = self.app.historial_tab.cal_fecha_historial.entry.get()
-        if not fecha_str:
-            fecha_str = date.today().strftime("%d/%m/%Y")
+        fecha_ui = self.app.historial_tab.cal_fecha_historial.entry.get()
+        try:
+            fecha_db = datetime.strptime(fecha_ui, "%d/%m/%Y").strftime("%Y-%m-%d")
+        except ValueError:
+            fecha_db = date.today().strftime("%Y-%m-%d")
         
-        # --- Lógica de Base de Datos (simulada) ---
+       
         # cierre_dia = db.obtener_cierre_caja_del_dia(fecha_db)
-        # historial = db.obtener_historial_ventas_detallado(fecha_db)
+        historial = db_manager.obtener_historial_por_fecha(fecha_db)
         cierre_dia = [("Efectivo", 1500.0), ("Transferencia", 500.0)]
         historial = [
             ("tx1", "2025-09-24 10:30:00", "Producto A", 2, 150, 300, 0, 300, "Completada", "101"),
@@ -73,8 +74,7 @@ class HistorialLogic:
         item_seleccionado = seleccion[0]
         parent_id = tab.tree_historial.parent(item_seleccionado)
         id_transaccion = parent_id if parent_id else item_seleccionado
-        
-        # Lógica de confirmación y anulación... (simulada)
+    
         dialogo = ConfirmacionDialog(
             parent=self.app, 
             title="Confirmar Acción", 
@@ -84,11 +84,13 @@ class HistorialLogic:
         respuesta = dialogo.show()
         if respuesta:
             print(f"Anulando venta {id_transaccion}...")
-            # exito = db.anular_venta(id_transaccion)
-            # if exito:
-            self.app.notificar_exito("Venta anulada y stock restaurado.")
-            self.recargar_historial_ventas()
-            # self.app.productos_logic.filtrar_productos_y_recargar() # Notificar a otras lógicas
+            exito = db_manager.anular_venta_existente(id_transaccion)
+            if exito:
+                self.app.notificar_exito("Venta anulada y stock restaurado.")
+                self.recargar_historial_ventas()
+                self.app.productos_logic.filtrar_productos_y_recargar()
+            else:
+                self.app.notificar_error("No se pudo anular la venta.")
 
     def actualizar_estado_boton_anular(self, event=None):
         """Habilita o deshabilita el botón de anular según si hay una selección."""

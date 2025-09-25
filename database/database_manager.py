@@ -82,7 +82,37 @@ def agregar_productos_en_lote(productos):
     except sqlite3.Error as e:
         print(f"Error en DB (agregar_productos_en_lote): {e}")
         return 0, [str(e)]
-    
+
+#VENTAS
+def registrar_nueva_venta(carrito, pago_efectivo, pago_transferencia, referencia):
+    try:
+        with conectar_db() as conn:
+            queries.registrar_venta(conn, carrito, pago_efectivo, pago_transferencia, referencia)
+        return True
+    except sqlite3.Error as e:
+        print(f"Error en DB (registrar_nueva_venta): {e}")
+        # La transacción se revierte automáticamente si hay una excepción
+        return False  
+def obtener_historial_por_fecha(fecha):
+    try:
+        with conectar_db() as conn:
+            historial = queries.obtener_historial_ventas_detallado(conn, fecha)
+            return historial
+    except sqlite3.Error as e:
+        print(f"Error en DB (obtener_historial_por_fecha): {e}")
+        return []
+def anular_venta_existente(id_transaccion):
+    """
+    Gestiona la anulación de una venta de forma transaccional.
+    Devuelve True si fue exitoso, False si hubo un error.
+    """
+    try:
+        with conectar_db() as conn:
+            queries.anular_venta(conn, id_transaccion)
+        return True
+    except sqlite3.Error as e:
+        print(f"Error en DB (anular_venta_existente): {e}")
+        return False 
 
 # Por ejemplo:
 # def agregar_producto_nuevo(datos): ...

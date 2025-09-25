@@ -206,14 +206,12 @@ class VentasLogic:
         """Procesa la venta, la guarda, y limpia el estado."""
         if not self.app.carrito: return False
         
-        # venta_exitosa = db.registrar_venta(
-        #     carrito=self.app.carrito,
-        #     pago_efectivo=payment_data.get("pago_efectivo", 0.0),
-        #     pago_transferencia=payment_data.get("pago_transferencia", 0.0),
-        #     referencia=payment_data.get("referencia", "")
-        # )
-        venta_exitosa = True # Simulación
-
+        venta_exitosa = db_manager.registrar_nueva_venta(
+             carrito=self.app.carrito,
+             pago_efectivo=payment_data.get("pago_efectivo", 0.0),
+             pago_transferencia=payment_data.get("pago_transferencia", 0.0),
+             referencia=payment_data.get("referencia", "")
+         )
         if venta_exitosa:
             self.app.carrito.clear()
             self._recalcular_total_carrito()

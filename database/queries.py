@@ -107,62 +107,70 @@ def buscar_productos_filtrados(conexion, filtro_stock, texto_busqueda):
     cursor.execute(query, params)
     return cursor.fetchall()
 
+#VENTAS
 
 def registrar_venta(conexion, carrito, pago_efectivo, pago_transferencia, referencia):
-    """
-    Registra una venta completa y sus productos, asignando un número de ticket correlativo.
-    """
     cursor = conexion.cursor()
     
-    id_transaccion = str(uuid.uuid4())
+    # 1. Obtenemos el último número de ticket para calcular el nuevo
+    cursor.execute("SELECT MAX(ticket_numero) FROM ventas")
+    ultimo_ticket = cursor.fetchone()[0]
+    nuevo_ticket = (ultimo_ticket or 0) + 1
+
+    # 2. Insertamos el registro principal en la tabla 'ventas'
+    id_transaccion = str(uuid.uuid4()) # Generamos un ID único para la venta
     fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     total_venta = sum(item["precio"] * item["cantidad"] for item in carrito.values())
-
-    try:
-        cursor.execute("SELECT MAX(ticket_numero) FROM ventas")
-        ultimo_ticket = cursor.fetchone()[0]
-        
-        # 2. Calcular el nuevo número (si no hay ninguno, empieza en 1)
-        nuevo_ticket = (ultimo_ticket or 0) + 1
-        # --- FIN DE LA NUEVA LÓGICA ---
-        
-        # Guarda la transacción completa, incluyendo el nuevo número de ticket
+    
+    cursor.execute(
+        """
+        INSERT INTO ventas (id_transaccion, fecha_hora, pago_efectivo, pago_transferencia, referencia, total_venta, ticket_numero) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (id_transaccion, fecha_hora, pago_efectivo, pago_transferencia, referencia, total_venta, nuevo_ticket)
+    )
+    
+    # 3. Insertamos cada producto del carrito en 'detalle_ventas'
+    for codigo, item in carrito.items():
         cursor.execute(
-            """
-            INSERT INTO ventas (id_transaccion, fecha_hora, pago_efectivo, pago_transferencia, referencia, total_venta, ticket_numero) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-            (id_transaccion, fecha_hora, pago_efectivo, pago_transferencia, referencia, total_venta, nuevo_ticket)
+            "INSERT INTO detalle_ventas (id_transaccion, codigo_producto, nombre_producto, precio_unitario, cantidad, total_fila) VALUES (?, ?, ?, ?, ?, ?)",
+            (id_transaccion, codigo, item['nombre'], item['precio'], item['cantidad'], item['precio'] * item['cantidad'])
         )
         
-        # Recorre el carrito para guardar cada producto en 'detalle_ventas'
-        for codigo, item in carrito.items():
-            nombre = item['nombre']
-            cantidad = item['cantidad']
-            precio_unitario = item['precio']
-            total_fila = item['total_fila']
-            
+        # 4. Actualizamos el stock (solo para productos que no son "comunes")
+        if not codigo.startswith("PROD_COMUN-"):
             cursor.execute(
-                "INSERT INTO detalle_ventas (id_transaccion, codigo_producto, nombre_producto, precio_unitario, cantidad, total_fila) VALUES (?, ?, ?, ?, ?, ?)",
-                (id_transaccion, codigo, nombre, precio_unitario, cantidad, total_fila)
+                "UPDATE productos SET stock = stock - ? WHERE codigo_barras = ?",
+                (item['cantidad'], codigo)
+            )
+    return True
+def anular_venta(conexion, id_transaccion):
+    cursor = conexion.cursor()
+    
+    # 1. Obtenemos la lista de productos y cantidades de la venta a anular
+    cursor.execute(
+        "SELECT codigo_producto, cantidad FROM detalle_ventas WHERE id_transaccion = ?",
+        (id_transaccion,)
+    )
+    productos_a_devolver = cursor.fetchall()
+    
+    # 2. Devolvemos cada producto al stock
+    for codigo, cantidad in productos_a_devolver:
+        # Solo actualizamos el stock si no es un "Producto Común"
+        if not codigo.startswith("PROD_COMUN-"):
+            cursor.execute(
+                "UPDATE productos SET stock = stock + ? WHERE codigo_barras = ?",
+                (cantidad, codigo)
             )
             
-            # Actualiza el stock de cada producto que no sea "común"
-            if not codigo.startswith("PROD_COMUN-"):
-                cursor.execute(
-                    "UPDATE productos SET stock = stock - ? WHERE codigo_barras = ?",
-                    (cantidad, codigo)
-                )
-            
-        conexion.commit()
-        return True
-        
-    except sqlite3.Error as e:
-        print(f"Error al registrar la venta: {e}")
-        conexion.rollback()
-        return False
+    # 3. Actualizamos el estado de la venta principal a 'Anulada'
+    cursor.execute(
+        "UPDATE ventas SET estado = 'Anulada' WHERE id_transaccion = ?",
+        (id_transaccion,)
+    )
     
-
+    # El commit se manejará desde el database_manager
+    return True
 
 def obtener_cierre_caja_del_dia(conexion, fecha_str):
     cursor = conexion.cursor()
@@ -184,10 +192,6 @@ def obtener_cierre_caja_del_dia(conexion, fecha_str):
     return [('Efectivo', total_efectivo), ('Transferencia', total_transferencia)]
 
 def obtener_historial_ventas_detallado(conexion, fecha_str):
-    """
-    Obtiene el historial de ventas detallado para una fecha específica,
-    uniendo las tablas de ventas y detalle_ventas.
-    """
     cursor = conexion.cursor()
     cursor.execute(
         """
