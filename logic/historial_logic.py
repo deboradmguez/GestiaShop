@@ -114,12 +114,6 @@ class HistorialLogic:
         )
 
     def descargar_reporte_historial(self):
-        """Genera y abre un reporte en PDF del historial del día seleccionado."""
-        fecha_str = self.app.historial_tab.cal_fecha_historial.entry.get()
-        print(f"Generando reporte para la fecha: {fecha_str}...")
-        # report.reporte_cierre_caja(fecha_str)
-        self.app.notificar_exito(f"Reporte PDF para {fecha_str} generado (simulación).")
-    def descargar_reporte_historial(self):
         fecha_ui = self.app.historial_tab.cal_fecha_historial.entry.get()
         try:
             fecha_db = datetime.strptime(fecha_ui, "%d/%m/%Y").strftime("%Y-%m-%d")

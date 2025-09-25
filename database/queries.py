@@ -279,6 +279,30 @@ def obtener_top_productos_periodo(conexion, fecha_inicio, fecha_fin, limite=5):
     
     return cursor.fetchall()
 
+#configuracion
+
+def cargar_configuracion(conexion):
+    cursor = conexion.cursor()
+    cursor.execute("SELECT clave, valor FROM configuracion")
+    return cursor.fetchall()
+
+def guardar_configuracion_multiples(conexion, valores):
+    cursor = conexion.cursor()
+    # Convertimos el diccionario a una lista de tuplas para 'executemany'
+    valores_para_db = list(valores.items())
+    cursor.executemany(
+        "INSERT OR REPLACE INTO configuracion (clave, valor) VALUES (?, ?)",
+        valores_para_db
+    )
+    conexion.commit()
+
+def restaurar_configuracion_default(conexion, config_default):
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM configuracion")
+    # Llamamos a la función que ya creamos para guardar múltiples valores
+    guardar_configuracion_multiples(conexion, config_default)
+
+
 def inicializar_base_de_datos():
     """
     Se conecta a la base de datos y se asegura de que todas las tablas necesarias

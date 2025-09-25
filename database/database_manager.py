@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3, json
 from .connection import conectar_db
 from . import queries
 
@@ -175,8 +175,6 @@ def registrar_ajuste_caja(fecha_db, monto_corregido, diferencia_corregida):
  
 #ESTADISTICAS
 
-# database_manager.py
-
 def obtener_resumen_ventas_periodo(fecha_inicio_db, fecha_fin_db):
    
     try:
@@ -198,10 +196,48 @@ def obtener_top_productos_periodo(fecha_inicio_db, fecha_fin_db, limite=5):
     except sqlite3.Error as e:
         print(f"Error en DB (obtener_top_productos_periodo): {e}")
         return []   
+ 
+ #configuracion
+ 
+def cargar_configuracion_completa():
+    """
+    Gestiona la carga de la configuración completa y la formatea como un diccionario.
+    """
+    config = {}
+    try:
+        with conectar_db() as conn:
+            for clave, valor in queries.cargar_configuracion(conn):
+                try:
+                    # Intenta convertir de JSON si es un tipo complejo (como booleanos)
+                    config[clave] = json.loads(valor)
+                except (json.JSONDecodeError, TypeError):
+                    config[clave] = valor # Si no, lo deja como texto
+        return config
+    except sqlite3.Error as e:
+        print(f"Error en DB (cargar_configuracion_completa): {e}")
+        return {} # Devuelve un diccionario vacío en caso de error
+
+def guardar_configuracion(nuevos_valores):
+    try:
+        with conectar_db() as conn:
+            # Preparamos los valores para guardarlos como texto
+            valores_a_guardar = {
+                k: json.dumps(v) if isinstance(v, bool) else str(v)
+                for k, v in nuevos_valores.items()
+            }
+            queries.guardar_configuracion_multiples(conn, valores_a_guardar)
+            return True
+    except sqlite3.Error as e:
+        print(f"Error en DB (guardar_configuracion): {e}")
+        return False
+
+def restaurar_configuracion():
+    from ..logic.configuracion_logic import CONFIG_DEFAULT # Importamos los valores por defecto
+    try:
+        with conectar_db() as conn:
+            queries.restaurar_configuracion_default(conn, CONFIG_DEFAULT)
+            return True
+    except sqlite3.Error as e:
+        print(f"Error en DB (restaurar_configuracion): {e}")
+        return False   
     
-    
-# Por ejemplo:
-# def agregar_producto_nuevo(datos): ...
-# def registrar_una_venta(carrito, pago_info): ...
-# def obtener_historial_del_dia(fecha): ...
-# etc.
