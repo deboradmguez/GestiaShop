@@ -15,7 +15,7 @@ def centrar_ventana(ventana_a_centrar, ventana_referencia):
     y = (ventana_referencia.winfo_screenheight() // 2) - (alto // 2)
     ventana_a_centrar.geometry(f"+{x}+{y}")
 
-def ruta_recurso(ruta_relativa):
+def obtener_ruta_reportes(ruta_relativa):
     """Obtiene la ruta absoluta al recurso, funciona para desarrollo y para PyInstaller."""
     try:
         ruta_base = sys._MEIPASS

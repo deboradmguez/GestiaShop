@@ -172,7 +172,32 @@ def registrar_ajuste_caja(fecha_db, monto_corregido, diferencia_corregida):
     except sqlite3.Error as e:
         print(f"Error en DB (registrar_ajuste_caja): {e}")
         return False    
-    
+ 
+#ESTADISTICAS
+
+# database_manager.py
+
+def obtener_resumen_ventas_periodo(fecha_inicio_db, fecha_fin_db):
+   
+    try:
+        with conectar_db() as conn:
+            resultados = queries.obtener_resumen_ventas_periodo(conn, fecha_inicio_db, fecha_fin_db)
+            return {
+                "efectivo": resultados[0] or 0.0,
+                "transferencia": resultados[1] or 0.0,
+                "total": resultados[2] or 0.0
+            }
+    except sqlite3.Error as e:
+        print(f"Error en DB (obtener_resumen_ventas_periodo): {e}")
+        return {"efectivo": 0.0, "transferencia": 0.0, "total": 0.0}
+
+def obtener_top_productos_periodo(fecha_inicio_db, fecha_fin_db, limite=5):
+    try:
+        with conectar_db() as conn:
+            return queries.obtener_top_productos_periodo(conn, fecha_inicio_db, fecha_fin_db, limite)
+    except sqlite3.Error as e:
+        print(f"Error en DB (obtener_top_productos_periodo): {e}")
+        return []   
     
     
 # Por ejemplo:

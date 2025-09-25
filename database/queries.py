@@ -248,11 +248,9 @@ def obtener_historial_ventas_detallado(conexion, fecha_str):
     )
     return cursor.fetchall()
 
+#ESTADISTICAS
 
 def obtener_resumen_ventas_periodo(conexion, fecha_inicio, fecha_fin):
-    """
-    Calcula la facturación total, efectivo y transferencia de un período.
-    """
     cursor = conexion.cursor()
     cursor.execute("""
         SELECT 
@@ -263,18 +261,9 @@ def obtener_resumen_ventas_periodo(conexion, fecha_inicio, fecha_fin):
         WHERE estado = 'Completada' AND DATE(fecha_hora) BETWEEN ? AND ?
     """, (fecha_inicio, fecha_fin))
     
-    resultados = cursor.fetchone()
-    # Devolvemos un diccionario para un acceso más claro
-    return {
-        "efectivo": resultados[0] or 0.0,
-        "transferencia": resultados[1] or 0.0,
-        "total": resultados[2] or 0.0
-    }
+    return cursor.fetchone()
 
 def obtener_top_productos_periodo(conexion, fecha_inicio, fecha_fin, limite=5):
-    """
-    Obtiene los productos más vendidos en un período, ordenados por cantidad.
-    """
     cursor = conexion.cursor()
     cursor.execute("""
         SELECT 
@@ -289,7 +278,6 @@ def obtener_top_productos_periodo(conexion, fecha_inicio, fecha_fin, limite=5):
     """, (fecha_inicio, fecha_fin, limite))
     
     return cursor.fetchall()
-# En app_multirrubro.py
 
 def inicializar_base_de_datos():
     """

@@ -2,9 +2,8 @@ from ttkbootstrap import ttk
 from datetime import datetime
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-# from ..database import database_manager as db
-# from ..services import report_generator
+from ..database import database_manager as db_manager
+from ..services import report_generator
 
 class EstadisticasLogic:
     """
@@ -16,33 +15,30 @@ class EstadisticasLogic:
         self.ultimos_datos_generados = None
 
     def generar_estadisticas(self):
-        """
-        Valida fechas, obtiene los datos y actualiza toda la UI de la pestaña.
-        """
         tab = self.app.estadisticas_tab
         fecha_inicio_str = tab.cal_desde.entry.get()
         fecha_fin_str = tab.cal_hasta.entry.get()
 
         try:
-            fecha_inicio = datetime.strptime(fecha_inicio_str, "%d/%m/%Y")
-            fecha_fin = datetime.strptime(fecha_fin_str, "%d/%m/%Y")
-            if fecha_inicio > fecha_fin:
+            # 1. Validamos y convertimos las fechas
+            fecha_inicio_obj = datetime.strptime(fecha_inicio_str, "%d/%m/%Y")
+            fecha_fin_obj = datetime.strptime(fecha_fin_str, "%d/%m/%Y")
+            if fecha_inicio_obj > fecha_fin_obj:
                 self.app.notificar_error("La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.")
                 return
+
+            fecha_inicio_db = fecha_inicio_obj.strftime("%Y-%m-%d")
+            fecha_fin_db = fecha_fin_obj.strftime("%Y-%m-%d")
+
         except ValueError:
-            self.app.notificar_error("Error de Formato", "Por favor, ingrese fechas válidas.")
+            self.app.notificar_error("Por favor, ingrese fechas válidas.")
             return
 
-        # --- Lógica de Base de Datos (simulada) ---
-        # resumen = db.obtener_resumen_ventas_periodo(fecha_inicio, fecha_fin)
-        # top_productos = db.obtener_top_productos_periodo(fecha_inicio, fecha_fin)
-        resumen = {'total': 18500.75, 'efectivo': 12300.25, 'transferencia': 6200.50}
-        top_productos = [("Producto A", 50), ("Producto C", 35), ("Producto B", 22)]
+        resumen = db_manager.obtener_resumen_ventas_periodo(fecha_inicio_db, fecha_fin_db)
+        top_productos = db_manager.obtener_top_productos_periodo(fecha_inicio_db, fecha_fin_db)
 
-        # Guardamos los datos para poder usarlos en la descarga del PDF
         self.ultimos_datos_generados = (fecha_inicio_str, fecha_fin_str, resumen, top_productos)
         
-        # --- Actualización de la UI ---
         tab.lbl_total_facturado.config(text=f"Facturación Total: ${resumen['total']:,.2f}")
         tab.lbl_total_efectivo.config(text=f"Total Efectivo: ${resumen['efectivo']:,.2f}")
         tab.lbl_total_transferencia.config(text=f"Total Transferencia: ${resumen['transferencia']:,.2f}")
@@ -83,14 +79,19 @@ class EstadisticasLogic:
         tab.canvas_grafico_widget = widget_grafico # Guardamos la referencia
 
     def descargar_reporte_estadisticas(self):
-        """Genera y guarda un PDF con los últimos datos generados."""
         if not self.ultimos_datos_generados:
-            self.app.notificar_error("Primero debe generar un reporte.")
+            self.app.notificar_alerta("Primero debe generar un reporte en pantalla.")
             return
             
-        # Desempaquetamos los datos guardados
+        # 1. Desempaquetamos los datos que guardamos previamente
         fecha_inicio, fecha_fin, resumen, top_productos = self.ultimos_datos_generados
         
-        print(f"Generando reporte PDF desde {fecha_inicio} hasta {fecha_fin}...")
-        # report_generator.generar_reporte_estadisticas_pdf(fecha_inicio, fecha_fin, resumen, top_productos)
-        self.app.notificar_exito("Reporte de estadísticas generado (simulación).")
+        # 2. Llamamos al servicio para que genere el PDF con esos datos
+        exito, error_msg = report_generator.generar_reporte_estadisticas(
+            fecha_inicio, fecha_fin, resumen, top_productos
+        )
+
+        if exito:
+            self.app.notificar_exito("Reporte de estadísticas generado.")
+        else:
+            self.app.notificar_error(f"No se pudo generar el reporte: {error_msg}")
