@@ -1,6 +1,6 @@
 import sys, os
-from ..utilities.dialogs import ConfirmacionDialog
-from ..database import database_manager as db_manager
+from utilities.dialogs import ConfirmacionDialog
+from database import database_manager as db_manager
 
 CONFIG_DEFAULT = {
     "nombre_comercio": "GestiaShop",

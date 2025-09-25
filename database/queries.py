@@ -1,7 +1,7 @@
 import sqlite3, os, sys, uuid
 from datetime import datetime
 from tkinter import messagebox
-from connection import conectar_db
+from .connection import conectar_db
 
 def resource_path(relative_path):
     try:

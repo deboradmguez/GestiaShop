@@ -3,9 +3,9 @@ from tkinter import Toplevel
 import webbrowser
 from ttkbootstrap import ttk
 from datetime import date
-from ..utilities import notifications
-from ..utilities.dialogs import ConfirmacionDialog, PinDialog
-from ..database import database_manager as db_manager
+from utilities import notifications
+from utilities.dialogs import ConfirmacionDialog, PinDialog
+from database import database_manager as db_manager
 
 class AppLogic:
     """

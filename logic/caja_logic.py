@@ -2,9 +2,9 @@ import tkinter as tk
 from ttkbootstrap import ttk
 from tkinter import Toplevel
 from datetime import date, datetime
-from ..database import database_manager as db_manager
-from ..services import report_generator 
-from ..utilities import helpers
+from database import database_manager as db_manager
+from services import report_generator 
+from utilities import helpers
 
 class CajaLogic:
     """

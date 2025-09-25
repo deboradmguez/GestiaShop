@@ -1,6 +1,6 @@
 from tkinter import Toplevel, ttk
-from ..utilities.dialogs import ConfirmarDialog
-from ..database import database_manager as db_manager
+from utilities.dialogs import ConfirmacionDialog
+from database import database_manager as db_manager
 
 class ProductosLogic:
     """
@@ -165,7 +165,7 @@ class ProductosLogic:
 
         values = self.app.productos_tab.tree_inventario.item(item_seleccionado, "values")
         codigo, nombre = values[0], values[1]
-        dialogo = ConfirmarDialog(
+        dialogo = ConfirmacionDialog(
             parent=self.app,
             title="Confirmar Eliminación",
             message=f"¿Estás seguro de que querés eliminar '{nombre}'?"
@@ -253,7 +253,7 @@ class ProductosLogic:
             self.app.notificar_alerta("No hay productos en la lista para guardar.")
             return
 
-        dialogo = ConfirmarDialog(
+        dialogo = ConfirmacionDialog(
                 parent=ventana, # Es importante que el diálogo sea "hijo" de la ventana de carga
                 title="Confirmar Guardado",
                 message=f"¿Desea guardar {len(productos)} productos en la base de datos?"

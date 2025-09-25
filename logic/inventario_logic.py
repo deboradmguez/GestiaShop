@@ -1,5 +1,5 @@
 import tkinter as tk
-from ..database import database_manager as db_manager
+from database import database_manager as db_manager
 
 class InventarioLogic:
     """

@@ -4,7 +4,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
-from ..logic.helpers import obtener_ruta_guardado
+from utilities.helpers import obtener_ruta_guardado
 
 def generar_reporte_cierre_caja(datos_cierre, historial_ventas, resumen_ventas, fecha_reporte):
     

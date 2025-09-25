@@ -232,7 +232,7 @@ def guardar_configuracion(nuevos_valores):
         return False
 
 def restaurar_configuracion():
-    from ..logic.configuracion_logic import CONFIG_DEFAULT # Importamos los valores por defecto
+    from logic.configuracion_logic import CONFIG_DEFAULT 
     try:
         with conectar_db() as conn:
             queries.restaurar_configuracion_default(conn, CONFIG_DEFAULT)

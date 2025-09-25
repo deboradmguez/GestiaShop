@@ -2,8 +2,8 @@ from ttkbootstrap import ttk
 from datetime import datetime
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from ..database import database_manager as db_manager
-from ..services import report_generator
+from database import database_manager as db_manager
+from services import report_generator
 
 class EstadisticasLogic:
     """

@@ -1,9 +1,9 @@
 import tkinter as tk
 from datetime import date, datetime
-from ..utilities.dialogs import ConfirmacionDialog
-from ..database import database_manager as db_manager
-from ..utilities import helpers
-from ..services import report_generator
+from utilities.dialogs import ConfirmacionDialog
+from database import database_manager as db_manager
+from utilities import helpers
+from services import report_generator
 
 class HistorialLogic:
     """
