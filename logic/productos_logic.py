@@ -1,5 +1,5 @@
 from tkinter import Toplevel, ttk
-from ..ui.utilities.dialogs import ConfirmarDialog
+from ..utilities.dialogs import ConfirmarDialog
 from ..database import database_manager as db_manager
 
 class ProductosLogic:

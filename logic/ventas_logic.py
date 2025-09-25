@@ -5,7 +5,7 @@ import uuid
 # Importamos las ventanas emergentes que son parte de la UI de esta lógica
 from ..ui.windows.busqueda_window import BusquedaWindow
 from ..ui.windows.cobrar_window import CobrarWindow
-from ..ui.utilities.dialogs import ConfirmacionDialog
+from ..utilities.dialogs import ConfirmacionDialog
 from ..database import database_manager as db_manager
 
 class VentasLogic:

@@ -23,7 +23,7 @@ from ..logic.estadisticas_logic import EstadisticasLogic
 from ..logic.configuracion_logic import ConfigLogic
 
 # --- Utilidades ---
-from ..logic.helpers import obtener_ruta_reportes
+from ..logic.helpers import obtener_ruta
 
 class App(Window):
     """
@@ -67,7 +67,7 @@ class App(Window):
         """Configura los atributos principales de la ventana."""
         self.title("GestiaShop - Sistema de Gestión")
         self.attributes("-fullscreen", True)
-        self.iconphoto(True, tk.PhotoImage(file=obtener_ruta_reportes('icons/icono_app.png')))
+        self.iconphoto(True, tk.PhotoImage(file=obtener_ruta('icons/icono_app.png')))
 
     def _crear_header(self):
         """Crea el encabezado de la aplicación con nombre, fecha y hora."""
@@ -152,7 +152,7 @@ class App(Window):
     def abrir_caja(self): self.app_logic.dialogo_abrir_caja()
     def cerrar_app(self): self.app_logic.cerrar_aplicacion_seguro()
     def mostrar_soporte(self): self.app_logic.mostrar_ventana_soporte()
-    def ruta_recurso(self, path): return obtener_ruta_reportes(path)
+    def ruta_recurso(self, path): return obtener_ruta(path)
 
     # -- Delegados de Ventas --
     def buscar_y_agregar_a_carrito(self): self.ventas_logic.buscar_y_agregar_a_carrito()

@@ -1,4 +1,5 @@
 import sys, os
+from pathlib import Path
 from datetime import datetime, date
 import tkinter as tk
 
@@ -15,14 +16,22 @@ def centrar_ventana(ventana_a_centrar, ventana_referencia):
     y = (ventana_referencia.winfo_screenheight() // 2) - (alto // 2)
     ventana_a_centrar.geometry(f"+{x}+{y}")
 
-def obtener_ruta_reportes(ruta_relativa):
+def ruta_recurso(ruta_relativa):
     """Obtiene la ruta absoluta al recurso, funciona para desarrollo y para PyInstaller."""
     try:
         ruta_base = sys._MEIPASS
     except Exception:
         ruta_base = os.path.abspath(".")
     return os.path.join(ruta_base, ruta_relativa)
-
+def obtener_ruta_guardado(nombre_carpeta):
+    # La ruta base es la carpeta personal del usuario (ej: C:/Users/TuUsuario)
+    ruta_base = Path.home() / "GestiaShop"
+    
+    ruta_final = ruta_base / nombre_carpeta
+    
+    ruta_final.mkdir(parents=True, exist_ok=True)
+    
+    return ruta_final
 
 
 def formatear_fecha_es(dt: datetime):

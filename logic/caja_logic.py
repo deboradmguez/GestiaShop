@@ -4,7 +4,7 @@ from tkinter import Toplevel
 from datetime import date, datetime
 from ..database import database_manager as db_manager
 from ..services import report_generator 
-from ..ui.utilities import helpers
+from ..utilities import helpers
 
 class CajaLogic:
     """
