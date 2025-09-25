@@ -171,7 +171,19 @@ def anular_venta(conexion, id_transaccion):
     
     # El commit se manejará desde el database_manager
     return True
+#inventario
+def actualizar_producto_inventario(conexion, codigo, nuevo_nombre, nuevo_precio, stock_a_agregar):
 
+    cursor = conexion.cursor()
+    cursor.execute(
+        """
+        UPDATE productos
+        SET nombre = ?, precio = ?, stock = stock + ?
+        WHERE codigo_barras = ?
+        """,
+        (nuevo_nombre, nuevo_precio, stock_a_agregar, codigo)
+    )
+    conexion.commit()
 #CAJA
 
 def obtener_corte_caja_por_fecha(conexion, fecha_db):

@@ -46,9 +46,6 @@ class InventarioLogic:
         entries["nombre_edit"].focus()
 
     def guardar_cambios_inventario(self, event=None):
-        """
-        Verifica si los datos del producto han cambiado y, si es así, los guarda.
-        """
         if not self.producto_actual_original:
             return
         
@@ -61,8 +58,7 @@ class InventarioLogic:
             self.app.notificar_error("El precio y el stock a agregar deben ser números válidos.")
             return
 
-        # --- Lógica de Negocio ---
-        # Comparamos si hubo algún cambio
+        # Comparamos si hubo algún cambio real
         hubo_cambios = (
             nuevo_nombre != self.producto_actual_original["nombre"] or
             nuevo_precio != self.producto_actual_original["precio"] or
@@ -74,18 +70,17 @@ class InventarioLogic:
             self._limpiar_campos()
             return
 
-        # Si hubo cambios, procedemos a guardar
         codigo = self.producto_actual_original["codigo"]
         
-        # --- Lógica de Base de Datos (simulada) ---
-        # exito = db.actualizar_producto_inventario(codigo, nuevo_nombre, nuevo_precio, stock_a_agregar)
-        # if exito:
-        self.app.notificar_exito("Producto actualizado correctamente.")
-        self._limpiar_campos()
-        # Avisamos al controlador de productos que sus datos pueden haber cambiado
-        self.app.productos_logic.filtrar_productos_y_recargar()
-        # else:
-        #      self.app.notificar_error("No se pudo actualizar el producto.")
+        exito = db_manager.actualizar_desde_inventario(codigo, nuevo_nombre, nuevo_precio, stock_a_agregar)
+        
+        if exito:
+            self.app.notificar_exito("Producto actualizado correctamente.")
+            self._limpiar_campos()
+            # Avisamos a la pestaña de productos que sus datos pueden haber cambiado
+            self.app.productos_logic.filtrar_productos_y_recargar()
+        else:
+            self.app.notificar_error("No se pudo actualizar el producto.")
         
     def _limpiar_campos(self):
         """Limpia todos los campos de la pestaña y resetea el estado."""

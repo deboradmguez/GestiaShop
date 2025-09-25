@@ -240,4 +240,15 @@ def restaurar_configuracion():
     except sqlite3.Error as e:
         print(f"Error en DB (restaurar_configuracion): {e}")
         return False   
-    
+
+#inventario
+
+
+def actualizar_desde_inventario(codigo, nombre, precio, stock_a_agregar):
+    try:
+        with conectar_db() as conn:
+            queries.actualizar_producto_inventario(conn, codigo, nombre, precio, stock_a_agregar)
+            return True
+    except sqlite3.Error as e:
+        print(f"Error en DB (actualizar_desde_inventario): {e}")
+        return False
