@@ -6,7 +6,7 @@ import uuid
 from ..ui.windows.busqueda_window import BusquedaWindow
 from ..ui.windows.cobrar_window import CobrarWindow
 from ..ui.utilities.dialogs import ConfirmacionDialog
-# from ..database import database_manager as db
+from ..database import database_manager as db_manager
 
 class VentasLogic:
     """
@@ -22,7 +22,7 @@ class VentasLogic:
         codigo = self.app.ventas_tab.entry_codigo.get()
         if not codigo: return
 
-        # producto_db = db.buscar_producto(codigo)
+        producto_db = db_manager.obtener_producto_por_codigo(codigo)
         producto_db = ("12345", "Producto de Ejemplo", 150.0, 50, 5) # Simulación
 
         if producto_db:

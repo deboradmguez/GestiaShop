@@ -33,7 +33,28 @@ def agregar_producto(conexion, codigo, nombre, precio, stock, umbral):
     cursor.execute("INSERT INTO productos (codigo_barras, nombre, precio, stock, umbral_alerta) VALUES (?, ?, ?, ?, ?)",
                    (codigo, nombre, precio, stock, umbral))
     conexion.commit()
-
+    
+def actualizar_producto(conexion, codigo, nuevo_nombre, nuevo_precio, nuevo_stock):
+    cursor = conexion.cursor()
+    cursor.execute(
+        """
+        UPDATE productos
+        SET nombre = ?, precio = ?, stock = ?
+        WHERE codigo_barras = ?
+        """,
+        (nuevo_nombre, nuevo_precio, nuevo_stock, codigo)
+    )
+    conexion.commit()
+def eliminar_producto(conexion, codigo):
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM productos WHERE codigo_barras = ?", (codigo,))
+    conexion.commit()
+def obtener_productos_para_reponer(conexion):
+    cursor = conexion.cursor()
+    cursor.execute(
+        "SELECT codigo_barras, nombre, stock FROM productos WHERE stock <= umbral_alerta"
+    )
+    return cursor.fetchall()
 def buscar_producto(conexion, codigo):
     cursor = conexion.cursor()
     cursor.execute("SELECT * FROM productos WHERE codigo_barras = ?", (codigo,))
@@ -43,8 +64,49 @@ def actualizar_stock(conexion, codigo, cantidad):
     cursor = conexion.cursor()
     cursor.execute("UPDATE productos SET stock = stock - ? WHERE codigo_barras = ?", (cantidad, codigo))
     conexion.commit()
+def agregar_productos_en_lote(conexion, productos_a_guardar):
+    cursor = conexion.cursor()
+    # executemany es ideal para insertar múltiples filas a la vez
+    cursor.executemany(
+        "INSERT INTO productos (codigo_barras, nombre, precio, stock, umbral_alerta) VALUES (?, ?, ?, ?, ?)",
+        productos_a_guardar
+    )
+    conexion.commit()
+def buscar_productos_por_nombre(conexion, nombre_producto):
+    cursor = conexion.cursor()
+    cursor.execute("SELECT codigo_barras, nombre, precio, stock, umbral_alerta FROM productos WHERE nombre LIKE ?", (f'%{nombre_producto}%',))
+    return cursor.fetchall()
 
-# app_multirrubro.py
+def buscar_productos_filtrados(conexion, filtro_stock, texto_busqueda):
+    cursor = conexion.cursor()
+    
+    # Preparamos los parámetros de búsqueda
+    texto_like = f"%{texto_busqueda}%"
+    
+    # Construimos la consulta base
+    query = """
+        SELECT codigo_barras, nombre, precio, stock, umbral_alerta
+        FROM productos
+    """
+    
+    params = []
+    
+    # Añadimos las condiciones WHERE
+    if filtro_stock == 'bajo':
+        query += " WHERE stock <= umbral_alerta"
+        if texto_busqueda:
+            query += " AND (LOWER(nombre) LIKE ? OR codigo_barras LIKE ?)"
+            params.extend([texto_like, texto_like])
+    else: # 'todos'
+        if texto_busqueda:
+            query += " WHERE LOWER(nombre) LIKE ? OR codigo_barras LIKE ?"
+            params.extend([texto_like, texto_like])
+            
+    query += " ORDER BY nombre"
+    
+    cursor.execute(query, params)
+    return cursor.fetchall()
+
 
 def registrar_venta(conexion, carrito, pago_efectivo, pago_transferencia, referencia):
     """
@@ -100,46 +162,7 @@ def registrar_venta(conexion, carrito, pago_efectivo, pago_transferencia, refere
         conexion.rollback()
         return False
     
-def buscar_productos_por_nombre(conexion, nombre_producto):
-    cursor = conexion.cursor()
-    cursor.execute("SELECT codigo_barras, nombre, precio, stock, umbral_alerta FROM productos WHERE nombre LIKE ?", (f'%{nombre_producto}%',))
-    return cursor.fetchall()
 
-def buscar_productos_filtrados(conexion, filtro_stock, texto_busqueda):
-    """
-    Busca productos combinando un filtro de stock y una búsqueda por texto.
-    
-    filtro_stock: 'todos' o 'bajo'.
-    texto_busqueda: término para buscar en nombre o código.
-    """
-    cursor = conexion.cursor()
-    
-    # Preparamos los parámetros de búsqueda
-    texto_like = f"%{texto_busqueda}%"
-    
-    # Construimos la consulta base
-    query = """
-        SELECT codigo_barras, nombre, precio, stock, umbral_alerta
-        FROM productos
-    """
-    
-    params = []
-    
-    # Añadimos las condiciones WHERE
-    if filtro_stock == 'bajo':
-        query += " WHERE stock <= umbral_alerta"
-        if texto_busqueda:
-            query += " AND (LOWER(nombre) LIKE ? OR codigo_barras LIKE ?)"
-            params.extend([texto_like, texto_like])
-    else: # 'todos'
-        if texto_busqueda:
-            query += " WHERE LOWER(nombre) LIKE ? OR codigo_barras LIKE ?"
-            params.extend([texto_like, texto_like])
-            
-    query += " ORDER BY nombre"
-    
-    cursor.execute(query, params)
-    return cursor.fetchall()
 
 def obtener_cierre_caja_del_dia(conexion, fecha_str):
     cursor = conexion.cursor()

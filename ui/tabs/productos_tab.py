@@ -102,3 +102,4 @@ class ProductosTab(ttk.Frame):
         self.tree_inventario.tag_configure("mensaje_vacio", font=("Segoe UI", 11, "italic"), foreground="grey")
 
         self.tree_inventario.bind("<Double-1>", self.controller.editar_con_doble_click)
+    

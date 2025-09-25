@@ -1,6 +1,6 @@
 from tkinter import Toplevel, ttk
 from ..ui.utilities.dialogs import ConfirmarDialog
-# from ..database import database_manager as db
+from ..database import database_manager as db_manager
 
 class ProductosLogic:
     """
@@ -19,8 +19,7 @@ class ProductosLogic:
         texto_busqueda = self.app.productos_tab.entry_buscar_producto.get().strip()
         tipo_filtro_db = 'bajo' if filtro_seleccionado == "Productos con stock bajo" else 'todos'
 
-        # productos_encontrados = db.buscar_productos_filtrados(tipo_filtro_db, texto_busqueda)
-        productos_encontrados = [("123", "Producto A", 150.0, 20, 5), ("456", "Producto B", 250.0, 3, 5)] # Simulación
+        productos_encontrados = db_manager.obtener_productos_filtrados(tipo_filtro_db, texto_busqueda)
 
         tree = self.app.productos_tab.tree_inventario
         tree.delete(*tree.get_children())
@@ -80,19 +79,19 @@ class ProductosLogic:
                 self.app.notificar_error("El código y el nombre son obligatorios.")
                 return
 
-            # umbral_global = self.app.configuracion.get("umbral_alerta_stock", 5)
-            # exito = db.agregar_producto(codigo, nombre, precio, stock, umbral_global)
-            # if exito:
-            self.app.notificar_exito(f"Producto '{nombre}' agregado correctamente.")
-            ventana.destroy()
-            self.filtrar_productos_y_recargar()
-            # else: 
-            #     self.app.notificar_error("No se pudo agregar el producto.")
+            umbral_global = self.app.configuracion.get("umbral_alerta_stock", 5)
+            exito = db_manager.agregar_producto_nuevo(codigo, nombre, precio, stock, umbral_global)
+            if exito:
+                self.app.notificar_exito(f"Producto '{nombre}' agregado correctamente.")
+                ventana.destroy()
+                self.filtrar_productos_y_recargar()
+            else: 
+                self.app.notificar_error("No se pudo agregar el producto.")
         except (ValueError, TypeError):
             self.app.notificar_error("El precio y el stock deben ser números válidos.")
 
     def modificar_producto(self):
-        """Muestra la ventana emergente para modificar un producto."""
+
         item_seleccionado = self.app.productos_tab.tree_inventario.selection()
         if not item_seleccionado:
             self.app.notificar_alerta("Seleccioná un producto para modificar.")
@@ -100,8 +99,8 @@ class ProductosLogic:
         
         codigo_a_modificar = self.app.productos_tab.tree_inventario.item(item_seleccionado, "values")[0]
         
-        # producto_db = db.buscar_producto(codigo_a_modificar)
-        producto_db = ("123", "Producto A", 150.0, 20, 5) # Simulación
+        producto_db = db_manager.obtener_producto_por_codigo(codigo_a_modificar)
+    
         if not producto_db: 
             self.app.notificar_error("Producto no encontrado en la base de datos.")
             return
@@ -147,13 +146,13 @@ class ProductosLogic:
                 self.app.notificar_error("El nombre del producto no puede estar vacío.")
                 return
 
-            # exito = db.actualizar_producto(codigo, nuevo_nombre, nuevo_precio, nuevo_stock)
-            # if exito:
-            self.app.notificar_exito(f"Producto '{nuevo_nombre}' modificado.")
-            ventana.destroy()
-            self.filtrar_productos_y_recargar()
-            # else:
-            #     self.app.notificar_error("No se pudo actualizar el producto.")
+            exito = db_manager.actualizar_producto_existente(codigo, nuevo_nombre, nuevo_precio, nuevo_stock)
+            if exito:
+                self.app.notificar_exito(f"Producto '{nuevo_nombre}' modificado.")
+                ventana.destroy()
+                self.filtrar_productos_y_recargar()
+            else:
+                self.app.notificar_error("No se pudo actualizar el producto.")
         except (ValueError, TypeError):
             self.app.notificar_error("El precio y el stock deben ser números válidos.")
 
@@ -174,12 +173,12 @@ class ProductosLogic:
         respuesta = dialogo.show()
         
         if respuesta:
-            # exito = db.eliminar_producto(codigo)
-            # if exito:
-            self.app.notificar_exito(f"Producto '{nombre}' eliminado correctamente.")
-            self.filtrar_productos_y_recargar()
-            # else: 
-            #     self.app.notificar_error("No se pudo eliminar el producto.")
+            exito = db_manager.eliminar_producto_existente(codigo)
+            if exito:
+                self.app.notificar_exito(f"Producto '{nombre}' eliminado correctamente.")
+                self.filtrar_productos_y_recargar()
+            else: 
+                self.app.notificar_error("No se pudo eliminar el producto.")
 
     def editar_con_doble_click(self, event):
         """Manejador para el evento de doble clic que inicia la modificación."""
@@ -264,8 +263,7 @@ class ProductosLogic:
             # La lógica es la misma: si la respuesta NO es True, retorna.
         if not respuesta: return
 
-        # agregados, errores = db.agregar_productos_en_lote(productos)
-        agregados, errores = len(productos), [] # Simulación
+        agregados, errores = db_manager.agregar_productos_en_lote(productos)
         
         mensaje_final = f"Se guardaron {agregados} productos con éxito."
         if errores:

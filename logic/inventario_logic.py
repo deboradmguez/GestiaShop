@@ -1,6 +1,5 @@
 import tkinter as tk
-
-# from ..database import database_manager as db # Lo usaremos en el futuro
+from ..database import database_manager as db_manager
 
 class InventarioLogic:
     """
@@ -18,8 +17,7 @@ class InventarioLogic:
             return
 
         # --- Lógica de Base de Datos (simulada por ahora) ---
-        # producto = db.buscar_producto(codigo)
-        producto = ("789", "Producto de Inventario C", 300.0, 15, 5) # Simulación
+        producto = db_manager.obtener_producto_por_codigo(codigo)
         
         if not producto:
             self.app.notificar_error("Producto no encontrado.")

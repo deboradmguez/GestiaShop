@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import Toplevel
+import webbrowser
 from ttkbootstrap import ttk
 from datetime import date
 from ..ui.utilities import notifications
 from ..ui.utilities.dialogs import ConfirmacionDialog
-# from ..database import database_manager as db
+from ..database import database_manager as db_manager
 
 class AppLogic:
     """
@@ -123,10 +124,8 @@ class AppLogic:
         # utils.centrar_ventana(ventana_soporte, self.app)
 
     def actualizar_alertas_stock(self):
-        """Actualiza el botón de alertas de stock en la UI principal."""
-        # Esta función obtendría los productos con stock bajo de la DB
-        # productos = db.obtener_productos_a_reponer()
-        productos = [("123", "Producto A", 2)] # Simulación
+        
+        productos = db_manager.obtener_lista_productos_a_reponer()
         conteo = len(productos)
 
         if conteo > 0 and hasattr(self.app, 'btn_alerta_stock'):
