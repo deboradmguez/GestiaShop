@@ -1,5 +1,6 @@
 import sys, os
-from datetime import datetime
+from datetime import datetime, date
+import tkinter as tk
 
 # --- Constantes para formateo de fecha ---
 DIAS_ES = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
@@ -22,6 +23,8 @@ def ruta_recurso(ruta_relativa):
         ruta_base = os.path.abspath(".")
     return os.path.join(ruta_base, ruta_relativa)
 
+
+
 def formatear_fecha_es(dt: datetime):
     """Formatea un objeto datetime a un string en español."""
     dia_sem = DIAS_ES[dt.weekday()].capitalize()
@@ -29,3 +32,13 @@ def formatear_fecha_es(dt: datetime):
     mes = MESES_ES[dt.month - 1]
     año = dt.year
     return f"{dia_sem}, {dia} de {mes} de {año}"
+def ir_a_hoy_y_recargar(calendario_widget, funcion_recarga):
+    
+    hoy_str = date.today().strftime("%d/%m/%Y")
+    
+    # Actualiza el widget del calendario
+    calendario_widget.entry.delete(0, tk.END)
+    calendario_widget.entry.insert(0, hoy_str)
+    
+    # Llama a la función de recarga específica de la pestaña
+    funcion_recarga()

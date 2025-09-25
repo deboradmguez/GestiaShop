@@ -69,7 +69,7 @@ class CajaTab(ttk.Frame):
         # Botones de Acciones (siempre visibles)
         frame_acciones = ttk.Frame(frame_principal)
         frame_acciones.pack(fill="x", pady=20)
-        self.btn_reporte_caja = ttk.Button(frame_acciones, text="📊 Descargar PDF", style="info.TButton", state="disabled")
+        self.btn_reporte_caja = ttk.Button(frame_acciones, text="📊 Descargar PDF", style="info.TButton", state="disabled", command=self.controller.descargar_reporte_caja)
         self.btn_reporte_caja.pack(side="left")
         self.btn_ajustar_caja = ttk.Button(frame_acciones, text="⚙️ Ajustar Cierre", style="warning.TButton", state="disabled")
         self.btn_ajustar_caja.pack(side="left", padx=10)

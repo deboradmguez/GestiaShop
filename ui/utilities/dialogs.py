@@ -48,3 +48,36 @@ class ConfirmacionDialog(tk.Toplevel):
         self.deiconify()
         self.wait_window(self)
         return self.result
+    
+# ui/utilities/dialogs.py
+
+class PinDialog(tk.Toplevel):
+    # Modificamos el constructor para que acepte el PIN
+    def __init__(self, parent, pin_correcto):
+        super().__init__(parent)
+        self.title("Acceso Restringido")
+        self.transient(parent)
+        self.grab_set()
+        self.result = False
+
+        self.PIN_CORRECTO = str(pin_correcto)
+    def _on_ok(self, event=None):
+        if self.entry_pin.get() == self.PIN_CORRECTO:
+            self.result = True
+            self.destroy()
+        else:
+            # Puedes usar las notificaciones de la app principal si tienes una referencia,
+            # o un simple messagebox para el diálogo.
+            from tkinter import messagebox
+            messagebox.showerror("Error", "PIN incorrecto.", parent=self)
+            self.result = False
+            self.destroy()
+            
+    def _on_cancel(self, event=None):
+        self.result = False
+        self.destroy()
+
+    def show(self):
+        self.deiconify()
+        self.wait_window(self)
+        return self.result

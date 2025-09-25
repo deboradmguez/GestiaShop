@@ -4,7 +4,7 @@ import webbrowser
 from ttkbootstrap import ttk
 from datetime import date
 from ..ui.utilities import notifications
-from ..ui.utilities.dialogs import ConfirmacionDialog
+from ..ui.utilities.dialogs import ConfirmacionDialog, PinDialog
 from ..database import database_manager as db_manager
 
 class AppLogic:
@@ -18,11 +18,9 @@ class AppLogic:
         self.app.usuario_actual = "Modo Consulta"
 
     def manejar_apertura_caja_inicial(self):
-        """
-        Verifica el estado de la caja al iniciar y configura la UI.
-        """
-        # estado, usuario = db.consultar_estado_caja_hoy() # Lógica de DB
-        estado, usuario = "inexistente", None # Simulación
+
+        hoy_db = date.today().strftime("%Y-%m-%d")
+        estado, usuario = db_manager.consultar_estado_caja(hoy_db) 
 
         if estado == 'abierta':
             self.app.modo_venta_activo = True
@@ -40,21 +38,66 @@ class AppLogic:
         self._actualizar_estado_controles_venta()
 
     def dialogo_abrir_caja(self):
-        """
-        Muestra el pop-up para abrir la caja y actualiza el estado de la app.
-        """
-        # Aquí iría la lógica del Toplevel para pedir usuario y fondo inicial.
-        # Al confirmar, se guardaría en la DB y se actualizaría el estado.
-        # usuario_nuevo = ... (obtenido del pop-up)
-        usuario_nuevo = "Admin" # Simulación
+        dialogo = Toplevel(self.app)
+        dialogo.title("Apertura de Caja")
+        dialogo.transient(self.app)
+        dialogo.grab_set()
+        dialogo.resizable(False, False)
 
-        if usuario_nuevo:
-            self.app.modo_venta_activo = True
-            self.app.usuario_actual = usuario_nuevo
-            self.app.header_btn_abrir_caja.pack_forget()
-            self._actualizar_estado_controles_venta()
-            self.app.caja_logic.recargar_vista_caja() # Avisa a la pestaña de caja que recargue
-            self.app.notificar_exito(f"Caja abierta por {usuario_nuevo}.")
+        frame = ttk.Frame(dialogo, padding=20)
+        frame.pack(expand=True, fill="both")
+
+        ttk.Label(frame, text="¿Quién abre la caja hoy?").pack()
+        entry_usuario = ttk.Entry(frame, width=30)
+        entry_usuario.pack(pady=5)
+        entry_usuario.focus()
+
+        ttk.Label(frame, text="¿Con cuánto fondo inicial?").pack()
+        entry_fondo = ttk.Entry(frame, width=30)
+        entry_fondo.pack(pady=5)
+
+        def confirmar_apertura():
+            usuario = entry_usuario.get().strip()
+            fondo_str = entry_fondo.get().strip()
+
+            if not all([usuario, fondo_str]):
+                self.app.notificar_error("Ambos campos son obligatorios.")
+                return
+            
+            try:
+                fondo = float(fondo_str)
+                hoy_db = date.today().strftime("%Y-%m-%d")
+                
+                exito = db_manager.registrar_apertura_caja(hoy_db, fondo, usuario)
+
+                if exito:
+                    self.app.modo_venta_activo = True
+                    self.app.usuario_actual = usuario
+                    self.app.header_btn_abrir_caja.pack_forget()
+                    self._actualizar_estado_controles_venta()
+                    self.app.caja_logic.recargar_vista_caja() # Avisa a la pestaña de caja que recargue
+                    self.app.notificar_exito(f"Caja abierta por {usuario}.")
+                    dialogo.destroy()
+                else:
+                    self.app.notificar_error("No se pudo registrar la apertura de caja.")
+
+            except (ValueError, TypeError):
+                self.app.notificar_error("El fondo inicial debe ser un número válido.")
+
+        btn_confirmar = ttk.Button(frame, text="Confirmar y Empezar", command=confirmar_apertura)
+        btn_confirmar.pack(pady=10)
+        
+        entry_fondo.bind("<Return>", lambda e: btn_confirmar.invoke())
+        dialogo.bind("<Escape>", lambda e: dialogo.destroy())
+    def solicitar_pin_admin(self):
+        
+        pin_guardado = self.app.configuracion.get("pin_admin", "0000") 
+
+        # 2. Crea y muestra el diálogo de PIN
+        dialogo_pin = PinDialog(self.app, pin_guardado)
+        
+        # 3. Devuelve el resultado
+        return dialogo_pin.show()
 
     def _actualizar_estado_controles_venta(self):
         """Activa o desactiva los controles de la pestaña de ventas."""

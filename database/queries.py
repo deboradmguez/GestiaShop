@@ -172,24 +172,57 @@ def anular_venta(conexion, id_transaccion):
     # El commit se manejará desde el database_manager
     return True
 
-def obtener_cierre_caja_del_dia(conexion, fecha_str):
+#CAJA
+
+def obtener_corte_caja_por_fecha(conexion, fecha_db):
     cursor = conexion.cursor()
-    
-    # Hacemos una sola consulta para mayor eficiencia, añadiendo el filtro por estado
+    cursor.execute(
+        "SELECT usuario, contado_final, fondo_inicial, diferencia FROM cortes_caja WHERE fecha = ?",
+        (fecha_db,)
+    )
+    return cursor.fetchone()
+
+def abrir_caja(conexion, fecha_db, fondo_inicial, usuario):
+    cursor = conexion.cursor()
+    cursor.execute(
+        "INSERT INTO cortes_caja (fecha, fondo_inicial, usuario) VALUES (?, ?, ?)",
+        (fecha_db, fondo_inicial, usuario)
+    )
+    conexion.commit()
+def obtener_cierre_caja_del_dia(conexion, fecha_db):
+    cursor = conexion.cursor()
     cursor.execute("""
         SELECT SUM(pago_efectivo), SUM(pago_transferencia) 
         FROM ventas
         WHERE DATE(fecha_hora) = ? AND estado = 'Completada'
-    """, (fecha_str,))
+    """, (fecha_db,))
     
     resultados = cursor.fetchone()
     
-    # Si no hay ventas en esa fecha, los valores serán None, los convertimos a 0.0
+    # Si no hay ventas, los valores serán None, los convertimos a 0.0
     total_efectivo = resultados[0] if resultados and resultados[0] is not None else 0.0
     total_transferencia = resultados[1] if resultados and resultados[1] is not None else 0.0
 
-    # Retornar los resultados en el formato esperado
     return [('Efectivo', total_efectivo), ('Transferencia', total_transferencia)]
+def cerrar_caja(conexion, fecha_db, monto_final, diferencia):
+    cursor = conexion.cursor()
+    cursor.execute("""
+        UPDATE cortes_caja
+        SET contado_final = ?, diferencia = ?
+        WHERE fecha = ?
+    """, (monto_final, diferencia, fecha_db))
+    conexion.commit()
+def ajustar_cierre_de_caja(conexion, fecha_db, monto_corregido, diferencia_corregida):
+    cursor = conexion.cursor()
+    cursor.execute("""
+        UPDATE cortes_caja
+        SET contado_final = ?, diferencia = ?
+        WHERE fecha = ?
+    """, (monto_corregido, diferencia_corregida, fecha_db))
+    conexion.commit()
+
+
+
 
 def obtener_historial_ventas_detallado(conexion, fecha_str):
     cursor = conexion.cursor()

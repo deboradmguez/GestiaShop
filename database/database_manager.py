@@ -112,8 +112,69 @@ def anular_venta_existente(id_transaccion):
         return True
     except sqlite3.Error as e:
         print(f"Error en DB (anular_venta_existente): {e}")
-        return False 
+        return False
+    
+#caja
 
+def consultar_estado_caja(fecha_db):
+    try:
+        with conectar_db() as conn:
+            caja_hoy = queries.obtener_corte_caja_por_fecha(conn, fecha_db)
+
+            if not caja_hoy:
+                return ('inexistente', None)
+
+            usuario, contado_final, fondo_inicial, diferencia = caja_hoy
+            
+            datos_caja = {
+                "usuario": usuario,
+                "fondo_inicial": fondo_inicial,
+                "contado_final": contado_final,
+                "diferencia": diferencia
+            }
+
+            if contado_final is None:
+                return ('abierta', datos_caja)  # La caja está abierta si no tiene monto final
+            else:
+                return ('cerrada', datos_caja)   # La caja ya se cerró
+                
+    except sqlite3.Error as e:
+        print(f"Error en DB (consultar_estado_caja): {e}")
+        return ('error', None) 
+def registrar_apertura_caja(fecha_db, fondo_inicial, usuario):
+    try:
+        with conectar_db() as conn:
+            queries.abrir_caja(conn, fecha_db, fondo_inicial, usuario)
+            return True
+    except sqlite3.Error as e:
+        print(f"Error en DB (registrar_apertura_caja): {e}")
+        return False
+def obtener_resumen_ventas_del_dia(fecha_db):
+    try:
+        with conectar_db() as conn:
+            return queries.obtener_cierre_caja_del_dia(conn, fecha_db)
+    except sqlite3.Error as e:
+        print(f"Error en DB (obtener_resumen_ventas_del_dia): {e}")
+        return [('Efectivo', 0.0), ('Transferencia', 0.0)]
+def registrar_cierre_caja(fecha_db, monto_final, diferencia):
+    try:
+        with conectar_db() as conn:
+            queries.cerrar_caja(conn, fecha_db, monto_final, diferencia)
+            return True
+    except sqlite3.Error as e:
+        print(f"Error en DB (registrar_cierre_caja): {e}")
+        return False
+def registrar_ajuste_caja(fecha_db, monto_corregido, diferencia_corregida):
+    try:
+        with conectar_db() as conn:
+            queries.ajustar_cierre_de_caja(conn, fecha_db, monto_corregido, diferencia_corregida)
+            return True
+    except sqlite3.Error as e:
+        print(f"Error en DB (registrar_ajuste_caja): {e}")
+        return False    
+    
+    
+    
 # Por ejemplo:
 # def agregar_producto_nuevo(datos): ...
 # def registrar_una_venta(carrito, pago_info): ...

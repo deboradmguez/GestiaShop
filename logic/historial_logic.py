@@ -2,6 +2,7 @@ import tkinter as tk
 from datetime import date, datetime
 from ..ui.utilities.dialogs import ConfirmacionDialog
 from ..database import database_manager as db_manager
+from ..ui.utilities import helpers
 # from ..services import report_generator as report # Para generar PDF
 
 class HistorialLogic:
@@ -105,12 +106,11 @@ class HistorialLogic:
             self.app.historial_tab.tree_historial.selection_set('')
             
     def ir_a_hoy_historial(self):
-        """Pone la fecha de hoy en el calendario y recarga la vista."""
-        hoy_str = date.today().strftime("%d/%m/%Y")
-        cal = self.app.historial_tab.cal_fecha_historial
-        cal.entry.delete(0, tk.END)
-        cal.entry.insert(0, hoy_str)
-        self.recargar_historial_ventas()
+        """Pone la fecha de hoy en el calendario de historial y recarga la vista."""
+        helpers.ir_a_hoy_y_recargar(
+            self.app.historial_tab.cal_fecha_historial, # Le pasamos el calendario de historial
+            self.recargar_historial_ventas              # Le pasamos la función de recarga de historial
+        )
 
     def descargar_reporte_historial(self):
         """Genera y abre un reporte en PDF del historial del día seleccionado."""
