@@ -1,6 +1,6 @@
 import tkinter as tk
-from tkinter import messagebox
 from datetime import date, datetime
+from ..ui.utilities.dialogs import ConfirmacionDialog
 
 # from ..database import database_manager as db
 # from ..services import report_generator as report # Para generar PDF
@@ -75,11 +75,18 @@ class HistorialLogic:
         id_transaccion = parent_id if parent_id else item_seleccionado
         
         # Lógica de confirmación y anulación... (simulada)
-        if messagebox.askyesno("Confirmar", f"¿Anular la venta con ID {id_transaccion}?"):
+        dialogo = ConfirmacionDialog(
+            parent=self.app, 
+            title="Confirmar Acción", 
+            message=f"¿Desea anular la venta con ID {id_transaccion}?"
+        )
+        
+        respuesta = dialogo.show()
+        if respuesta:
             print(f"Anulando venta {id_transaccion}...")
             # exito = db.anular_venta(id_transaccion)
             # if exito:
-            messagebox.showinfo("Éxito", "Venta anulada y stock restaurado.", parent=self.app)
+            self.app.notificar_exito("Venta anulada y stock restaurado.")
             self.recargar_historial_ventas()
             # self.app.productos_logic.filtrar_productos_y_recargar() # Notificar a otras lógicas
 
@@ -108,4 +115,4 @@ class HistorialLogic:
         fecha_str = self.app.historial_tab.cal_fecha_historial.entry.get()
         print(f"Generando reporte para la fecha: {fecha_str}...")
         # report.reporte_cierre_caja(fecha_str)
-        messagebox.showinfo("Reporte", f"Reporte PDF para {fecha_str} generado (simulación).", parent=self.app)
+        self.app.notificar_exito(f"Reporte PDF para {fecha_str} generado (simulación).")

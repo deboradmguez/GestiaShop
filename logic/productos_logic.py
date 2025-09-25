@@ -1,6 +1,5 @@
-import tkinter as tk
-from tkinter import Toplevel, ttk, messagebox
-
+from tkinter import Toplevel, ttk
+from ..ui.utilities.dialogs import ConfirmarDialog
 # from ..database import database_manager as db
 
 class ProductosLogic:
@@ -78,25 +77,25 @@ class ProductosLogic:
             stock = int(entries["Stock Inicial"].get())
 
             if not all([codigo, nombre]):
-                messagebox.showerror("Error", "El código y el nombre son obligatorios.", parent=ventana)
+                self.app.notificar_error("El código y el nombre son obligatorios.")
                 return
 
             # umbral_global = self.app.configuracion.get("umbral_alerta_stock", 5)
             # exito = db.agregar_producto(codigo, nombre, precio, stock, umbral_global)
             # if exito:
-            messagebox.showinfo("Éxito", f"Producto '{nombre}' agregado correctamente.", parent=self.app)
+            self.app.notificar_exito(f"Producto '{nombre}' agregado correctamente.")
             ventana.destroy()
             self.filtrar_productos_y_recargar()
             # else: 
-            #     messagebox.showerror("Error de Base de Datos", "No se pudo agregar el producto.", parent=ventana)
+            #     self.app.notificar_error("No se pudo agregar el producto.")
         except (ValueError, TypeError):
-            messagebox.showerror("Error de Formato", "El precio y el stock deben ser números válidos.", parent=ventana)
+            self.app.notificar_error("El precio y el stock deben ser números válidos.")
 
     def modificar_producto(self):
         """Muestra la ventana emergente para modificar un producto."""
         item_seleccionado = self.app.productos_tab.tree_inventario.selection()
         if not item_seleccionado:
-            messagebox.showwarning("Atención", "Seleccioná un producto para modificar.", parent=self.app)
+            self.app.notificar_alerta("Seleccioná un producto para modificar.")
             return
         
         codigo_a_modificar = self.app.productos_tab.tree_inventario.item(item_seleccionado, "values")[0]
@@ -104,7 +103,7 @@ class ProductosLogic:
         # producto_db = db.buscar_producto(codigo_a_modificar)
         producto_db = ("123", "Producto A", 150.0, 20, 5) # Simulación
         if not producto_db: 
-            messagebox.showerror("Error", "Producto no encontrado en la base de datos.", parent=self.app)
+            self.app.notificar_error("Producto no encontrado en la base de datos.")
             return
 
         codigo_barras, nombre, precio, stock, _ = producto_db
@@ -145,36 +144,42 @@ class ProductosLogic:
             nuevo_stock = int(entries["Stock"].get())
 
             if not nuevo_nombre:
-                messagebox.showerror("Error", "El nombre del producto no puede estar vacío.", parent=ventana)
+                self.app.notificar_error("El nombre del producto no puede estar vacío.")
                 return
 
             # exito = db.actualizar_producto(codigo, nuevo_nombre, nuevo_precio, nuevo_stock)
             # if exito:
-            messagebox.showinfo("Éxito", f"Producto '{nuevo_nombre}' modificado.", parent=self.app)
+            self.app.notificar_exito(f"Producto '{nuevo_nombre}' modificado.")
             ventana.destroy()
             self.filtrar_productos_y_recargar()
             # else:
-            #     messagebox.showerror("Error", "No se pudo actualizar el producto.", parent=ventana)
+            #     self.app.notificar_error("No se pudo actualizar el producto.")
         except (ValueError, TypeError):
-            messagebox.showerror("Error de Formato", "El precio y el stock deben ser números válidos.", parent=ventana)
+            self.app.notificar_error("El precio y el stock deben ser números válidos.")
 
     def eliminar_producto(self):
         """Elimina el producto seleccionado previa confirmación."""
         item_seleccionado = self.app.productos_tab.tree_inventario.selection()
         if not item_seleccionado:
-            messagebox.showwarning("Atención", "Seleccioná un producto para eliminar.", parent=self.app)
+            self.app.notificar_error("Seleccioná un producto para eliminar.")
             return
 
         values = self.app.productos_tab.tree_inventario.item(item_seleccionado, "values")
         codigo, nombre = values[0], values[1]
-
-        if messagebox.askyesno("Confirmar Eliminación", f"¿Estás seguro de que querés eliminar '{nombre}'?", parent=self.app):
+        dialogo = ConfirmarDialog(
+            parent=self.app,
+            title="Confirmar Eliminación",
+            message=f"¿Estás seguro de que querés eliminar '{nombre}'?"
+        )
+        respuesta = dialogo.show()
+        
+        if respuesta:
             # exito = db.eliminar_producto(codigo)
             # if exito:
-            messagebox.showinfo("Éxito", f"Producto '{nombre}' eliminado correctamente.", parent=self.app)
+            self.app.notificar_exito(f"Producto '{nombre}' eliminado correctamente.")
             self.filtrar_productos_y_recargar()
             # else: 
-            #     messagebox.showerror("Error", "No se pudo eliminar el producto.", parent=self.app)
+            #     self.app.notificar_error("No se pudo eliminar el producto.")
 
     def editar_con_doble_click(self, event):
         """Manejador para el evento de doble clic que inicia la modificación."""
@@ -216,7 +221,7 @@ class ProductosLogic:
             stock_str = campos_entries["Stock Inicial"].get().strip()
 
             if not all([codigo, nombre, precio_str, stock_str]):
-                messagebox.showerror("Error", "Todos los campos son obligatorios.", parent=ventana_carga)
+                self.app.notificar_error("Todos los campos son obligatorios.")
                 return
             try:
                 precio = float(precio_str)
@@ -229,7 +234,7 @@ class ProductosLogic:
                 lbl_contador.config(text=f"Productos en lista: {len(productos_a_guardar)}")
                 campos_entries["Código de Barras"].focus_set()
             except ValueError:
-                messagebox.showerror("Error de Formato", "El precio y el stock deben ser números válidos.", parent=ventana_carga)
+                self.app.notificar_error("El precio y el stock deben ser números válidos.")
 
         frame_botones = ttk.Frame(frame_principal)
         frame_botones.grid(row=len(campos_entries) + 1, column=0, columnspan=2, pady=20)
@@ -246,20 +251,27 @@ class ProductosLogic:
     def _finalizar_y_guardar_carga_rapida(self, productos, ventana):
         """Guarda la lista de productos de la carga rápida en la base de datos."""
         if not productos:
-            messagebox.showwarning("Atención", "No hay productos en la lista para guardar.", parent=ventana)
+            self.app.notificar_alerta("No hay productos en la lista para guardar.")
             return
 
-        if not messagebox.askyesno("Confirmar Guardado", f"¿Desea guardar {len(productos)} productos en la base de datos?", parent=ventana):
-            return
+        dialogo = ConfirmarDialog(
+                parent=ventana, # Es importante que el diálogo sea "hijo" de la ventana de carga
+                title="Confirmar Guardado",
+                message=f"¿Desea guardar {len(productos)} productos en la base de datos?"
+            )
+        respuesta = dialogo.show()
+
+            # La lógica es la misma: si la respuesta NO es True, retorna.
+        if not respuesta: return
 
         # agregados, errores = db.agregar_productos_en_lote(productos)
         agregados, errores = len(productos), [] # Simulación
         
         mensaje_final = f"Se guardaron {agregados} productos con éxito."
         if errores:
-            messagebox.showwarning("Proceso con Errores", f"{mensaje_final}\n\nNo se pudieron agregar {len(errores)} productos.", parent=ventana)
+            self.app.notificar_alerta(f"{mensaje_final}\n\nNo se pudieron agregar {len(errores)} productos.")
         else:
-            messagebox.showinfo("Éxito", mensaje_final, parent=self.app)
+            self.app.notificar_exito("Éxito", mensaje_final)
         
         ventana.destroy()
         self.filtrar_productos_y_recargar()

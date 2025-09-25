@@ -23,8 +23,7 @@ from ..logic.estadisticas_logic import EstadisticasLogic
 from ..logic.configuracion_logic import ConfigLogic
 
 # --- Utilidades ---
-# Aquí importaríamos las funciones de ayuda, pero como ruta_recurso es simple,
-# la podemos mantener como un método por ahora.
+from ..logic.helpers import ruta_recurso
 
 class App(Window):
     """
@@ -57,6 +56,7 @@ class App(Window):
         self._crear_header()
         self._crear_notebook()
         self._crear_footer()
+        self._crear_widget_notificaciones()
         
         # --- Procesos de Inicio y Bindings ---
         self._iniciar_procesos_de_fondo()
@@ -67,6 +67,7 @@ class App(Window):
         """Configura los atributos principales de la ventana."""
         self.title("GestiaShop - Sistema de Gestión")
         self.attributes("-fullscreen", True)
+        self.iconphoto(True, tk.PhotoImage(file=ruta_recurso('icons/icono_app.png')))
 
     def _crear_header(self):
         """Crea el encabezado de la aplicación con nombre, fecha y hora."""
@@ -100,7 +101,9 @@ class App(Window):
         self.btn_soporte = ttk.Button(self, text="⛑️ Ayuda", command=self.mostrar_soporte)
         self.btn_soporte.place(relx=0.0, rely=1.0, x=10, y=-10, anchor="sw")
         self.btn_alerta_stock = ttk.Button(self, text="⚠ Alertas") # La lógica de app_logic lo gestionará
-
+    def _crear_widget_notificaciones(self):
+        """Crea la etiqueta que se usará para todas las notificaciones."""
+        self.lbl_notificacion = ttk.Label(self, text="", font=("Segoe UI", 12), padding=10)
     def _iniciar_procesos_de_fondo(self):
         """Inicia tareas recurrentes y la configuración inicial de la UI."""
         self.actualizar_titulo_app()
@@ -128,7 +131,7 @@ class App(Window):
         """Actualiza el reloj y la fecha del encabezado cada minuto."""
         ahora = datetime.now()
         self.lbl_hora.config(text=ahora.strftime("%H:%M"))
-        self.lbl_fecha.config(text=ahora.strftime("%A, %d de %B de %Y").capitalize())
+        self.lbl_fecha.config(text=self.app_logic.formatear_fecha_es(ahora))
         self.after(60000, self.actualizar_fecha_hora)
     
     def actualizar_titulo_app(self):
@@ -149,7 +152,7 @@ class App(Window):
     def abrir_caja(self): self.app_logic.dialogo_abrir_caja()
     def cerrar_app(self): self.app_logic.cerrar_aplicacion_seguro()
     def mostrar_soporte(self): self.app_logic.mostrar_ventana_soporte()
-    def ruta_recurso(self, path): return path # Simulación por ahora
+    def ruta_recurso(self, path): return ruta_recurso(path)
 
     # -- Delegados de Ventas --
     def buscar_y_agregar_a_carrito(self): self.ventas_logic.buscar_y_agregar_a_carrito()
@@ -198,3 +201,12 @@ class App(Window):
     def aplicar_y_guardar_config(self, v): self.config_logic.aplicar_y_guardar_config(v)
     def restaurar_config_default(self): return self.config_logic.restaurar_config_default()
 
+    # -- Delegados de App --
+    def notificar_exito(self, texto):
+        self.app_logic.notificar_exito(texto)
+        
+    def notificar_alerta(self, texto):
+        self.app_logic.notificar_alerta(texto)
+        
+    def notificar_error(self, texto):
+        self.app_logic.notificar_error(texto)

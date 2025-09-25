@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 
 # from ..database import database_manager as db # Lo usaremos en el futuro
 
@@ -23,7 +22,7 @@ class InventarioLogic:
         producto = ("789", "Producto de Inventario C", 300.0, 15, 5) # Simulación
         
         if not producto:
-            messagebox.showerror("Error", "Producto no encontrado.", parent=self.app)
+            self.app.notificar_error("Producto no encontrado.")
             self._limpiar_campos()
             return
         
@@ -61,7 +60,7 @@ class InventarioLogic:
             nuevo_precio = float(entries["precio_edit"].get())
             stock_a_agregar = int(entries["stock_agregar"].get() or "0")
         except (ValueError, TypeError):
-            messagebox.showerror("Error de Formato", "El precio y el stock a agregar deben ser números válidos.", parent=self.app)
+            self.app.notificar_error("El precio y el stock a agregar deben ser números válidos.")
             return
 
         # --- Lógica de Negocio ---
@@ -73,7 +72,7 @@ class InventarioLogic:
         )
 
         if not hubo_cambios:
-            messagebox.showinfo("Información", "No se detectaron cambios.", parent=self.app)
+            self.app.notificar_alerta("No se detectaron cambios.")
             self._limpiar_campos()
             return
 
@@ -83,12 +82,12 @@ class InventarioLogic:
         # --- Lógica de Base de Datos (simulada) ---
         # exito = db.actualizar_producto_inventario(codigo, nuevo_nombre, nuevo_precio, stock_a_agregar)
         # if exito:
-        messagebox.showinfo("Éxito", "Producto actualizado correctamente.", parent=self.app)
+        self.app.notificar_exito("Producto actualizado correctamente.")
         self._limpiar_campos()
         # Avisamos al controlador de productos que sus datos pueden haber cambiado
         self.app.productos_logic.filtrar_productos_y_recargar()
         # else:
-        #     messagebox.showerror("Error", "No se pudo actualizar el producto.", parent=self.app)
+        #      self.app.notificar_error("No se pudo actualizar el producto.")
         
     def _limpiar_campos(self):
         """Limpia todos los campos de la pestaña y resetea el estado."""

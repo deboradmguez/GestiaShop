@@ -1,10 +1,11 @@
 import tkinter as tk
-from tkinter import Toplevel, ttk, messagebox
+from tkinter import Toplevel, ttk
 import uuid
 
 # Importamos las ventanas emergentes que son parte de la UI de esta lógica
 from ..ui.windows.busqueda_window import BusquedaWindow
 from ..ui.windows.cobrar_window import CobrarWindow
+from ..ui.utilities.dialogs import ConfirmacionDialog
 # from ..database import database_manager as db
 
 class VentasLogic:
@@ -28,13 +29,13 @@ class VentasLogic:
             codigo_barras, nombre, precio, stock_total, _ = producto_db
             stock_en_carrito = self.app.carrito.get(codigo_barras, {}).get("cantidad", 0)
             if stock_total - stock_en_carrito <= 0:
-                messagebox.showwarning("Stock Insuficiente", f"No hay más stock disponible para '{nombre}'.", parent=self.app)
+                self.app.notificar_alerta(f"No hay más stock disponible para '{nombre}'.", parent=self.app)
                 self.app.ventas_tab.entry_codigo.delete(0, 'end')
                 return
             self._agregar_a_carrito((codigo_barras, nombre, precio, 1), stock_total)
             self.app.ventas_tab.entry_codigo.delete(0, 'end')
         else:
-            messagebox.showinfo("Información", "Producto no encontrado.", parent=self.app)
+            self.app.notificar_alerta("Producto no encontrado.")
             self.app.ventas_tab.entry_codigo.delete(0, 'end')
 
     def _agregar_a_carrito(self, producto, stock_info=None):
@@ -53,10 +54,22 @@ class VentasLogic:
 
     def vaciar_carrito(self):
         """Limpia todos los productos del carrito previa confirmación."""
-        if self.app.carrito and messagebox.askyesno("Confirmar", "¿Desea vaciar el carrito por completo?", parent=self.app):
+        if not self.app.carrito: return
+        
+        dialogo = ConfirmacionDialog(
+            parent=self.app, 
+            title="Confirmar Acción", 
+            message="¿Desea vaciar el carrito por completo?"
+        )
+        
+        # 3. Mostramos el diálogo y esperamos la respuesta
+        respuesta = dialogo.show()
+
+        if respuesta:
             self.app.carrito.clear()
             self._recalcular_total_carrito()
             self.app.ventas_tab.actualizar_vista(self.app.carrito, self.app.total_venta)
+            self.app.notificar_exito("Carrito vaciado")
     
     def quitar_producto_del_carrito(self):
         """Quita el producto seleccionado en la tabla del carrito."""
@@ -118,10 +131,10 @@ class VentasLogic:
         try:
             nueva_cantidad = int(entry.get().strip())
             if nueva_cantidad <= 0:
-                messagebox.showwarning("Atención", "La cantidad debe ser mayor a cero.", parent=ventana)
+                self.app.notificar_alerta("La cantidad debe ser mayor a cero.")
                 return
             if stock_disponible is not None and nueva_cantidad > stock_disponible:
-                messagebox.showwarning("Stock Insuficiente", f"El stock máximo es {stock_disponible}.", parent=ventana)
+                self.app.notificar_alerta(f"Stock Insuficiente. El stock máximo es {stock_disponible}.", parent=ventana)
                 return
 
             self.app.carrito[codigo]["cantidad"] = nueva_cantidad
@@ -129,7 +142,7 @@ class VentasLogic:
             self.app.ventas_tab.actualizar_vista(self.app.carrito, self.app.total_venta)
             ventana.destroy()
         except ValueError:
-            messagebox.showerror("Error", "La cantidad debe ser un número válido.", parent=ventana)
+            self.app.notificar_error("La cantidad debe ser un número válido.")
 
     def mostrar_ventana_busqueda(self):
         """Muestra la ventana de búsqueda de productos por nombre."""
@@ -171,21 +184,21 @@ class VentasLogic:
             precio = float(entries["Precio"].get())
             cantidad = int(entries["Cantidad"].get())
             if not nombre or precio <= 0 or cantidad <= 0:
-                messagebox.showwarning("Atención", "Todos los campos son obligatorios y los números deben ser positivos.", parent=ventana)
+                self.app.notificar_alerta("Todos los campos son obligatorios y los números deben ser positivos.")
                 return
 
             codigo_comun = f"PROD_COMUN-{uuid.uuid4()}"
             self._agregar_a_carrito((codigo_comun, nombre, precio, cantidad), None)
             ventana.destroy()
         except (ValueError, TypeError):
-             messagebox.showerror("Error", "Precio y cantidad deben ser números válidos.", parent=ventana)
+            self.app.notificar_error("Precio y cantidad deben ser números válidos.")
 
     # --- LÓGICA DE FINALIZACIÓN DE VENTA ---
 
     def mostrar_ventana_cobrar(self):
         """Valida y muestra la ventana de cobro."""
         if not self.app.carrito:
-            messagebox.showwarning("Atención", "El carrito está vacío.", parent=self.app)
+            self.app.notificar_alerta("El carrito está vacío.")
             return
         CobrarWindow(parent=self.app, controller=self.app, total_a_cobrar=self.app.total_venta)
 
@@ -212,9 +225,9 @@ class VentasLogic:
             # if hasattr(self.app, 'historial_logic'):
             #     self.app.historial_logic.recargar_historial()
             
-            messagebox.showinfo("Éxito", "Venta realizada correctamente.", parent=self.app)
+            self.app.notificar_exito("Venta realizada correctamente.")
             return True
         else:
-            messagebox.showerror("Error", "No se pudo registrar la venta.", parent=self.app)
+            self.app.notificar_error("No se pudo registrar la venta.")
             return False
 

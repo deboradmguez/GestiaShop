@@ -1,5 +1,3 @@
-import tkinter as tk
-from tkinter import messagebox, Toplevel
 from ttkbootstrap import ttk
 from datetime import datetime
 from matplotlib.figure import Figure
@@ -29,10 +27,10 @@ class EstadisticasLogic:
             fecha_inicio = datetime.strptime(fecha_inicio_str, "%d/%m/%Y")
             fecha_fin = datetime.strptime(fecha_fin_str, "%d/%m/%Y")
             if fecha_inicio > fecha_fin:
-                messagebox.showerror("Error de Fechas", "La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.", parent=self.app)
+                self.app.notificar_error("La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.")
                 return
         except ValueError:
-            messagebox.showerror("Error de Formato", "Por favor, ingrese fechas válidas.", parent=self.app)
+            self.app.notificar_error("Error de Formato", "Por favor, ingrese fechas válidas.")
             return
 
         # --- Lógica de Base de Datos (simulada) ---
@@ -87,7 +85,7 @@ class EstadisticasLogic:
     def descargar_reporte_estadisticas(self):
         """Genera y guarda un PDF con los últimos datos generados."""
         if not self.ultimos_datos_generados:
-            messagebox.showwarning("Sin Datos", "Primero debe generar un reporte.", parent=self.app)
+            self.app.notificar_error("Primero debe generar un reporte.")
             return
             
         # Desempaquetamos los datos guardados
@@ -95,4 +93,4 @@ class EstadisticasLogic:
         
         print(f"Generando reporte PDF desde {fecha_inicio} hasta {fecha_fin}...")
         # report_generator.generar_reporte_estadisticas_pdf(fecha_inicio, fecha_fin, resumen, top_productos)
-        messagebox.showinfo("Éxito", "Reporte de estadísticas generado (simulación).", parent=self.app)
+        self.app.notificar_exito("Reporte de estadísticas generado (simulación).")

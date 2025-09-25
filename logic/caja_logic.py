@@ -1,7 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox, Toplevel
-from ttkbootstrap import ttk
-from datetime import date, datetime
+from datetime import date
 
 # from ..database import database_manager as db
 
@@ -70,7 +68,7 @@ class CajaLogic:
         monto_str = self.app.caja_tab.entry_monto_final.get()
         # ... (Validaciones, cálculos, llamada a la DB) ...
         print(f"Procesando cierre para {fecha_str} con monto {monto_str}")
-        messagebox.showinfo("Éxito", "Cierre de caja procesado (simulación).", parent=self.app)
+        self.app.notificar_exito("Cierre de caja procesado (simulación).")
         self.recargar_vista_caja()
 
     def ajustar_cierre_de_caja(self, fecha_str):

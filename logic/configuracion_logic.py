@@ -1,7 +1,5 @@
-import tkinter as tk
-from tkinter import messagebox
-import sys
-import os
+import sys, os
+from ..ui.utilities.dialogs import ConfirmacionDialog
 
 # from ..database import config_manager_db as db  # Usaremos un manager de DB específico para config
 
@@ -35,29 +33,43 @@ class ConfigLogic:
             # --- Lógica de Negocio ---
             # Comparamos si un valor clave (como el tema) ha cambiado
             if config_anterior.get("tema") != nuevos_valores.get("tema"):
-                if messagebox.askyesno("Reinicio Necesario", "Para aplicar el nuevo tema, es necesario reiniciar la aplicación.\n¿Desea reiniciar ahora?", parent=self.app):
+                
+                dialogo = ConfirmacionDialog(
+                parent=self.app,
+                title="Reinicio necesario",
+                message="Para aplicar el nuevo tema, es necesario reiniciar la aplicación.\n¿Desea reiniciar ahora?")
+                
+                respuesta = dialogo.show()
+                if respuesta:
                     self._reiniciar_aplicacion()
                 else:
-                    messagebox.showinfo("Información", "El nuevo tema se aplicará la próxima vez que inicie el programa.", parent=self.app)
+                    self.app.notificar_alerta("El nuevo tema se aplicará la próxima vez que inicie el programa.")
             else:
-                messagebox.showinfo("Éxito", "Configuración guardada correctamente.", parent=self.app)
+                self.app.notificar_exito("Configuración guardada correctamente.")
                 # Si otros valores cambiaron, podríamos necesitar actualizar otras partes de la UI
                 # self.app.actualizar_titulo_app()
                 # self.app.actualizar_alertas_stock()
         else:
-            messagebox.showerror("Error", "No se pudo guardar la configuración en la base de datos.", parent=self.app)
+            self.app.notificar_error("No se pudo guardar la configuración.")
 
     def restaurar_config_default(self):
         """Restaura la configuración a los valores por defecto."""
-        if messagebox.askyesno("Confirmar", "¿Está seguro de que desea restaurar todos los ajustes a sus valores por defecto?", parent=self.app):
+        
+        dialogo = ConfirmacionDialog(
+            parent=self.app,
+            title="Confirmar cambios",
+            message="¿Está seguro de que desea restaurar todos los ajustes a sus valores por defecto?")
+        
+        respuesta = dialogo.show()
+        if respuesta:
             # exito = db.restaurar_configuracion_default()
             exito = True # Simulación
             if exito:
                 # self.app.configuracion = db.cargar_configuracion() # Recargamos
-                messagebox.showinfo("Éxito", "La configuración ha sido restaurada.", parent=self.app)
+                self.app.notificar_exito("La configuración ha sido restaurada.")
                 return True
             else:
-                messagebox.showerror("Error", "No se pudo restaurar la configuración.", parent=self.app)
+                self.app.notificar_error("No se pudo restaurar la configuración.")
                 return False
         return False
 

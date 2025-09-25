@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import messagebox, Toplevel
+from tkinter import Toplevel
 from ttkbootstrap import ttk
 from datetime import date
-
+from ..ui.utilities import notifications
+from ..ui.utilities.dialogs import ConfirmacionDialog
 # from ..database import database_manager as db
 
 class AppLogic:
@@ -52,7 +53,7 @@ class AppLogic:
             self.app.header_btn_abrir_caja.pack_forget()
             self._actualizar_estado_controles_venta()
             self.app.caja_logic.recargar_vista_caja() # Avisa a la pestaña de caja que recargue
-            messagebox.showinfo("Éxito", f"Caja abierta por {usuario_nuevo}.")
+            self.app.notificar_exito(f"Caja abierta por {usuario_nuevo}.")
 
     def _actualizar_estado_controles_venta(self):
         """Activa o desactiva los controles de la pestaña de ventas."""
@@ -69,7 +70,15 @@ class AppLogic:
         # caja_abierta = db.verificar_caja_abierta() # Lógica de DB real
         caja_abierta_simulacion = True # Simulación
         if caja_abierta_simulacion and self.app.modo_venta_activo:
-            if messagebox.askyesno("Confirmar Cierre", "La caja del día aún está abierta. ¿Desea cerrar de todos modos?", parent=self.app):
+            
+            dialogo = ConfirmacionDialog(
+                parent=self.app,
+                title="Confirmar Cierre",
+                message="La caja del día aún está abierta.\n¿Desea cerrar de todos modos?"
+            )
+            
+            respuesta = dialogo.show()
+            if respuesta:
                 self.app.destroy()
         else:
             self.app.destroy()
@@ -125,3 +134,14 @@ class AppLogic:
             self.app.btn_alerta_stock.place(relx=1.0, rely=0, x=-5, y=-5, anchor="ne")
         elif hasattr(self.app, 'btn_alerta_stock'):
             self.app.btn_alerta_stock.place_forget()
+    
+    #notificaciones
+    
+    def notificar_exito(self, texto):
+        notifications.mostrar_mensaje_exito(self.app.lbl_notificacion, texto)
+
+    def notificar_alerta(self, texto):
+        notifications.mostrar_mensaje_alerta(self.app.lbl_notificacion, texto)
+
+    def notificar_error(self, texto):
+        notifications.mostrar_mensaje_error(self.app.lbl_notificacion, texto)
