@@ -3,10 +3,6 @@ from tkinter import ttk
 from ttkbootstrap.widgets import DateEntry
 
 class CajaTab(ttk.Frame):
-    """
-    Clase que representa la INTERFAZ de la pestaña 'Caja'.
-    Define todos los widgets pero no contiene lógica de estado.
-    """
     def __init__(self, parent, controller):
         super().__init__(parent, padding=20)
         self.controller = controller

@@ -117,7 +117,7 @@ class App(Window):
         self.app_logic.actualizar_alertas_stock()
         self.historial_logic.recargar_historial_ventas()
         self.productos_logic.filtrar_productos_y_recargar()
-
+        self.caja_logic.recargar_vista_caja()
     def _configurar_locale(self):
         """Configura el idioma para fechas y formatos."""
         try: locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')

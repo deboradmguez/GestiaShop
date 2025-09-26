@@ -111,7 +111,8 @@ class AppLogic:
     
     def cerrar_aplicacion_seguro(self):
         """Verifica el estado de la caja antes de cerrar."""
-        caja_abierta = db_manager.consultar_estado_caja() # Lógica de DB real
+        hoy_db = date.today().strftime("%Y-%m-%d")
+        caja_abierta, _ = db_manager.consultar_estado_caja(hoy_db) # Lógica de DB real
         if caja_abierta and self.app.modo_venta_activo:
             
             dialogo = ConfirmacionDialog(
