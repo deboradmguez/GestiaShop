@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from utilities import helpers
+
 class CobrarWindow(tk.Toplevel):
     """
     Clase que representa la ventana emergente para el proceso de cobro.
@@ -28,32 +29,26 @@ class CobrarWindow(tk.Toplevel):
         self._configurar_bindings()
         self._actualizar_inputs_metodo()
         helpers.centrar_ventana(self, parent)
-        
-
 
     def _crear_widgets(self):
         """Crea la estructura de widgets de la ventana."""
-        # Frame del total
         frame_total = ttk.LabelFrame(self, text="Total a Cobrar", padding=10)
         frame_total.pack(padx=10, pady=10, fill="x")
         ttk.Label(frame_total, text=f"${self.total_a_cobrar:,.2f}", font=("Segoe UI", 16, "bold")).pack()
 
-        # Frame para los métodos de pago (Radios)
         frame_metodos = ttk.Frame(self)
         frame_metodos.pack(pady=(0, 5))
-        opciones_metodo = ["Efectivo", "Transferencia", "Mixto"]
-        for op in opciones_metodo:
+        self.opciones_metodo = ["Efectivo", "Transferencia", "Mixto"]
+        for op in self.opciones_metodo:
             radio = ttk.Radiobutton(
                 frame_metodos, text=op, variable=self.metodo_pago, value=op,
                 command=self._actualizar_inputs_metodo
             )
             radio.pack(side="left", padx=5)
 
-        # Frame dinámico para las entradas de texto
         self.frame_inputs = ttk.LabelFrame(self, text="Detalles de Pago", padding=10)
         self.frame_inputs.pack(padx=10, pady=5, fill="both", expand=True)
 
-        # Frame para el botón de finalizar
         frame_finalizar = ttk.Frame(self)
         frame_finalizar.pack(pady=20)
         self.btn_finalizar = ttk.Button(
@@ -66,6 +61,18 @@ class CobrarWindow(tk.Toplevel):
         """Configura los atajos de teclado para la ventana."""
         self.bind("<Escape>", lambda e: self.destroy())
         self.bind("<Return>", lambda e: self._on_finalizar_venta())
+        self.bind("<Left>", self._navegar_metodos_pago)
+        self.bind("<Right>", self._navegar_metodos_pago)
+
+    def _navegar_metodos_pago(self, event):
+        """Permite cambiar de método de pago con las flechas."""
+        indice_actual = self.opciones_metodo.index(self.metodo_pago.get())
+        if event.keysym == "Right":
+            nuevo_indice = (indice_actual + 1) % len(self.opciones_metodo)
+        else: # Left
+            nuevo_indice = (indice_actual - 1 + len(self.opciones_metodo)) % len(self.opciones_metodo)
+        self.metodo_pago.set(self.opciones_metodo[nuevo_indice])
+        self._actualizar_inputs_metodo()
 
     def _actualizar_inputs_metodo(self, *args):
         """Limpia y redibuja las entradas de texto según el método de pago."""
@@ -77,9 +84,14 @@ class CobrarWindow(tk.Toplevel):
         if metodo == "Efectivo":
             ttk.Label(self.frame_inputs, text="Monto Recibido:").pack(anchor="w")
             self.monto_efectivo_entry = ttk.Entry(self.frame_inputs, font=("Segoe UI", 16))
-            self.monto_efectivo_entry.pack(fill="x", pady=(0, 10))
+            self.monto_efectivo_entry.pack(fill="x", pady=(0, 5))
             self.monto_efectivo_entry.focus_set()
             self.monto_efectivo_entry.insert(0, f"{self.total_a_cobrar:.2f}")
+
+            self.label_vuelto = ttk.Label(self.frame_inputs, text="Vuelto: $0.00", font=("Segoe UI", 12, "bold"))
+            self.label_vuelto.pack(fill="x", pady=5)
+            self.monto_efectivo_entry.bind("<KeyRelease>", self._calcular_vuelto)
+            self._calcular_vuelto()
 
         elif metodo == "Transferencia":
             ttk.Label(self.frame_inputs, text="Referencia (opcional):").pack(anchor="w")
@@ -97,18 +109,49 @@ class CobrarWindow(tk.Toplevel):
             self.monto_transferencia_entry = ttk.Entry(self.frame_inputs, font=("Segoe UI", 16))
             self.monto_transferencia_entry.pack(fill="x")
 
+            self.monto_efectivo_entry.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(self.monto_efectivo_entry, self.monto_transferencia_entry))
+            self.monto_transferencia_entry.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(self.monto_transferencia_entry, self.monto_efectivo_entry))
+
+    def _calcular_vuelto(self, event=None):
+        """Calcula y muestra el vuelto para el pago en efectivo."""
+        try:
+            monto_recibido = float(self.monto_efectivo_entry.get())
+            vuelto = monto_recibido - self.total_a_cobrar
+            if vuelto >= 0:
+                self.label_vuelto.config(text=f"Vuelto: ${vuelto:,.2f}", foreground="")
+            else:
+                self.label_vuelto.config(text=f"Falta: ${abs(vuelto):,.2f}", foreground="red")
+        except (ValueError, TypeError):
+            self.label_vuelto.config(text="Monto inválido", foreground="red")
+
+    def _calcular_monto_restante(self, entry_activa, entry_pasiva):
+        """Calcula automáticamente el monto faltante en el pago mixto."""
+        try:
+            monto_ingresado = float(entry_activa.get() or 0)
+            monto_restante = self.total_a_cobrar - monto_ingresado
+            
+            # Desvincula temporalmente para evitar bucles
+            entry_pasiva.unbind("<KeyRelease>")
+            entry_pasiva.delete(0, tk.END)
+
+            if monto_restante > 0:
+                entry_pasiva.insert(0, f"{monto_restante:.2f}")
+            else:
+                entry_pasiva.insert(0, "0.00")
+            # Vuelve a vincular
+            entry_pasiva.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(entry_pasiva, entry_activa))
+
+        except (ValueError, TypeError):
+            entry_pasiva.delete(0, tk.END)
+
     def _on_finalizar_venta(self):
-        """
-        Recolecta los datos de la UI y los envía al controlador para ser procesados.
-        """
+        """Recolecta los datos de la UI y los envía al controlador."""
         payment_data = {"metodo": self.metodo_pago.get()}
-        
         try:
             if payment_data["metodo"] == "Efectivo":
                 pago_recibido = float(self.monto_efectivo_entry.get())
                 if pago_recibido < self.total_a_cobrar:
-                    # self.controller.mostrar_mensaje_error(...)
-                    print("El pago es insuficiente.")
+                    self.controller.notificar_error("El pago es insuficiente.")
                     return
                 payment_data["pago_efectivo"] = self.total_a_cobrar
 
@@ -120,19 +163,14 @@ class CobrarWindow(tk.Toplevel):
                 pago_efectivo = float(self.monto_efectivo_entry.get() or 0)
                 pago_transferencia = float(self.monto_transferencia_entry.get() or 0)
                 if (pago_efectivo + pago_transferencia) < self.total_a_cobrar:
-                    # self.controller.mostrar_mensaje_error(...)
-                    print("El pago mixto es insuficiente.")
+                    self.controller.notificar_error("El pago mixto es insuficiente.")
                     return
                 payment_data["pago_efectivo"] = pago_efectivo
                 payment_data["pago_transferencia"] = pago_transferencia
-
-            # Llama al método del controlador para procesar la venta
+                
             venta_exitosa = self.controller.finalizar_venta(payment_data)
             
-            # Si la venta fue exitosa, la ventana se cierra.
             if venta_exitosa:
                 self.destroy()
-
         except (ValueError, TypeError):
-            # self.controller.mostrar_mensaje_error(...)
-            print("Monto inválido.")
+            self.controller.notificar_error("Monto inválido.")
