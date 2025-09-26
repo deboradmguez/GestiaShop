@@ -28,15 +28,14 @@ from utilities.helpers import ruta_recurso
 
 
 class App(Window):
-    """
-    Clase principal de la aplicación. Actúa como el orquestador general.
-    Construye la UI principal y delega toda la lógica a los controladores
-    especializados.
-    """
-    def __init__(self, config):
+    
+    def __init__(self, config, single_instance_lock=None):
         self.configuracion = config
         super().__init__(themename=self.configuracion.get("tema", "superhero"))
-        
+        self.single_instance_lock = single_instance_lock
+        style = ttk.Style()
+        style.configure("Custom.Treeview", font=("Segoe UI", 11), rowheight=30) 
+        style.configure("Custom.Treeview.Heading", font=("Segoe UI", 12, "bold"))
         self._configurar_ventana()
         self._configurar_locale()
 
@@ -125,8 +124,15 @@ class App(Window):
     def _configurar_bindings_globales(self):
         """Configura los atajos de teclado de toda la aplicación."""
         self.notebook.bind("<<NotebookTabChanged>>", self._on_tab_change)
-        # Aquí puedes añadir los bindings F1, F2, etc. si lo deseas
-        # self.bind("<F1>", lambda e: self.notebook.select(self.ventas_tab))
+        
+        self.bind("<F1>", lambda e: self.notebook.select(0))
+        self.bind("<F2>", lambda e: self.notebook.select(1))
+        self.bind("<F3>", lambda e: self.notebook.select(2))
+        self.bind("<F4>", lambda e: self.notebook.select(3))
+        self.bind("<F5>", lambda e: self.notebook.select(4))
+        self.bind("<F6>", lambda e: self.notebook.select(5))
+        self.bind("<F7>", lambda e: self.notebook.select(6))
+        self.bind("<Escape>", lambda e: self.attributes("-fullscreen", False))
     
     # --- MÉTODOS DE ACTUALIZACIÓN DE UI PRINCIPAL ---
     def actualizar_fecha_hora(self):

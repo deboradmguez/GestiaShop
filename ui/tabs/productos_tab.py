@@ -85,7 +85,7 @@ class ProductosTab(ttk.Frame):
     def _crear_tabla_de_inventario(self):
         """Crea la tabla (Treeview) para mostrar el listado de productos."""
         self.tree_inventario = ttk.Treeview(
-            self, columns=("codigo", "nombre", "precio", "stock"), show="headings"
+            self, columns=("codigo", "nombre", "precio", "stock"), show="headings", style="Custom.Treeview"
         )
         self.tree_inventario.heading("codigo", text="Código")
         self.tree_inventario.heading("nombre", text="Nombre")

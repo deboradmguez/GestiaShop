@@ -21,7 +21,7 @@ class SingleInstance:
         except (IOError, ImportError):
             return True
 
-    def __del__(self):
+    def release(self):
         if self.fp:
             if sys.platform == 'win32':
                 os.close(self.fp)
@@ -31,3 +31,7 @@ class SingleInstance:
                 fcntl.lockf(self.fp, fcntl.LOCK_UN)
                 self.fp.close()
                 os.remove(self.lockfile)
+            self.fp = None
+
+    def __del__(self):
+        self.release()

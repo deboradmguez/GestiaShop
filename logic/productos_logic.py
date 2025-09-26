@@ -1,7 +1,7 @@
 from tkinter import Toplevel, ttk
 from utilities.dialogs import ConfirmacionDialog
 from database import database_manager as db_manager
-
+from utilities import helpers
 class ProductosLogic:
     """
     Controlador especializado para toda la lógica de la pestaña de Productos.
@@ -65,6 +65,7 @@ class ProductosLogic:
         entries["Nombre del Producto"].bind("<Return>", lambda e: entries["Precio"].focus_set())
         entries["Precio"].bind("<Return>", lambda e: entries["Stock Inicial"].focus_set())
         entries["Stock Inicial"].bind("<Return>", lambda e: btn_guardar.invoke())
+        helpers.centrar_ventana(ventana_agregar, self.app)
         ventana_agregar.bind("<Escape>", lambda e: ventana_agregar.destroy())
 
     def _guardar_nuevo_producto(self, entries, ventana):
@@ -134,7 +135,7 @@ class ProductosLogic:
         )
         btn_guardar.pack(pady=10)
         entries["Stock"].bind("<Return>", lambda e: btn_guardar.invoke())
-
+        helpers.centrar_ventana(ventana_modificar, self.app)
     def _guardar_modificaciones_producto(self, codigo, entries, ventana):
         """Valida y guarda las modificaciones de un producto."""
         try:

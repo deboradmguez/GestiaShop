@@ -44,7 +44,7 @@ def main():
     if not config:
         messagebox.showerror("Error Crítico", "No se pudo cargar la configuración inicial.")
         sys.exit()
-    app = App(config=config)
+    app = App(config=config, single_instance_lock=myapp)
     app.mainloop()
 
 if __name__ == "__main__":

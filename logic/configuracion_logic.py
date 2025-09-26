@@ -67,5 +67,7 @@ class ConfigLogic:
         return False
 
     def _reiniciar_aplicacion(self):
+        if self.app.single_instance_lock:
+            self.app.single_instance_lock.release()
         python = sys.executable
         os.execl(python, python, *sys.argv)
