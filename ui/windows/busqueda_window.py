@@ -40,11 +40,11 @@ class BusquedaWindow(tk.Toplevel):
         self.tree_busqueda = ttk.Treeview(
             frame_busqueda, columns=("nombre", "precio", "stock"), show="headings"
         )
-        # ... (configuración de headings y columns sin cambios) ...
+        
         self.tree_busqueda.heading("nombre", text="Nombre")
         self.tree_busqueda.heading("precio", text="Precio")
         self.tree_busqueda.heading("stock", text="Stock")
-        self.tree_busqueda.column("nombre", width=300, anchor="w")
+        self.tree_busqueda.column("nombre", width=500, anchor="w")
         self.tree_busqueda.column("precio", width=100, anchor="e")
         self.tree_busqueda.column("stock", width=100, anchor="e")
         self.tree_busqueda.pack(fill="both", expand=True)

@@ -77,7 +77,7 @@ class VentasTab(ttk.Frame):
 
         self.tree_carrito.heading("producto", text="Producto")
         self.tree_carrito.heading("cantidad", text="Cantidad")
-        self.tree_carrito.column("producto", width=250, anchor="w")
+        self.tree_carrito.column("producto", width=350, anchor="w")
         self.tree_carrito.column("cantidad", width=80, anchor="e")
         self.tree_carrito.column("precio", width=80, anchor="e")
         self.tree_carrito.column("stock", width=80, anchor="e")
@@ -123,10 +123,7 @@ class VentasTab(ttk.Frame):
         )
         self.btn_finalizar.pack(side="left", padx=5)
     def actualizar_vista(self, carrito_actualizado, total_actualizado):
-        """
-        Limpia y redibuja la tabla del carrito y el total.
-        Esta función será llamada por el controlador.
-        """
+        
         # Limpiamos la vista actual
         for item in self.tree_carrito.get_children():
             self.tree_carrito.delete(item)

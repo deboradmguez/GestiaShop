@@ -72,7 +72,7 @@ class HistorialTab(ttk.Frame):
         self.tree_historial.tag_configure("child", font=("Segoe UI", 9))
         self.tree_historial.heading("fecha", text="Fecha"); self.tree_historial.column("fecha", width=80)
         self.tree_historial.heading("hora", text="Hora"); self.tree_historial.column("hora", width=60)
-        self.tree_historial.heading("desc", text="Descripción"); self.tree_historial.column("desc", width=300)
+        self.tree_historial.heading("desc", text="Descripción"); self.tree_historial.column("desc", width=400)
         self.tree_historial.heading("cant", text="Cant."); self.tree_historial.column("cant", width=50, anchor="e")
         self.tree_historial.heading("p_unit", text="P. Unit."); self.tree_historial.column("p_unit", width=80, anchor="e")
         self.tree_historial.heading("p_efec", text="Efectivo"); self.tree_historial.column("p_efec", width=80, anchor="e")

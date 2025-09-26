@@ -65,7 +65,7 @@ class EstadisticasTab(ttk.Frame):
         self.tree_top_productos = ttk.Treeview(frame_top_productos, columns=("producto", "cantidad"), show="headings", height=5)
         self.tree_top_productos.heading("producto", text="Producto")
         self.tree_top_productos.heading("cantidad", text="Unidades")
-        self.tree_top_productos.column("producto", width=200)
+        self.tree_top_productos.column("producto", width=300)
         self.tree_top_productos.column("cantidad", width=100, anchor="center")
         self.tree_top_productos.pack(fill="x")
 

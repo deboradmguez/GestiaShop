@@ -5,20 +5,10 @@ from tkinter import ttk
 FUENTE_GENERAL = ("Segoe UI", 16)
 
 class ProductosTab(ttk.Frame):
-    """
-    Clase que representa la pestaña de 'Productos' (gestión de inventario).
-    """
     def __init__(self, parent, controller):
-        """
-        Constructor de la pestaña.
-        - 'parent': El widget Notebook.
-        - 'controller': La clase principal de la aplicación (App).
-        """
         super().__init__(parent)
         self.controller = controller
 
-        # Para que las imágenes no desaparezcan, las guardamos como atributos de la clase.
-        # Asumimos que la función 'ruta_recurso' ahora es un método del controller.
         self.icono_agregar = tk.PhotoImage(file=self.controller.ruta_recurso("icons/agregar.png"))
         self.icono_modificar = tk.PhotoImage(file=self.controller.ruta_recurso("icons/lapiz.png"))
         self.icono_eliminar = tk.PhotoImage(file=self.controller.ruta_recurso("icons/borrar.png"))
@@ -92,7 +82,7 @@ class ProductosTab(ttk.Frame):
         self.tree_inventario.heading("precio", text="Precio")
         self.tree_inventario.heading("stock", text="Stock")
         self.tree_inventario.column("codigo", width=150, anchor="w")
-        self.tree_inventario.column("nombre", width=300, anchor="w")
+        self.tree_inventario.column("nombre", width=400, anchor="w")
         self.tree_inventario.column("precio", width=100, anchor="e")
         self.tree_inventario.column("stock", width=100, anchor="e")
         self.tree_inventario.pack(fill="both", expand=True)

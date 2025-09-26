@@ -34,12 +34,16 @@ class App(Window):
         super().__init__(themename=self.configuracion.get("tema", "superhero"))
         self.single_instance_lock = single_instance_lock
         
-        self.is_fullscreen = True # Variable de estado para la pantalla completa
+        self.is_fullscreen = True
         
         style = ttk.Style()
-        style.configure("Custom.Treeview", font=("Segoe UI", 11), rowheight=30) 
-        style.configure("Custom.Treeview.Heading", font=("Segoe UI", 12, "bold"))
-        
+
+        style.configure('.', font=('Segoe UI', 12)) 
+        style.configure('TButton', font=('Segoe UI', 11))
+        style.configure('TNotebook.Tab', font=('Segoe UI', 11))
+        style.configure('TLabelframe.Label', font=('Segoe UI', 12, 'bold'))
+        style.configure("Treeview", font=("Segoe UI", 12), rowheight=40)
+        style.configure("Treeview.Heading", font=("Segoe UI", 13, "bold"))
         self._configurar_ventana()
         self._configurar_locale()
 
