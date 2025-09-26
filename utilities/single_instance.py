@@ -1,6 +1,4 @@
-import sys
-import os
-import tempfile
+import sys, os, tempfile
 
 class SingleInstance:
     def __init__(self, name=""):

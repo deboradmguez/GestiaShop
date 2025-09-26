@@ -1,5 +1,4 @@
-import tkinter as tk
-from ttkbootstrap import ttk
+import customtkinter as ctk 
 from tkinter import Toplevel
 from datetime import date, datetime
 from database import database_manager as db_manager
@@ -106,11 +105,11 @@ class CajaLogic:
         dialogo_ajuste.transient(self.app)
         dialogo_ajuste.grab_set()
 
-        frame = ttk.Frame(dialogo_ajuste, padding=20)
+        frame = ctk.CTkFrame(dialogo_ajuste, padding=20)
         frame.pack(expand=True)
 
-        ttk.Label(frame, text=f"Nuevo monto final para el día {fecha_ui}:").pack(pady=5)
-        entry_monto = ttk.Entry(frame, width=20, font=("Segoe UI", 12))
+        ctk.CTkLabel(frame, text=f"Nuevo monto final para el día {fecha_ui}:").pack(pady=5)
+        entry_monto = ctk.CTkEntry(frame, width=20, font=("Segoe UI", 12))
         entry_monto.pack(pady=5)
         entry_monto.focus()
 
@@ -142,7 +141,7 @@ class CajaLogic:
             except (ValueError, TypeError):
                 self.app.notificar_error("El monto ingresado no es un número válido.")
         
-        btn_confirmar = ttk.Button(frame, text="Confirmar Ajuste", command=confirmar_ajuste)
+        btn_confirmar = ctk.CTkButton(frame, text="Confirmar Ajuste", command=confirmar_ajuste)
         btn_confirmar.pack(pady=10)
         helpers.centrar_ventana(dialogo_ajuste, self.app)
         entry_monto.bind("<Return>", lambda e: btn_confirmar.invoke())

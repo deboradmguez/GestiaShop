@@ -1,6 +1,4 @@
-import tkinter as tk
-from tkinter import Toplevel, ttk
-import uuid
+import uuid, customtkinter as ctk
 
 # Importamos las ventanas emergentes que son parte de la UI de esta lógica
 from ui.windows.busqueda_window import BusquedaWindow
@@ -106,16 +104,16 @@ class VentasLogic:
         ventana_cantidad.grab_set()
         ventana_cantidad.resizable(False, False)
 
-        frame = ttk.Frame(ventana_cantidad, padding=20)
+        frame = ctk.CTkFrame(ventana_cantidad, padding=20)
         frame.pack(expand=True, fill="both")
         
-        ttk.Label(frame, text=f"Nueva cantidad para '{nombre}':").pack(pady=5)
-        entry_cantidad = ttk.Entry(frame, justify="center")
+        ctk.CTkLabel(frame, text=f"Nueva cantidad para '{nombre}':").pack(pady=5)
+        entry_cantidad = ctk.CTkEntry(frame, justify="center")
         entry_cantidad.insert(0, str(cantidad_actual))
         entry_cantidad.pack(pady=5)
         entry_cantidad.focus()
 
-        btn_guardar = ttk.Button(frame, text="Guardar", command=lambda: self._guardar_nueva_cantidad(codigo_a_modificar, entry_cantidad, stock_total_db, ventana_cantidad))
+        btn_guardar = ctk.CTkButton(frame, text="Guardar", command=lambda: self._guardar_nueva_cantidad(codigo_a_modificar, entry_cantidad, stock_total_db, ventana_cantidad))
         btn_guardar.pack(pady=10)
         helpers.centrar_ventana(ventana_cantidad, self.app)
         entry_cantidad.bind("<Return>", lambda e: btn_guardar.invoke())
@@ -162,16 +160,16 @@ class VentasLogic:
         ventana_comun.transient(self.app)
         ventana_comun.grab_set()
 
-        frame = ttk.Frame(ventana_comun, padding=20)
+        frame = ctk.CTkFrame(ventana_comun, padding=20)
         frame.pack()
 
-        campos = {"Nombre": ttk.Entry(frame), "Precio": ttk.Entry(frame), "Cantidad": ttk.Entry(frame)}
+        campos = {"Nombre": ctk.CTkEntry(frame), "Precio": ctk.CTkEntry(frame), "Cantidad": ctk.CTkEntry(frame)}
         for texto, entry in campos.items():
-            ttk.Label(frame, text=f"{texto}:").pack()
+            ctk.CTkLabel(frame, text=f"{texto}:").pack()
             entry.pack(pady=5)
         campos["Nombre"].focus()
 
-        btn_confirmar = ttk.Button(frame, text="Agregar", command=lambda: self._confirmar_y_agregar_comun(campos, ventana_comun))
+        btn_confirmar = ctk.CTkButton(frame, text="Agregar", command=lambda: self._confirmar_y_agregar_comun(campos, ventana_comun))
         btn_confirmar.pack(pady=10)
         
         campos["Cantidad"].bind("<Return>", lambda e: btn_confirmar.invoke())

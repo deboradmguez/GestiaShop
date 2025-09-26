@@ -1,7 +1,6 @@
 import sys, os
 from pathlib import Path
 from datetime import datetime, date
-import tkinter as tk
 
 # --- Constantes para formateo de fecha ---
 DIAS_ES = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]

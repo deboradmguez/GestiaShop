@@ -1,10 +1,7 @@
-import tkinter as tk
-from tkinter import ttk
-
-# Es buena práctica definir constantes si se usan en varios lugares.
+import customtkinter as ctk
 FUENTE_GENERAL = ("Segoe UI", 16)
 
-class ProductosTab(ttk.Frame):
+class ProductosTab(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
@@ -19,10 +16,10 @@ class ProductosTab(ttk.Frame):
 
     def _crear_panel_de_controles(self):
         """Crea el panel superior con filtros, búsqueda y botones de acción."""
-        frame_controles = ttk.Frame(self)
+        frame_controles = ctk.CTkFrame(self)
         frame_controles.pack(pady=5, fill="x")
 
-        ttk.Label(frame_controles, text="Filtrar por:", font=("Segoe UI", 11)).pack(
+        ctk.CTkLabel(frame_controles, text="Filtrar por:", font=("Segoe UI", 11)).pack(
             side="left", padx=(10, 5)
         )
         opciones_filtro = ["Todos los productos", "Productos con stock bajo"]
@@ -35,37 +32,37 @@ class ProductosTab(ttk.Frame):
         # Los 'binds' ahora llaman a métodos del controller.
         self.combo_filtro_productos.bind("<<ComboboxSelected>>", self.controller.filtrar_productos_y_recargar)
 
-        ttk.Label(frame_controles, text="Buscar:", font=FUENTE_GENERAL).pack(
+        ctk.CTkLabel(frame_controles, text="Buscar:", font=FUENTE_GENERAL).pack(
             side="left", padx=5
         )
-        self.entry_buscar_producto = ttk.Entry(frame_controles, font=FUENTE_GENERAL)
+        self.entry_buscar_producto = ctk.CTkEntry(frame_controles, font=FUENTE_GENERAL)
         self.entry_buscar_producto.pack(side="left", padx=5, fill="x", expand=True)
         self.entry_buscar_producto.bind("<KeyRelease>", self.controller.filtrar_productos_y_recargar)
         self.entry_buscar_producto.bind("<Return>", self.controller.filtrar_productos_y_recargar)
 
         # Botones de acción
-        self.btn_agregar_prod = ttk.Button(
+        self.btn_agregar_prod = ctk.CTkButton(
             frame_controles, image=self.icono_agregar,
             command=self.controller.mostrar_ventana_agregar_producto,
             style="success.TButton"
         )
         self.btn_agregar_prod.pack(side="left", padx=5)
 
-        self.btn_modificar_prod = ttk.Button(
+        self.btn_modificar_prod = ctk.CTkButton(
             frame_controles, image=self.icono_modificar,
             command=self.controller.modificar_producto,
             style="warning.TButton"
         )
         self.btn_modificar_prod.pack(side="left", padx=5)
 
-        self.btn_eliminar_prod = ttk.Button(
+        self.btn_eliminar_prod = ctk.CTkButton(
             frame_controles, image=self.icono_eliminar,
             command=self.controller.eliminar_producto,
             style="danger.TButton"
         )
         self.btn_eliminar_prod.pack(side="left", padx=5)
 
-        self.btn_carga_rapida = ttk.Button(
+        self.btn_carga_rapida = ctk.CTkButton(
             frame_controles, text="Carga Rápida",
             command=self.controller.abrir_ventana_carga_rapida,
             style="primary.TButton"

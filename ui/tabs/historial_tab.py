@@ -1,8 +1,7 @@
-import tkinter as tk
-from tkinter import ttk
-from ttkbootstrap.widgets import DateEntry
+import customtkinter as ctk
 
-class HistorialTab(ttk.Frame):
+
+class HistorialTab(ctk.CTkFrame):
 
     def __init__(self, parent, controller):
         super().__init__(parent, padding=10)
@@ -22,21 +21,21 @@ class HistorialTab(ttk.Frame):
 
     def _crear_panel_controles(self):
         """Crea el panel superior para la selección de fecha."""
-        frame_controles = ttk.Frame(self)
+        frame_controles = ctk.CTkFrame(self)
         frame_controles.pack(fill="x", pady=5)
 
-        ttk.Label(frame_controles, text="Ver ventas del:", font=("Segoe UI", 12)).pack(side="left", padx=5)
+        ctk.CTkLabel(frame_controles, text="Ver ventas del:", font=("Segoe UI", 12)).pack(side="left", padx=5)
         self.cal_fecha_historial = DateEntry(frame_controles, dateformat="%d/%m/%Y")
         self.cal_fecha_historial.pack(side="left", padx=5)
         
-        btn_recargar = ttk.Button(
+        btn_recargar = ctk.CTkButton(
             frame_controles, text="Cargar Historial", style="info.TButton",
             # Llama al método delegado del controlador
             command=lambda: self.controller.recargar_historial_ventas()
         )
         btn_recargar.pack(side="left", padx=5)
 
-        btn_hoy = ttk.Button(
+        btn_hoy = ctk.CTkButton(
             frame_controles, text="Hoy", style="secondary.TButton",
             # Llama a un método de utilidad del controlador
             command=self.controller.ir_a_hoy_historial
@@ -45,16 +44,16 @@ class HistorialTab(ttk.Frame):
 
     def _crear_panel_resumen(self):
         """Crea las etiquetas para los totales del día."""
-        frame_resumen = ttk.Frame(self)
+        frame_resumen = ctk.CTkFrame(self)
         frame_resumen.pack(fill="x", pady=5)
         
-        self.lbl_total_efectivo = ttk.Label(frame_resumen, text="Efectivo: $0.00", font=("Segoe UI", 12))
+        self.lbl_total_efectivo = ctk.CTkLabel(frame_resumen, text="Efectivo: $0.00", font=("Segoe UI", 12))
         self.lbl_total_efectivo.pack(side="left", padx=5)
         
-        self.lbl_total_transferencia = ttk.Label(frame_resumen, text="Transferencia: $0.00", font=("Segoe UI", 12))
+        self.lbl_total_transferencia = ctk.CTkLabel(frame_resumen, text="Transferencia: $0.00", font=("Segoe UI", 12))
         self.lbl_total_transferencia.pack(side="left", padx=5)
         
-        self.lbl_total_general = ttk.Label(frame_resumen, text="Total: $0.00", font=("Segoe UI", 12, "bold"))
+        self.lbl_total_general = ctk.CTkLabel(frame_resumen, text="Total: $0.00", font=("Segoe UI", 12, "bold"))
         self.lbl_total_general.pack(side="right", padx=5)
 
     def _crear_vista_historial(self):
@@ -81,10 +80,10 @@ class HistorialTab(ttk.Frame):
 
     def _crear_panel_acciones(self):
         """Crea los botones de acción en la parte inferior."""
-        frame_acciones = ttk.Frame(self)
+        frame_acciones = ctk.CTkFrame(self)
         frame_acciones.pack(fill="x", side="bottom", pady=5)
         
-        self.btn_generar_pdf = ttk.Button(
+        self.btn_generar_pdf = ctk.CTkButton(
             frame_acciones, text="Descargar PDF", image=self.icono_descargar, compound="left",
             style="success.TButton",
             # Llama al método delegado del controlador
@@ -92,7 +91,7 @@ class HistorialTab(ttk.Frame):
         )
         self.btn_generar_pdf.pack(side="left", padx=5, pady=5)
 
-        self.btn_anular_venta = ttk.Button(
+        self.btn_anular_venta = ctk.CTkButton(
             frame_acciones, text="Anular Venta Seleccionada",
             style="danger.TButton", state="disabled",
             # Llama al método delegado del controlador

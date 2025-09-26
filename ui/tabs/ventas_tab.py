@@ -1,10 +1,9 @@
-import tkinter as tk
-from tkinter import ttk
+import customtkinter as ctk
 
 # Definimos una constante para la fuente, para no repetirla.
 FUENTE_GENERAL = ("Segoe UI", 16)
 
-class VentasTab(ttk.Frame):
+class VentasTab(ctk.CTkFrame):
     
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -18,28 +17,28 @@ class VentasTab(ttk.Frame):
 
     def _crear_controles_superiores(self):
         """Crea el área de ingreso de código y los botones de acción."""
-        frame_control_venta = ttk.Frame(self, padding=10)
+        frame_control_venta = ctk.CTkFrame(self, padding=10)
         frame_control_venta.pack(fill="x", side="top")
 
         # Campo para escanear el código
-        frame_codigo = ttk.Frame(frame_control_venta)
+        frame_codigo = ctk.CTkFrame(frame_control_venta)
         frame_codigo.pack(fill="x", pady=3)
 
-        ttk.Label(frame_codigo, text="Código de Barras:", font=FUENTE_GENERAL).pack(
+        ctk.CTkLabel(frame_codigo, text="Código de Barras:", font=FUENTE_GENERAL).pack(
             side="left", padx=5
         )
         # Los widgets ahora son atributos de la clase (self.entry_codigo)
-        self.entry_codigo = ttk.Entry(frame_codigo, font=("Segoe UI", 12), width=25)
+        self.entry_codigo = ctk.CTkEntry(frame_codigo, font=("Segoe UI", 12), width=25)
         self.entry_codigo.pack(side="left", expand=True, fill="x", padx=5)
         self.entry_codigo.focus()
         # Los comandos ahora llaman a métodos del 'controller'
         self.entry_codigo.bind("<Return>", lambda event: self.controller.buscar_y_agregar_a_carrito())
 
         # Botones de acceso rápido
-        frame_botones_venta = ttk.Frame(frame_control_venta)
+        frame_botones_venta = ctk.CTkFrame(frame_control_venta)
         frame_botones_venta.pack(fill="x", pady=(10, 0))
 
-        self.btn_buscar_nombre = ttk.Button(
+        self.btn_buscar_nombre = ctk.CTkButton(
             frame_botones_venta,
             text="🔎 Buscar por Nombre (Ctrl + B)",
             command=self.controller.mostrar_ventana_busqueda, # Llama al método en el controller
@@ -47,7 +46,7 @@ class VentasTab(ttk.Frame):
         )
         self.btn_buscar_nombre.pack(side="left", padx=5, ipadx=5)
 
-        self.btn_prod_comun = ttk.Button(
+        self.btn_prod_comun = ctk.CTkButton(
             frame_botones_venta,
             text="➕ Prod. Común (Ctrl + A)",
             command=self.controller.agregar_producto_comun, # Llama al método en el controller
@@ -57,10 +56,10 @@ class VentasTab(ttk.Frame):
 
     def _crear_vista_carrito(self):
         """Crea la tabla (Treeview) para mostrar los productos del carrito."""
-        frame_carrito = ttk.Frame(self)
+        frame_carrito = ctk.CTkFrame(self)
         frame_carrito.pack(fill="both", expand=True, pady=10)
         
-        tree_frame = ttk.Frame(frame_carrito)
+        tree_frame = ctk.CTkFrame(frame_carrito)
         tree_frame.pack(fill="both", expand=True)
 
         scrollbar = ttk.Scrollbar(tree_frame)
@@ -90,10 +89,10 @@ class VentasTab(ttk.Frame):
 
     def _crear_pie_de_pestana(self):
         """Crea el área inferior con el total y los botones de finalizar venta."""
-        frame_pie_ventas = ttk.Frame(self)
+        frame_pie_ventas = ctk.CTkFrame(self)
         frame_pie_ventas.pack(fill="x", side="bottom", pady=(10, 0))
 
-        self.lbl_total = ttk.Label(
+        self.lbl_total = ctk.CTkLabel(
             frame_pie_ventas,
             text="Total: $0.00",
             font=("Arial Black", 28),
@@ -102,21 +101,21 @@ class VentasTab(ttk.Frame):
         )
         self.lbl_total.pack(side="right", padx=(20, 10))
 
-        self.btn_quitar = ttk.Button(
+        self.btn_quitar = ctk.CTkButton(
             frame_pie_ventas, text="Quitar",
             command=self.controller.quitar_producto_del_carrito,
             style="danger.TButton", state="disabled",
         )
         self.btn_quitar.pack(side="left", padx=(10, 5))
 
-        self.btn_vaciar = ttk.Button(
+        self.btn_vaciar = ctk.CTkButton(
             frame_pie_ventas, text="Vaciar (Ctrl + D)",
             command=self.controller.vaciar_carrito,
             style="secondary.TButton", state="disabled",
         )
         self.btn_vaciar.pack(side="left", padx=5)
 
-        self.btn_finalizar = ttk.Button(
+        self.btn_finalizar = ctk.CTkButton(
             frame_pie_ventas, text="Finalizar (Ctrl + F)",
             command=self.controller.mostrar_ventana_cobrar,
             style="success.TButton", state="disabled",

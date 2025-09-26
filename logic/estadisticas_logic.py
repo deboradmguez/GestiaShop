@@ -1,4 +1,4 @@
-from ttkbootstrap import ttk
+import customtkinter as ctk
 from datetime import datetime
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -62,7 +62,7 @@ class EstadisticasLogic:
         
         # Si no hay datos, mostramos un mensaje en lugar del gráfico
         if all(s == 0 for s in sizes):
-            ttk.Label(tab.frame_grafico, text="No hay datos para mostrar.").pack(expand=True)
+            ctk.CTkLabel(tab.frame_grafico, text="No hay datos para mostrar.").pack(expand=True)
             return
 
         fig = Figure(figsize=(4, 4), dpi=100, facecolor='#303030')

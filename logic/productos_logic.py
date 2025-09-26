@@ -1,7 +1,8 @@
-from tkinter import Toplevel, ttk
 from utilities.dialogs import ConfirmacionDialog
 from database import database_manager as db_manager
 from utilities import helpers
+import customtkinter as ctk
+
 class ProductosLogic:
     """
     Controlador especializado para toda la lógica de la pestaña de Productos.
@@ -41,14 +42,14 @@ class ProductosLogic:
         ventana_agregar.transient(self.app)
         ventana_agregar.grab_set()
         
-        frame_agregar = ttk.Frame(ventana_agregar, padding=20)
+        frame_agregar = ctk.CTkFrame(ventana_agregar, padding=20)
         frame_agregar.pack()
 
         entries = {}
         campos = ["Código de Barras", "Nombre del Producto", "Precio", "Stock Inicial"]
         for campo in campos:
-            ttk.Label(frame_agregar, text=campo).pack(anchor="w")
-            entry = ttk.Entry(frame_agregar, width=35, font=("Segoe UI", 11))
+            ctk.CTkLabel(frame_agregar, text=campo).pack(anchor="w")
+            entry = ctk.CTkEntry(frame_agregar, width=35, font=("Segoe UI", 11))
             entry.pack(fill="x", padx=5, pady=(0, 10))
             entries[campo] = entry
 
@@ -56,9 +57,9 @@ class ProductosLogic:
         entries["Código de Barras"].focus_set()
 
         umbral_global = self.app.configuracion.get("umbral_alerta_stock", 5)
-        ttk.Label(frame_agregar, text=f"Umbral de alerta por defecto: {umbral_global}", font=("Segoe UI", 9, "italic")).pack(pady=5)
+        ctk.CTkLabel(frame_agregar, text=f"Umbral de alerta por defecto: {umbral_global}", font=("Segoe UI", 9, "italic")).pack(pady=5)
 
-        btn_guardar = ttk.Button(frame_agregar, text="Guardar Producto", style="success.TButton", command=lambda: self._guardar_nuevo_producto(entries, ventana_agregar))
+        btn_guardar = ctk.CTkButton(frame_agregar, text="Guardar Producto", style="success.TButton", command=lambda: self._guardar_nuevo_producto(entries, ventana_agregar))
         btn_guardar.pack(pady=10)
         # --- BINDS ---
         entries["Código de Barras"].bind("<Return>", lambda e: entries["Nombre del Producto"].focus_set())
@@ -113,19 +114,19 @@ class ProductosLogic:
         ventana_modificar.transient(self.app)
         ventana_modificar.grab_set()
 
-        frame_modificar = ttk.Frame(ventana_modificar, padding=20)
+        frame_modificar = ctk.CTkFrame(ventana_modificar, padding=20)
         frame_modificar.pack(expand=True)
 
         entries = {}
         campos = {"Nombre": nombre, "Precio": f"{precio:.2f}", "Stock": stock}
         for campo, valor in campos.items():
-            ttk.Label(frame_modificar, text=f"{campo}:").pack(anchor="w", padx=5)
-            entry = ttk.Entry(frame_modificar, width=35, font=("Segoe UI", 11))
+            ctk.CTkLabel(frame_modificar, text=f"{campo}:").pack(anchor="w", padx=5)
+            entry = ctk.CTkEntry(frame_modificar, width=35, font=("Segoe UI", 11))
             entry.insert(0, valor)
             entry.pack(fill="x", padx=5, pady=(0, 10))
             entries[campo] = entry
         entries["Nombre"].focus_set()
-        btn_guardar = ttk.Button(
+        btn_guardar = ctk.CTkButton(
             frame_modificar,
             text="Guardar Cambios",
             style="success.TButton",
@@ -204,21 +205,21 @@ class ProductosLogic:
 
         productos_a_guardar = []
 
-        frame_principal = ttk.Frame(ventana_carga, padding=20)
+        frame_principal = ctk.CTkFrame(ventana_carga, padding=20)
         frame_principal.pack(fill="both", expand=True)
 
         campos_entries = {
-            "Código de Barras": ttk.Entry(frame_principal, font=("Segoe UI", 11)),
-            "Nombre": ttk.Entry(frame_principal, font=("Segoe UI", 11)),
-            "Precio": ttk.Entry(frame_principal, font=("Segoe UI", 11)),
-            "Stock Inicial": ttk.Entry(frame_principal, font=("Segoe UI", 11)),
+            "Código de Barras": ctk.CTkEntry(frame_principal, font=("Segoe UI", 11)),
+            "Nombre": ctk.CTkEntry(frame_principal, font=("Segoe UI", 11)),
+            "Precio": ctk.CTkEntry(frame_principal, font=("Segoe UI", 11)),
+            "Stock Inicial": ctk.CTkEntry(frame_principal, font=("Segoe UI", 11)),
         }
         for i, (texto, entry) in enumerate(campos_entries.items()):
-            ttk.Label(frame_principal, text=texto, font=("Segoe UI", 10)).grid(row=i, column=0, sticky="w", pady=2)
+            ctk.CTkLabel(frame_principal, text=texto, font=("Segoe UI", 10)).grid(row=i, column=0, sticky="w", pady=2)
             entry.grid(row=i, column=1, sticky="ew", pady=2, padx=5)
         
         campos_entries["Código de Barras"].focus_set()
-        lbl_contador = ttk.Label(frame_principal, text="Productos en lista: 0", font=("Segoe UI", 10, "italic"))
+        lbl_contador = ctk.CTkLabel(frame_principal, text="Productos en lista: 0", font=("Segoe UI", 10, "italic"))
         lbl_contador.grid(row=len(campos_entries), column=0, columnspan=2, pady=10)
 
         def agregar_y_siguiente(event=None):
@@ -243,13 +244,13 @@ class ProductosLogic:
             except ValueError:
                 self.app.notificar_error("El precio y el stock deben ser números válidos.")
 
-        frame_botones = ttk.Frame(frame_principal)
+        frame_botones = ctk.CTkFrame(frame_principal)
         frame_botones.grid(row=len(campos_entries) + 1, column=0, columnspan=2, pady=20)
         
-        btn_agregar = ttk.Button(frame_botones, text="Agregar y Siguiente (Enter)", command=agregar_y_siguiente)
+        btn_agregar = ctk.CTkButton(frame_botones, text="Agregar y Siguiente (Enter)", command=agregar_y_siguiente)
         btn_agregar.pack(side="left", padx=10)
 
-        btn_finalizar = ttk.Button(frame_botones, text="Finalizar y Guardar Todo", style="success.TButton", command=lambda: self._finalizar_y_guardar_carga_rapida(productos_a_guardar, ventana_carga))
+        btn_finalizar = ctk.CTkButton(frame_botones, text="Finalizar y Guardar Todo", style="success.TButton", command=lambda: self._finalizar_y_guardar_carga_rapida(productos_a_guardar, ventana_carga))
         btn_finalizar.pack(side="left", padx=10)
         helpers.centrar_ventana(ventana_carga, self.app)
         campos_entries["Stock Inicial"].bind("<Return>", agregar_y_siguiente)

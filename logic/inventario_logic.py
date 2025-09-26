@@ -1,4 +1,4 @@
-import tkinter as tk
+import customtkinter as ctk
 from database import database_manager as db_manager
 
 class InventarioLogic:

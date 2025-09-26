@@ -1,5 +1,5 @@
-import tkinter as tk
-from ttkbootstrap import Window, ttk
+import customtkinter as ctk
+from PIL import Image
 from datetime import datetime
 import locale
 
@@ -27,23 +27,15 @@ from utilities import helpers
 from utilities.helpers import ruta_recurso
 
 
-class App(Window):
-    
+class App(ctk.CTk):
     def __init__(self, config, single_instance_lock=None):
+        super().__init__()
         self.configuracion = config
-        super().__init__(themename=self.configuracion.get("tema", "superhero"))
-        self.single_instance_lock = single_instance_lock
-        
+        ctk.set_appearance_mode(self.configuracion.get("tema", "dark")) # Opciones: "dark", "light", "system"
+        ctk.set_default_color_theme("blue") # Opciones: "blue", "dark-blue", "green"
+
         self.is_fullscreen = True
         
-        style = ttk.Style()
-
-        style.configure('.', font=('Segoe UI', 12)) 
-        style.configure('TButton', font=('Segoe UI', 11))
-        style.configure('TNotebook.Tab', font=('Segoe UI', 11))
-        style.configure('TLabelframe.Label', font=('Segoe UI', 12, 'bold'))
-        style.configure("Treeview", font=("Segoe UI", 12), rowheight=40)
-        style.configure("Treeview.Heading", font=("Segoe UI", 13, "bold"))
         self._configurar_ventana()
         self._configurar_locale()
 
@@ -76,25 +68,25 @@ class App(Window):
         """Configura los atributos principales de la ventana."""
         self.title("GestiaShop - Sistema de Gestión")
         self.attributes("-fullscreen", self.is_fullscreen)
-        self.iconphoto(True, tk.PhotoImage(file=ruta_recurso('icons/icono_app.png')))
+        self.iconphoto(True, ctk.PhotoImage(file=ruta_recurso('icons/icono_app.png')))
 
     def _crear_header(self):
         """Crea el encabezado de la aplicación con nombre, fecha y hora."""
-        frame_header = ttk.Frame(self, padding=(10, 6))
+        frame_header = ctk.CTkFrame(self, padding=(10, 6))
         frame_header.pack(fill="x", side="top")
         
-        frame_izquierda = ttk.Frame(frame_header); frame_izquierda.pack(side="left", anchor="w")
-        self.lbl_nombre_comercio = ttk.Label(frame_izquierda, font=("Georgia", 22, "bold"))
+        frame_izquierda = ctk.CTkFrame(frame_header); frame_izquierda.pack(side="left", anchor="w")
+        self.lbl_nombre_comercio = ctk.CTkLabel(frame_izquierda, font=("Georgia", 22, "bold"))
         self.lbl_nombre_comercio.pack(anchor="w")
-        self.lbl_fecha = ttk.Label(frame_izquierda, font=("Segoe UI", 12)); self.lbl_fecha.pack(anchor="w")
+        self.lbl_fecha = ctk.CTkLabel(frame_izquierda, font=("Segoe UI", 12)); self.lbl_fecha.pack(anchor="w")
         
-        frame_derecha = ttk.Frame(frame_header); frame_derecha.pack(side="right", anchor="e", padx=10)
-        self.lbl_hora = ttk.Label(frame_derecha, font=("Segoe UI", 40, "bold")); self.lbl_hora.pack(anchor="e")
-        self.header_btn_abrir_caja = ttk.Button(frame_derecha, text="☀️ Abrir Caja", command=self.abrir_caja, style="success.TButton")
+        frame_derecha = ctk.CTkFrame(frame_header); frame_derecha.pack(side="right", anchor="e", padx=10)
+        self.lbl_hora = ctk.CTkLabel(frame_derecha, font=("Segoe UI", 40, "bold")); self.lbl_hora.pack(anchor="e")
+        self.header_btn_abrir_caja = ctk.CTkButton(frame_derecha, text="☀️ Abrir Caja", command=self.abrir_caja, style="success.TButton")
 
     def _crear_notebook(self):
         """Crea y llena el panel de pestañas."""
-        self.notebook = ttk.Notebook(self)
+        self.notebook = ctk.CTkTabview(self)
         self.notebook.pack(pady=10, padx=10, fill="both", expand=True)
         
         self.ventas_tab = VentasTab(self.notebook, self); self.notebook.add(self.ventas_tab, text="Ventas (F1)")
@@ -107,12 +99,12 @@ class App(Window):
 
     def _crear_footer(self):
         """Crea el pie de página con botones de ayuda y alertas."""
-        self.btn_soporte = ttk.Button(self, text="⛑️ Ayuda", command=self.mostrar_soporte)
+        self.btn_soporte = ctk.CTkButton(self, text="⛑️ Ayuda", command=self.mostrar_soporte)
         self.btn_soporte.place(relx=0.0, rely=1.0, x=10, y=-10, anchor="sw")
-        self.btn_alerta_stock = ttk.Button(self, text="⚠ Alertas") # La lógica de app_logic lo gestionará
+        self.btn_alerta_stock = ctk.CTkButton(self, text="⚠ Alertas") # La lógica de app_logic lo gestionará
     def _crear_widget_notificaciones(self):
         """Crea la etiqueta que se usará para todas las notificaciones."""
-        self.lbl_notificacion = ttk.Label(self, text="", font=("Segoe UI", 12), padding=10)
+        self.lbl_notificacion = ctk.CTkLabel(self, text="", font=("Segoe UI", 12), padding=10)
     def _iniciar_procesos_de_fondo(self):
         """Inicia tareas recurrentes y la configuración inicial de la UI."""
         self.actualizar_titulo_app()

@@ -1,4 +1,3 @@
-import tkinter as tk
 from datetime import date, datetime
 from utilities.dialogs import ConfirmacionDialog
 from database import database_manager as db_manager

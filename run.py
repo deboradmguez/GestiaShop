@@ -1,5 +1,5 @@
 import sys,os
-import tkinter as tk
+import customtkinter as ctk
 from tkinter import messagebox
 ruta_proyecto = os.path.dirname(os.path.abspath(__file__))
 if ruta_proyecto not in sys.path:
@@ -13,7 +13,7 @@ from logic.licencia_logic import LicenciaLogic
 
 def mostrar_ventana_activacion():
     licencia_logic = LicenciaLogic()
-    activacion_root = tk.Tk()
+    activacion_root = ctk.CTk()
     activacion_root.title("Activación Requerida")
     activacion_root.withdraw()
     from tkinter.simpledialog import askstring

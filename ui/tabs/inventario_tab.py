@@ -1,7 +1,7 @@
-import tkinter as tk
-from tkinter import ttk
+import customtkinter as ctk
 
-class InventarioTab(ttk.Frame):
+
+class InventarioTab(ctk.CTkFrame):
     """
     Clase que representa la interfaz de la pestaña 'Inventario'.
     No contiene lógica de negocio, solo la definición de los widgets.
@@ -16,14 +16,14 @@ class InventarioTab(ttk.Frame):
 
     def _crear_widgets(self):
         """Crea y posiciona todos los widgets de esta pestaña."""
-        ttk.Label(self, text="Escanear Código de Barras", font=("Segoe UI", 16)).pack(pady=(10, 5))
+        ctk.CTkLabel(self, text="Escanear Código de Barras", font=("Segoe UI", 16)).pack(pady=(10, 5))
 
-        self.entry_codigo_inv = ttk.Entry(self, font=("Segoe UI", 16))
+        self.entry_codigo_inv = ctk.CTkEntry(self, font=("Segoe UI", 16))
         self.entry_codigo_inv.pack(padx=20, pady=5, fill="x")
         self.entry_codigo_inv.focus()
 
         # Frame para los datos del producto
-        frame_datos = ttk.Frame(self, padding=10)
+        frame_datos = ctk.CTkFrame(self, padding=10)
         frame_datos.pack(fill="x", pady=10)
         frame_datos.columnconfigure(1, weight=1) # Permite que los Entry se expandan
 
@@ -37,17 +37,17 @@ class InventarioTab(ttk.Frame):
         }
 
         for i, (texto, clave) in enumerate(campos.items()):
-            ttk.Label(frame_datos, text=texto).grid(row=i, column=0, sticky="w", padx=5, pady=5)
+            ctk.CTkLabel(frame_datos, text=texto).grid(row=i, column=0, sticky="w", padx=5, pady=5)
             if clave == "lbl_stock_actual":
-                widget = ttk.Label(frame_datos, text="0", font=("Segoe UI", 11, "bold"))
+                widget = ctk.CTkLabel(frame_datos, text="0", font=("Segoe UI", 11, "bold"))
             else:
-                widget = ttk.Entry(frame_datos, width=40)
+                widget = ctk.CTkEntry(frame_datos, width=40)
             
             widget.grid(row=i, column=1, padx=5, pady=5, sticky="ew")
             self.entries[clave] = widget
         
         # Botón de confirmación
-        self.btn_confirmar_cambios = ttk.Button(
+        self.btn_confirmar_cambios = ctk.CTkButton(
             self, text="✅ Guardar Cambios", style="success.TButton", state="disabled"
         )
         self.btn_confirmar_cambios.pack(pady=10)

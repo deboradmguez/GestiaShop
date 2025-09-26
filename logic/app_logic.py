@@ -1,7 +1,7 @@
-import tkinter as tk
-from tkinter import Toplevel
+
+import customtkinter as ctk 
 import webbrowser
-from ttkbootstrap import ttk
+
 from datetime import date
 from utilities import notifications, helpers
 from utilities.dialogs import ConfirmacionDialog, PinDialog
@@ -44,16 +44,16 @@ class AppLogic:
         dialogo.grab_set()
         dialogo.resizable(False, False)
 
-        frame = ttk.Frame(dialogo, padding=20)
+        frame = ctk.CTkFrame(dialogo, padding=20)
         frame.pack(expand=True, fill="both")
 
-        ttk.Label(frame, text="¿Quién abre la caja hoy?").pack()
-        entry_usuario = ttk.Entry(frame, width=30)
+        ctk.CTkLabel(frame, text="¿Quién abre la caja hoy?").pack()
+        entry_usuario = ctk.CTkEntry(frame, width=30)
         entry_usuario.pack(pady=5)
         entry_usuario.focus()
 
-        ttk.Label(frame, text="¿Con cuánto fondo inicial?").pack()
-        entry_fondo = ttk.Entry(frame, width=30)
+        ctk.CTkLabel(frame, text="¿Con cuánto fondo inicial?").pack()
+        entry_fondo = ctk.CTkEntry(frame, width=30)
         entry_fondo.pack(pady=5)
 
         def confirmar_apertura():
@@ -130,33 +130,33 @@ class AppLogic:
         ventana_soporte.grab_set()
         ventana_soporte.resizable(False, False)
 
-        frame_principal = ttk.Frame(ventana_soporte, padding=15)
+        frame_principal = ctk.CTkFrame(ventana_soporte, padding=15)
         frame_principal.pack(fill="both", expand=True)
-        frame_texto = ttk.Frame(frame_principal)
+        frame_texto = ctk.CTkFrame(frame_principal)
         frame_texto.pack(side="left", fill="both", expand=True, padx=(0, 15))
-        frame_qr = ttk.Frame(frame_principal)
+        frame_qr = ctk.CTkFrame(frame_principal)
         frame_qr.pack(side="right")
         
-        ttk.Label(frame_texto, text="Soporte Técnico", font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(0, 10))
-        ttk.Label(frame_texto, text="Para consultas o problemas, puedes:", font=("Segoe UI", 10)).pack(anchor="w")
+        ctk.CTkLabel(frame_texto, text="Soporte Técnico", font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(0, 10))
+        ctk.CTkLabel(frame_texto, text="Para consultas o problemas, puedes:", font=("Segoe UI", 10)).pack(anchor="w")
 
-        lbl_email = ttk.Label(frame_texto, text="Enviar un correo electrónico", font=("Segoe UI", 10, "underline"), foreground="#6495ED", cursor="hand2")
+        lbl_email = ctk.CTkLabel(frame_texto, text="Enviar un correo electrónico", font=("Segoe UI", 10, "underline"), foreground="#6495ED", cursor="hand2")
         lbl_email.pack(anchor="w", pady=5)
         lbl_email.bind("<Button-1>", lambda e: webbrowser.open("mailto:sistema.app.dominguez@gmail.com"))
 
-        ttk.Label(frame_texto, text="o escanear el código para chatear por WhatsApp.", font=("Segoe UI", 10)).pack(anchor="w")
-        ttk.Label(frame_texto, text="\nVersión del Software: 1.0.0", font=("Segoe UI", 9, "italic")).pack(anchor="w", pady=(10, 0))
+        ctk.CTkLabel(frame_texto, text="o escanear el código para chatear por WhatsApp.", font=("Segoe UI", 10)).pack(anchor="w")
+        ctk.CTkLabel(frame_texto, text="\nVersión del Software: 1.0.0", font=("Segoe UI", 9, "italic")).pack(anchor="w", pady=(10, 0))
 
         try:
             # Asumiendo que ruta_recurso ahora es un método del controlador App
             qr_path = self.app.ruta_recurso("icons/whatsapp_qr.png")
             qr_image_original = tk.PhotoImage(file=qr_path)
             qr_image = qr_image_original.subsample(3, 3)
-            lbl_qr = ttk.Label(frame_qr, image=qr_image)
+            lbl_qr = ctk.CTkLabel(frame_qr, image=qr_image)
             lbl_qr.image = qr_image 
             lbl_qr.pack()
         except tk.TclError:
-            ttk.Label(frame_qr, text="Error al cargar QR").pack()
+            ctk.CTkLabel(frame_qr, text="Error al cargar QR").pack()
         
         helpers.centrar_ventana(ventana_soporte, self.app)
 
