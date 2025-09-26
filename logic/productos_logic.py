@@ -134,9 +134,13 @@ class ProductosLogic:
             )
         )
         btn_guardar.pack(pady=10)
+        
+        entries["Nombre"].bind("<Return>", lambda e: entries["Precio"].focus_set())
+        entries["Precio"].bind("<Return>", lambda e: entries["Stock"].focus_set())
         entries["Stock"].bind("<Return>", lambda e: btn_guardar.invoke())
-        helpers.centrar_ventana(ventana_modificar, self.app)
         ventana_modificar.bind("<Escape>", lambda e: ventana_modificar.destroy())
+        
+        helpers.centrar_ventana(ventana_modificar, self.app)
 
     def _guardar_modificaciones_producto(self, codigo, entries, ventana):
         
