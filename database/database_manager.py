@@ -58,6 +58,15 @@ def obtener_productos_filtrados(tipo_filtro, texto_busqueda):
     except sqlite3.Error as e:
         print(f"Error en DB (obtener_productos_filtrados): {e}")
         return []
+    
+def buscar_productos_por_nombre(termino_busqueda):
+    try:
+        with conectar_db() as conn:
+            productos = queries.buscar_productos_por_nombre(conn, termino_busqueda)
+            return productos
+    except sqlite3.Error as e:
+        print(f"Error en DB (buscar_productos_por_nombre): {e}")
+        return []
 def agregar_productos_en_lote(productos):
     agregados = 0
     errores = []

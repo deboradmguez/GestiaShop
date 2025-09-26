@@ -274,4 +274,21 @@ class ProductosLogic:
         
         ventana.destroy()
         self.filtrar_productos_y_recargar()
+    def realizar_busqueda_productos(self, termino_busqueda, tree_widget):
+        """
+        Busca productos por nombre y actualiza un Treeview con los resultados.
+        """
+        if not termino_busqueda:
+            tree_widget.delete(*tree_widget.get_children())
+            return
 
+        productos_encontrados = db_manager.buscar_productos_por_nombre(termino_busqueda)
+        
+        tree_widget.delete(*tree_widget.get_children())
+        for prod in productos_encontrados:
+            codigo, nombre, precio, stock, _ = prod
+            tree_widget.insert(
+                "", "end", 
+                values=(nombre, f"${precio:,.2f}", stock), 
+                tags=(codigo,)
+            )

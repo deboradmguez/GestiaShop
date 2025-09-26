@@ -191,15 +191,14 @@ class App(Window):
     def agregar_producto_comun(self): self.ventas_logic.agregar_producto_comun()
     def mostrar_ventana_cobrar(self): self.ventas_logic.mostrar_ventana_cobrar()
     def finalizar_venta(self, d): return self.ventas_logic.finalizar_venta(d)
-
-    # -- Delegados de Productos --
+ # -- Delegados de Productos --
+    def realizar_busqueda_productos(self, t, w): self.productos_logic.realizar_busqueda_productos(t, w)
     def filtrar_productos_y_recargar(self, e=None): self.productos_logic.filtrar_productos_y_recargar(e)
     def mostrar_ventana_agregar_producto(self, c=""): self.productos_logic.mostrar_ventana_agregar_producto(c)
     def modificar_producto(self): self.productos_logic.modificar_producto()
     def eliminar_producto(self): self.productos_logic.eliminar_producto()
     def editar_con_doble_click(self, e): self.productos_logic.editar_con_doble_click(e)
     def abrir_ventana_carga_rapida(self): self.productos_logic.abrir_ventana_carga_rapida()
-        
     # -- Delegados de Inventario --
     def buscar_producto_para_inventario(self, e=None): self.inventario_logic.buscar_producto_para_inventario(e)
     def guardar_cambios_inventario(self, e=None): self.inventario_logic.guardar_cambios_inventario(e)

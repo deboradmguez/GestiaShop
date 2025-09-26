@@ -14,7 +14,7 @@ class VentasLogic:
     Controlador especializado para toda la lógica de la pestaña de Ventas.
     """
     def __init__(self, app_controller):
-        self.app = app_controller # Referencia a la App principal para acceder al estado y las vistas
+        self.app = app_controller 
 
     # --- LÓGICA PRINCIPAL DEL CARRITO ---
 
@@ -24,13 +24,12 @@ class VentasLogic:
         if not codigo: return
 
         producto_db = db_manager.obtener_producto_por_codigo(codigo)
-        producto_db = ("12345", "Producto de Ejemplo", 150.0, 50, 5) # Simulación
 
         if producto_db:
             codigo_barras, nombre, precio, stock_total, _ = producto_db
             stock_en_carrito = self.app.carrito.get(codigo_barras, {}).get("cantidad", 0)
             if stock_total - stock_en_carrito <= 0:
-                self.app.notificar_alerta(f"No hay más stock disponible para '{nombre}'.", parent=self.app)
+                self.app.notificar_alerta(f"No hay más stock disponible para '{nombre}'.")
                 self.app.ventas_tab.entry_codigo.delete(0, 'end')
                 return
             self._agregar_a_carrito((codigo_barras, nombre, precio, 1), stock_total)
@@ -40,7 +39,6 @@ class VentasLogic:
             self.app.ventas_tab.entry_codigo.delete(0, 'end')
 
     def _agregar_a_carrito(self, producto, stock_info=None):
-        """Método interno para añadir o actualizar un producto en el carrito."""
         codigo, nombre, precio, cantidad = producto
         if codigo in self.app.carrito:
             self.app.carrito[codigo]["cantidad"] += cantidad
@@ -85,10 +83,7 @@ class VentasLogic:
             self._recalcular_total_carrito()
             self.app.ventas_tab.actualizar_vista(self.app.carrito, self.app.total_venta)
 
-    # --- LÓGICA DE VENTANAS EMERGENTES (Pop-ups) ---
-
     def modificar_cantidad_carrito(self, event=None):
-        """Muestra una ventana emergente para modificar la cantidad de un producto."""
         item_id = self.app.ventas_tab.tree_carrito.focus()
         if not item_id: return
         
@@ -101,8 +96,7 @@ class VentasLogic:
         nombre = producto_en_carrito["nombre"]
         cantidad_actual = producto_en_carrito["cantidad"]
         
-        # producto_db = db.buscar_producto(codigo_a_modificar)
-        producto_db = ("12345", "Producto de Ejemplo", 150.0, 50, 5) # Simulación
+        producto_db = db_manager.obtener_producto_por_codigo(codigo_a_modificar)
         stock_total_db = producto_db[3] if producto_db else None
 
         # Creación de la ventana
@@ -151,8 +145,7 @@ class VentasLogic:
 
     def agregar_producto_desde_busqueda(self, codigo_barras):
         """Agrega un producto al carrito desde la ventana de búsqueda."""
-        # producto_db = db.buscar_producto(codigo_barras)
-        producto_db = ("45678", "Producto Buscado", 250.0, 30, 5) # Simulación
+        producto_db = db_manager.obtener_producto_por_codigo(codigo_barras)
         if producto_db:
             _, nombre, precio, stock, _ = producto_db
             self._agregar_a_carrito((codigo_barras, nombre, precio, 1), stock)
@@ -222,8 +215,10 @@ class VentasLogic:
             # Notificar a otros controladores que una venta ocurrió
             if hasattr(self.app, 'productos_logic'):
                 self.app.productos_logic.filtrar_productos_y_recargar()
-            # if hasattr(self.app, 'historial_logic'):
-            #     self.app.historial_logic.recargar_historial()
+            if hasattr(self.app, 'historial_logic'):
+                self.app.historial_logic.recargar_historial_ventas()
+            if hasattr(self.app, 'caja_logic'):
+                self.app.caja_logic.recargar_vista_caja()
             
             self.app.notificar_exito("Venta realizada correctamente.")
             return True
