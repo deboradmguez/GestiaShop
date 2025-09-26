@@ -186,7 +186,6 @@ class App(Window):
     def cerrar_app(self): self.app_logic.cerrar_aplicacion_seguro()
     def mostrar_soporte(self): self.app_logic.mostrar_ventana_soporte()
     def ruta_recurso(self, path): return ruta_recurso(path)
-
     # -- Delegados de Ventas --
     def buscar_y_agregar_a_carrito(self): self.ventas_logic.buscar_y_agregar_a_carrito()
     def vaciar_carrito(self): self.ventas_logic.vaciar_carrito()
@@ -222,7 +221,7 @@ class App(Window):
     def procesar_cierre_caja(self, f, t): self.caja_logic.procesar_cierre_caja(f, t)
     def ajustar_cierre_de_caja(self, f): self.caja_logic.ajustar_cierre_de_caja(f)
     def ir_a_hoy_caja(self): self.caja_logic.ir_a_hoy_caja()
-    def descargar_reporte_caja(self, f): self.caja_logic.descargar_reporte_caja(f)
+    def descargar_reporte_caja(self): self.caja_logic.descargar_reporte_caja()
     
     # -- Delegados de Estadísticas --
     def generar_estadisticas(self): self.estadisticas_logic.generar_estadisticas()

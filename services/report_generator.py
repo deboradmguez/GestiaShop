@@ -32,11 +32,14 @@ def generar_reporte_cierre_caja(datos_cierre, historial_ventas, resumen_ventas, 
         total_efectivo = sum(t for m, t in resumen_ventas if m == "Efectivo")
         total_esperado = datos_cierre.get('fondo_inicial', 0.0) + total_efectivo
         
+        monto_final_str = f"${datos_cierre.get('contado_final', 0.0):,.2f}" if datos_cierre.get('contado_final') is not None else "N/A"
+        diferencia_str = f"${datos_cierre.get('diferencia', 0.0):,.2f}" if datos_cierre.get('diferencia') is not None else "N/A"
+        
         data_cierre = [
             ["Fondo Inicial:", f"${datos_cierre.get('fondo_inicial', 0.0):,.2f}"],
             ["Total Esperado en Caja:", f"${total_esperado:,.2f}"],
-            ["Monto Contado Final:", f"${datos_cierre.get('contado_final', 0.0):,.2f}"],
-            ["Diferencia:", f"${datos_cierre.get('diferencia', 0.0):,.2f}"]
+            ["Monto Contado Final:", monto_final_str],
+            ["Diferencia:", diferencia_str]
         ]
         table_cierre = Table(data_cierre, colWidths=[200, 150])
         story.append(table_cierre)
