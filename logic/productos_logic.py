@@ -60,14 +60,14 @@ class ProductosLogic:
 
         btn_guardar = ttk.Button(frame_agregar, text="Guardar Producto", style="success.TButton", command=lambda: self._guardar_nuevo_producto(entries, ventana_agregar))
         btn_guardar.pack(pady=10)
-
+        # --- BINDS ---
         entries["Código de Barras"].bind("<Return>", lambda e: entries["Nombre del Producto"].focus_set())
         entries["Nombre del Producto"].bind("<Return>", lambda e: entries["Precio"].focus_set())
         entries["Precio"].bind("<Return>", lambda e: entries["Stock Inicial"].focus_set())
         entries["Stock Inicial"].bind("<Return>", lambda e: btn_guardar.invoke())
-        helpers.centrar_ventana(ventana_agregar, self.app)
         ventana_agregar.bind("<Escape>", lambda e: ventana_agregar.destroy())
-
+        helpers.centrar_ventana(ventana_agregar, self.app)
+        
     def _guardar_nuevo_producto(self, entries, ventana):
         """Valida y guarda los datos del nuevo producto."""
         try:
@@ -136,7 +136,10 @@ class ProductosLogic:
         btn_guardar.pack(pady=10)
         entries["Stock"].bind("<Return>", lambda e: btn_guardar.invoke())
         helpers.centrar_ventana(ventana_modificar, self.app)
+        ventana_modificar.bind("<Escape>", lambda e: ventana_modificar.destroy())
+
     def _guardar_modificaciones_producto(self, codigo, entries, ventana):
+        
         """Valida y guarda las modificaciones de un producto."""
         try:
             nuevo_nombre = entries["Nombre"].get().strip()

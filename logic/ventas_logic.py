@@ -176,6 +176,7 @@ class VentasLogic:
         
         campos["Cantidad"].bind("<Return>", lambda e: btn_confirmar.invoke())
         helpers.centrar_ventana(ventana_comun, self.app)
+        ventana_comun.bind("<Escape>", lambda e: ventana_comun.destroy())
 
     def _confirmar_y_agregar_comun(self, entries, ventana):
         """Valida y agrega un producto común al carrito."""

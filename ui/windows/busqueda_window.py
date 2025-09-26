@@ -59,9 +59,9 @@ class BusquedaWindow(tk.Toplevel):
         # Al escribir, la ventana le pide al controlador que realice la búsqueda
         self.entry_busqueda.bind("<KeyRelease>", self._on_realizar_busqueda)
 
-        # Al presionar "Agregar", la ventana le pide al controlador que agregue el producto
         self.btn_agregar.config(command=self._on_agregar_seleccion)
         self.tree_busqueda.bind("<Double-1>", lambda e: self._on_agregar_seleccion())
+        self.bind("<Escape>", lambda e: self.destroy())
     
     # --- Métodos que comunican con el controlador ---
 

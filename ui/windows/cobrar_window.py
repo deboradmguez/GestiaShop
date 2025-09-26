@@ -28,6 +28,8 @@ class CobrarWindow(tk.Toplevel):
         self._configurar_bindings()
         self._actualizar_inputs_metodo()
         helpers.centrar_ventana(self, parent)
+        
+
 
     def _crear_widgets(self):
         """Crea la estructura de widgets de la ventana."""
