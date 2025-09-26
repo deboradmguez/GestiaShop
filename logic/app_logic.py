@@ -3,7 +3,7 @@ from tkinter import Toplevel
 import webbrowser
 from ttkbootstrap import ttk
 from datetime import date
-from utilities import notifications
+from utilities import notifications, helpers
 from utilities.dialogs import ConfirmacionDialog, PinDialog
 from database import database_manager as db_manager
 
@@ -86,7 +86,7 @@ class AppLogic:
 
         btn_confirmar = ttk.Button(frame, text="Confirmar y Empezar", command=confirmar_apertura)
         btn_confirmar.pack(pady=10)
-        
+        helpers.centrar_ventana(dialogo, self.app)
         entry_fondo.bind("<Return>", lambda e: btn_confirmar.invoke())
         dialogo.bind("<Escape>", lambda e: dialogo.destroy())
     def solicitar_pin_admin(self):
@@ -111,9 +111,8 @@ class AppLogic:
     
     def cerrar_aplicacion_seguro(self):
         """Verifica el estado de la caja antes de cerrar."""
-        # caja_abierta = db.verificar_caja_abierta() # Lógica de DB real
-        caja_abierta_simulacion = True # Simulación
-        if caja_abierta_simulacion and self.app.modo_venta_activo:
+        caja_abierta = db_manager.consultar_estado_caja() # Lógica de DB real
+        if caja_abierta and self.app.modo_venta_activo:
             
             dialogo = ConfirmacionDialog(
                 parent=self.app,
@@ -163,8 +162,7 @@ class AppLogic:
         except tk.TclError:
             ttk.Label(frame_qr, text="Error al cargar QR").pack()
         
-        # Aquí necesitaríamos una función de utilidad para centrar, la crearemos después
-        # utils.centrar_ventana(ventana_soporte, self.app)
+        helpers.centrar_ventana(ventana_soporte, self.app)
 
     def actualizar_alertas_stock(self):
         

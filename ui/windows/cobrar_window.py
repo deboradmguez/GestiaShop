@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
+from utilities import helpers
 class CobrarWindow(tk.Toplevel):
     """
     Clase que representa la ventana emergente para el proceso de cobro.
@@ -26,7 +26,8 @@ class CobrarWindow(tk.Toplevel):
         # --- Creación de la interfaz ---
         self._crear_widgets()
         self._configurar_bindings()
-        self._actualizar_inputs_metodo() # Llamada inicial para dibujar los campos
+        self._actualizar_inputs_metodo()
+        helpers.centrar_ventana(self, parent)
 
     def _crear_widgets(self):
         """Crea la estructura de widgets de la ventana."""

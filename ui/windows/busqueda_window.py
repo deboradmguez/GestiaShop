@@ -2,7 +2,7 @@
 
 import tkinter as tk
 from tkinter import ttk
-
+from utilities import helpers
 class BusquedaWindow(tk.Toplevel):
     def __init__(self, parent, controller):
         """
@@ -22,8 +22,7 @@ class BusquedaWindow(tk.Toplevel):
         self._crear_widgets()
         self._configurar_bindings()
         
-        # (Aquí puedes poner tu función para centrar la ventana)
-        # self.controller.centrar_ventana(self, parent)
+        helpers.centrar_ventana(self, parent)
 
     def _crear_widgets(self):
         """Crea y posiciona todos los widgets de esta ventana."""

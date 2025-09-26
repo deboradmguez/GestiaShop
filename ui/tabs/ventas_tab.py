@@ -77,7 +77,6 @@ class VentasTab(ttk.Frame):
 
         self.tree_carrito.heading("producto", text="Producto")
         self.tree_carrito.heading("cantidad", text="Cantidad")
-        # ... (resto de headings y columns sin cambios) ...
         self.tree_carrito.column("producto", width=250, anchor="w")
         self.tree_carrito.column("cantidad", width=80, anchor="e")
         self.tree_carrito.column("precio", width=80, anchor="e")

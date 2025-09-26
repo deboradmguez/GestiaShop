@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
+from utilities import helpers
 class ConfirmacionDialog(tk.Toplevel):
     def __init__(self, parent, title, message):
         super().__init__(parent)
@@ -31,10 +31,9 @@ class ConfirmacionDialog(tk.Toplevel):
         btn_no.pack(side="left", padx=10)
         
         # Centrar la ventana
-        self.update_idletasks()
-        x = parent.winfo_x() + (parent.winfo_width() // 2) - (self.winfo_width() // 2)
-        y = parent.winfo_y() + (parent.winfo_height() // 2) - (self.winfo_height() // 2)
-        self.geometry(f"+{x}+{y}")
+        #self.update_idletasks()
+        helpers.centrar_ventana(self, parent)
+
 
     def _on_si(self):
         self.result = True
@@ -61,6 +60,8 @@ class PinDialog(tk.Toplevel):
         self.result = False
 
         self.PIN_CORRECTO = str(pin_correcto)
+        helpers.centrar_ventana(self, parent)
+
     def _on_ok(self, event=None):
         if self.entry_pin.get() == self.PIN_CORRECTO:
             self.result = True

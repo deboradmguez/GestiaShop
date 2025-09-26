@@ -144,6 +144,7 @@ class CajaLogic:
         
         btn_confirmar = ttk.Button(frame, text="Confirmar Ajuste", command=confirmar_ajuste)
         btn_confirmar.pack(pady=10)
+        helpers.centrar_ventana(dialogo_ajuste, self.app)
         entry_monto.bind("<Return>", lambda e: btn_confirmar.invoke())
         dialogo_ajuste.bind("<Escape>", lambda e: dialogo_ajuste.destroy())
 

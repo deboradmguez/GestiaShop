@@ -7,6 +7,7 @@ from ui.windows.busqueda_window import BusquedaWindow
 from ui.windows.cobrar_window import CobrarWindow
 from utilities.dialogs import ConfirmacionDialog
 from database import database_manager as db_manager
+from utilities import helpers
 
 class VentasLogic:
     """
@@ -122,7 +123,7 @@ class VentasLogic:
 
         btn_guardar = ttk.Button(frame, text="Guardar", command=lambda: self._guardar_nueva_cantidad(codigo_a_modificar, entry_cantidad, stock_total_db, ventana_cantidad))
         btn_guardar.pack(pady=10)
-        
+        helpers.centrar_ventana(ventana_cantidad, self.app)
         entry_cantidad.bind("<Return>", lambda e: btn_guardar.invoke())
         ventana_cantidad.bind("<Escape>", lambda e: ventana_cantidad.destroy())
 
@@ -176,6 +177,7 @@ class VentasLogic:
         btn_confirmar.pack(pady=10)
         
         campos["Cantidad"].bind("<Return>", lambda e: btn_confirmar.invoke())
+        helpers.centrar_ventana(ventana_comun, self.app)
 
     def _confirmar_y_agregar_comun(self, entries, ventana):
         """Valida y agrega un producto común al carrito."""

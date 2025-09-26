@@ -244,7 +244,7 @@ class ProductosLogic:
 
         btn_finalizar = ttk.Button(frame_botones, text="Finalizar y Guardar Todo", style="success.TButton", command=lambda: self._finalizar_y_guardar_carga_rapida(productos_a_guardar, ventana_carga))
         btn_finalizar.pack(side="left", padx=10)
-
+        helpers.centrar_ventana(ventana_carga, self.app)
         campos_entries["Stock Inicial"].bind("<Return>", agregar_y_siguiente)
         ventana_carga.bind("<Escape>", lambda e: ventana_carga.destroy())
 
