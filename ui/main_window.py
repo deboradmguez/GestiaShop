@@ -126,9 +126,9 @@ class App(Window):
             except: print("Advertencia: No se pudo establecer el locale a español.")
     
     def _configurar_bindings_globales(self):
-        """Configura los atajos de teclado de toda la aplicación."""
         self.notebook.bind("<<NotebookTabChanged>>", self._on_tab_change)
         
+        # Atajos para cambiar de pestaña
         self.bind("<F1>", lambda e: self.notebook.select(0))
         self.bind("<F2>", lambda e: self.notebook.select(1))
         self.bind("<F3>", lambda e: self.notebook.select(2))
@@ -137,6 +137,12 @@ class App(Window):
         self.bind("<F6>", lambda e: self.notebook.select(5))
         self.bind("<F7>", lambda e: self.notebook.select(6))
         
+        # Atajos para la pestaña de Ventas
+        self.bind("<Control-f>", lambda e: self.mostrar_ventana_cobrar())
+        self.bind("<Control-b>", lambda e: self.mostrar_ventana_busqueda())
+        self.bind("<Control-a>", lambda e: self.agregar_producto_comun())
+        self.bind("<Control-d>", lambda e: self.vaciar_carrito())
+
         # Nuevos bindings para pantalla completa
         self.bind("<F11>", self.toggle_fullscreen)
         self.bind("<Escape>", self.salir_de_fullscreen)

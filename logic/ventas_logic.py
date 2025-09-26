@@ -129,7 +129,7 @@ class VentasLogic:
                 self.app.notificar_alerta("La cantidad debe ser mayor a cero.")
                 return
             if stock_disponible is not None and nueva_cantidad > stock_disponible:
-                self.app.notificar_alerta(f"Stock Insuficiente. El stock máximo es {stock_disponible}.", parent=ventana)
+                self.app.notificar_alerta(f"Stock Insuficiente. El stock máximo es {stock_disponible}.")
                 return
 
             self.app.carrito[codigo]["cantidad"] = nueva_cantidad
@@ -148,6 +148,11 @@ class VentasLogic:
         producto_db = db_manager.obtener_producto_por_codigo(codigo_barras)
         if producto_db:
             _, nombre, precio, stock, _ = producto_db
+            stock_en_carrito = self.app.carrito.get(codigo_barras, {}).get("cantidad", 0)
+            if stock - stock_en_carrito <= 0:
+                self.app.notificar_alerta(f"No hay más stock disponible para '{nombre}'.")
+                return 
+
             self._agregar_a_carrito((codigo_barras, nombre, precio, 1), stock)
 
     def agregar_producto_comun(self):
