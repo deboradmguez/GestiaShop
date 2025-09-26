@@ -124,7 +124,7 @@ class ProductosLogic:
             entry.insert(0, valor)
             entry.pack(fill="x", padx=5, pady=(0, 10))
             entries[campo] = entry
-
+        entries["Nombre"].focus_set()
         btn_guardar = ttk.Button(
             frame_modificar,
             text="Guardar Cambios",

@@ -90,13 +90,8 @@ class AppLogic:
         entry_fondo.bind("<Return>", lambda e: btn_confirmar.invoke())
         dialogo.bind("<Escape>", lambda e: dialogo.destroy())
     def solicitar_pin_admin(self):
-        
         pin_guardado = self.app.configuracion.get("pin_admin", "0000") 
-
-        # 2. Crea y muestra el diálogo de PIN
         dialogo_pin = PinDialog(self.app, pin_guardado)
-        
-        # 3. Devuelve el resultado
         return dialogo_pin.show()
 
     def _actualizar_estado_controles_venta(self):

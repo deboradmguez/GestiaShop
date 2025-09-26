@@ -49,7 +49,6 @@ class ConfirmacionDialog(tk.Toplevel):
         return self.result
     
 class PinDialog(tk.Toplevel):
-    # Modificamos el constructor para que acepte el PIN
     def __init__(self, parent, pin_correcto):
         super().__init__(parent)
         self.title("Acceso Restringido")
@@ -66,7 +65,6 @@ class PinDialog(tk.Toplevel):
         
         self.entry_pin = ttk.Entry(frame, show="*", justify="center", font=("Segoe UI", 12))
         self.entry_pin.pack(pady=5)
-        self.entry_pin.focus_set()
 
         frame_botones = ttk.Frame(frame)
         frame_botones.pack(pady=10)
@@ -79,8 +77,14 @@ class PinDialog(tk.Toplevel):
 
         self.bind("<Return>", self._on_ok)
         self.bind("<Escape>", self._on_cancel)
-
+        
+        # Asigna la acción de cancelar al botón "X" de la ventana
+        self.protocol("WM_DELETE_WINDOW", self._on_cancel)
+        
         helpers.centrar_ventana(self, parent)
+        
+        # Forzamos el foco DESPUÉS de haber centrado la ventana
+        self.entry_pin.focus_force()
 
     def _on_ok(self, event=None):
         if self.entry_pin.get() == self.PIN_CORRECTO:
@@ -89,11 +93,11 @@ class PinDialog(tk.Toplevel):
         else:
             from tkinter import messagebox
             messagebox.showerror("Error", "PIN incorrecto.", parent=self)
+            # No destruimos la ventana si el PIN es incorrecto, para que pueda reintentar.
             self.result = False
-            self.destroy()
             
     def _on_cancel(self, event=None):
-        self.result = False
+        self.result = None
         self.destroy()
 
     def show(self):

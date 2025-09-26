@@ -68,9 +68,17 @@ class HistorialLogic:
             return
 
         item_seleccionado = seleccion[0]
+        # Nos aseguramos de obtener el ID del elemento padre (la venta en sí)
         parent_id = tab.tree_historial.parent(item_seleccionado)
         id_transaccion = parent_id if parent_id else item_seleccionado
         
+        # --- NUEVA VERIFICACIÓN AÑADIDA ---
+        # Verificamos si la venta ya está anulada antes de continuar
+        item_actual = tab.tree_historial.item(id_transaccion)
+        if 'anulada' in item_actual['tags']:
+            self.app.notificar_alerta("Esta venta ya ha sido anulada.")
+            return
+
         dialogo_confirmacion = ConfirmacionDialog(
             parent=self.app, 
             title="Confirmar Anulación", 
@@ -80,14 +88,21 @@ class HistorialLogic:
         if not dialogo_confirmacion.show():
             self.app.notificar_alerta("Anulación cancelada.")
             return
-        if not self.app.app_logic.solicitar_pin_admin():
+
+        resultado_pin = self.app.app_logic.solicitar_pin_admin()
+
+        if resultado_pin is False:
             self.app.notificar_error("PIN incorrecto. Anulación no autorizada.")
             return
+        
+        if resultado_pin is None:
+            self.app.notificar_alerta("Anulación cancelada.")
+            return
+
         exito = db_manager.anular_venta_existente(id_transaccion)
         
         if exito:
             self.app.notificar_exito("Venta anulada y stock restaurado correctamente.")
-            
             self.recargar_historial_ventas()
             self.app.productos_logic.filtrar_productos_y_recargar()
             self.app.caja_logic.recargar_vista_caja()
