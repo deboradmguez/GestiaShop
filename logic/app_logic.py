@@ -38,7 +38,7 @@ class AppLogic:
         self._actualizar_estado_controles_venta()
 
     def dialogo_abrir_caja(self):
-        dialogo = Toplevel(self.app)
+        dialogo = ctk.CTkToplevel(self.app)
         dialogo.title("Apertura de Caja")
         dialogo.transient(self.app)
         dialogo.grab_set()
@@ -84,7 +84,7 @@ class AppLogic:
             except (ValueError, TypeError):
                 self.app.notificar_error("El fondo inicial debe ser un número válido.")
 
-        btn_confirmar = ttk.Button(frame, text="Confirmar y Empezar", command=confirmar_apertura)
+        btn_confirmar = ctk.CTkButton(frame, text="Confirmar y Empezar", command=confirmar_apertura)
         btn_confirmar.pack(pady=10)
         helpers.centrar_ventana(dialogo, self.app)
         entry_fondo.bind("<Return>", lambda e: btn_confirmar.invoke())
@@ -124,7 +124,7 @@ class AppLogic:
     
     def mostrar_ventana_soporte(self):
         """Muestra la ventana emergente de Soporte Técnico."""
-        ventana_soporte = Toplevel(self.app)
+        ventana_soporte = ctk.CTkToplevel(self.app)
         ventana_soporte.title("Soporte Técnico")
         ventana_soporte.transient(self.app)
         ventana_soporte.grab_set()
@@ -150,7 +150,7 @@ class AppLogic:
         try:
             # Asumiendo que ruta_recurso ahora es un método del controlador App
             qr_path = self.app.ruta_recurso("icons/whatsapp_qr.png")
-            qr_image_original = tk.PhotoImage(file=qr_path)
+            qr_image_original = ctk.CTkImage(file=qr_path)
             qr_image = qr_image_original.subsample(3, 3)
             lbl_qr = ctk.CTkLabel(frame_qr, image=qr_image)
             lbl_qr.image = qr_image 

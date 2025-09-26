@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from utilities import helpers
-class ConfirmacionDialog(tk.Toplevel):
+class ConfirmacionDialog(ctk.CTkToplevel):
     def __init__(self, parent, title, message):
         super().__init__(parent)
         self.title(title)
@@ -47,7 +47,7 @@ class ConfirmacionDialog(tk.Toplevel):
         self.wait_window(self)
         return self.result
     
-class PinDialog(tk.Toplevel):
+class PinDialog(ctk.CTkToplevel):
     def __init__(self, parent, pin_correcto):
         super().__init__(parent)
         self.title("Acceso Restringido")

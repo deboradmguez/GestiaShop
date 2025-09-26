@@ -6,9 +6,9 @@ class ProductosTab(ctk.CTkFrame):
         super().__init__(parent)
         self.controller = controller
 
-        self.icono_agregar = tk.PhotoImage(file=self.controller.ruta_recurso("icons/agregar.png"))
-        self.icono_modificar = tk.PhotoImage(file=self.controller.ruta_recurso("icons/lapiz.png"))
-        self.icono_eliminar = tk.PhotoImage(file=self.controller.ruta_recurso("icons/borrar.png"))
+        self.icono_agregar =ctk.CTkImage(file=self.controller.ruta_recurso("icons/agregar.png"))
+        self.icono_modificar = ctk.CTkImage(file=self.controller.ruta_recurso("icons/lapiz.png"))
+        self.icono_eliminar = ctk.CTkImage(file=self.controller.ruta_recurso("icons/borrar.png"))
 
         # Organizamos la creación de widgets en métodos para mayor claridad.
         self._crear_panel_de_controles()
@@ -23,7 +23,7 @@ class ProductosTab(ctk.CTkFrame):
             side="left", padx=(10, 5)
         )
         opciones_filtro = ["Todos los productos", "Productos con stock bajo"]
-        self.combo_filtro_productos = ttk.Combobox(
+        self.combo_filtro_productos = ctk.CTkComboBox(
             frame_controles, values=opciones_filtro, state="readonly", 
             font=("Segoe UI", 12), width=22
         )

@@ -37,7 +37,7 @@ class ProductosLogic:
 
     def mostrar_ventana_agregar_producto(self, codigo_previo=""):
         """Muestra la ventana emergente para agregar un nuevo producto."""
-        ventana_agregar = Toplevel(self.app)
+        ventana_agregar = ctk.CTkToplevel(self.app)
         ventana_agregar.title("Agregar Nuevo Producto")
         ventana_agregar.transient(self.app)
         ventana_agregar.grab_set()
@@ -109,7 +109,7 @@ class ProductosLogic:
 
         codigo_barras, nombre, precio, stock, _ = producto_db
 
-        ventana_modificar = Toplevel(self.app)
+        ventana_modificar = ctk.CTkToplevel(self.app)
         ventana_modificar.title(f"Modificar Producto: {codigo_barras}")
         ventana_modificar.transient(self.app)
         ventana_modificar.grab_set()
@@ -197,7 +197,7 @@ class ProductosLogic:
 
     def abrir_ventana_carga_rapida(self):
         """Muestra la ventana emergente para la carga rápida de múltiples productos."""
-        ventana_carga = Toplevel(self.app)
+        ventana_carga = ctk.CTkToplevel(self.app)
         ventana_carga.title("Carga Rápida de Inventario")
         ventana_carga.transient(self.app)
         ventana_carga.grab_set()

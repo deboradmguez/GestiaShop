@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from tkinter import ttk
 
 # Definimos una constante para la fuente, para no repetirla.
 FUENTE_GENERAL = ("Segoe UI", 16)
@@ -62,7 +63,7 @@ class VentasTab(ctk.CTkFrame):
         tree_frame = ctk.CTkFrame(frame_carrito)
         tree_frame.pack(fill="both", expand=True)
 
-        scrollbar = ttk.Scrollbar(tree_frame)
+        scrollbar = ctk.CTkScrollbar(tree_frame)
         scrollbar.pack(side="right", fill="y")
 
         self.tree_carrito = ttk.Treeview(

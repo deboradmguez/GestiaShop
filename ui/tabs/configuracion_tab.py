@@ -15,7 +15,7 @@ class ConfiguracionTab(ctk.CTkFrame):
 
     def _crear_campo_combobox(self, parent, label_text, value, values_list):
         ctk.CTkLabel(parent, text=label_text).pack(anchor="w")
-        combo = ttk.Combobox(parent, values=values_list, state="readonly")
+        combo = ctk.CTkComboBox(parent, values=values_list, state="readonly")
         combo.set(value)
         combo.pack(fill="x", pady=2)
         return combo
@@ -61,7 +61,7 @@ class ConfiguracionTab(ctk.CTkFrame):
         main_frame = ctk.CTkFrame(self)
         main_frame.pack(fill="both", expand=True)
         canvas = tk.Canvas(main_frame)
-        scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+        scrollbar = ctk.CTkScrollbar(main_frame, orient="vertical", command=canvas.yview)
         scrollable_frame = ctk.CTkFrame(canvas)
         scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
@@ -90,7 +90,7 @@ class ConfiguracionTab(ctk.CTkFrame):
         frame_tema.pack(fill="x", pady=5)
         ctk.CTkLabel(frame_tema, text="Tema:", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
         temas_disponibles = ["superhero", "darkly", "cyborg", "vapor", "sandstone"]
-        self.combo_tema = ttk.Combobox(frame_tema, values=temas_disponibles, font=("Segoe UI", 10), state="readonly")
+        self.combo_tema = ctk.CTkComboBox(frame_tema, values=temas_disponibles, font=("Segoe UI", 10), state="readonly")
         self.combo_tema.set(config.get("tema", "superhero"))
         self.combo_tema.pack(fill="x", pady=2)
         
@@ -98,10 +98,10 @@ class ConfiguracionTab(ctk.CTkFrame):
         ctk.CTkLabel(frame_tema, text="Nota: Cambiar el tema reiniciará la aplicación.", font=("Segoe UI", 8, "italic")).pack(anchor="w", pady=(5,0))
         
         # Inventario
-        frame_inventario = ctk.CTkLabelFrame(frame_principal, text="Inventario", padding=10)
+        frame_inventario = ctk.CTkFrame(frame_principal, text="Inventario", padding=10)
         frame_inventario.pack(fill="x", pady=5)
         self.var_alertas = tk.BooleanVar(value=config.get("mostrar_alertas_stock", True))
-        check_alertas = ttk.Checkbutton(frame_inventario, text="Mostrar alertas de stock bajo", variable=self.var_alertas)
+        check_alertas = ctk.CTkCheckBox(frame_inventario, text="Mostrar alertas de stock bajo", variable=self.var_alertas)
         check_alertas.pack(anchor="w", pady=2)
         frame_umbral = ctk.CTkFrame(frame_inventario)
         frame_umbral.pack(fill="x", pady=2)

@@ -98,7 +98,7 @@ class VentasLogic:
         stock_total_db = producto_db[3] if producto_db else None
 
         # Creación de la ventana
-        ventana_cantidad = Toplevel(self.app)
+        ventana_cantidad = ctk.CTkToplevel(self.app)
         ventana_cantidad.title("Modificar Cantidad")
         ventana_cantidad.transient(self.app)
         ventana_cantidad.grab_set()
@@ -155,7 +155,7 @@ class VentasLogic:
 
     def agregar_producto_comun(self):
         """Muestra una ventana para agregar un producto no inventariado."""
-        ventana_comun = Toplevel(self.app)
+        ventana_comun = ctk.CTkToplevel(self.app)
         ventana_comun.title("Agregar Producto Común")
         ventana_comun.transient(self.app)
         ventana_comun.grab_set()

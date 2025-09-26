@@ -9,7 +9,7 @@ class HistorialTab(ctk.CTkFrame):
 
         # Intentamos cargar el ícono, si falla, el botón no tendrá imagen.
         try:
-            self.icono_descargar = tk.PhotoImage(file=self.controller.ruta_recurso("icons/descargar.png"))
+            self.icono_descargar = ctk.CTkImage(file=self.controller.ruta_recurso("icons/descargar.png"))
         except tk.TclError:
             self.icono_descargar = None
 
