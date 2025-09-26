@@ -42,8 +42,7 @@ class VentasTab(ctk.CTkFrame):
         self.btn_buscar_nombre = ctk.CTkButton(
             frame_botones_venta,
             text="🔎 Buscar por Nombre (Ctrl + B)",
-            command=self.controller.mostrar_ventana_busqueda, # Llama al método en el controller
-            style="secondary.TButton",
+            command=self.controller.mostrar_ventana_busqueda
         )
         self.btn_buscar_nombre.pack(side="left", padx=5, ipadx=5)
 
@@ -97,10 +96,9 @@ class VentasTab(ctk.CTkFrame):
             frame_pie_ventas,
             text="Total: $0.00",
             font=("Arial Black", 28),
-            bootstyle="inverse-success",
-            padding=10,
+            text_color="white", fg_color="green"
         )
-        self.lbl_total.pack(side="right", padx=(20, 10))
+        self.lbl_total.pack(side="right", padx=20, pady=10)
 
         self.btn_quitar = ctk.CTkButton(
             frame_pie_ventas, text="Quitar",

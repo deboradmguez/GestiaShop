@@ -31,9 +31,9 @@ class CajaTab(ctk.CTkFrame):
         # Contenedor de datos
         frame_contenedor = ctk.CTkFrame(frame_principal)
         frame_contenedor.pack(fill="both", expand=True, pady=10)
-        frame_ventas = ctk.CTkLabelFrame(frame_contenedor, text="RESUMEN DE VENTAS", padding=15)
+        frame_ventas = ctk.CTkFrame(frame_contenedor, text="RESUMEN DE VENTAS", padding=15)
         frame_ventas.pack(side="left", fill="both", expand=True, padx=(0, 10))
-        frame_caja = ctk.CTkLabelFrame(frame_contenedor, text="INFORMACIÓN DE CAJA", padding=15)
+        frame_caja = ctk.CTkFrame(frame_contenedor, text="INFORMACIÓN DE CAJA", padding=15)
         frame_caja.pack(side="right", fill="both", expand=True, padx=(10, 0))
 
         # Labels de información (se llenarán desde el controlador)

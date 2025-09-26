@@ -50,7 +50,7 @@ class EstadisticasTab(ctk.CTkFrame):
         frame_resumen_datos = ctk.CTkFrame(frame_resultados)
         frame_resumen_datos.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
 
-        frame_ganancias = ctk.CTkLabelFrame(frame_resumen_datos, text="Resumen de Ingresos", padding=10)
+        frame_ganancias = ctk.CTkFrame(frame_resumen_datos, text="Resumen de Ingresos", padding=10)
         frame_ganancias.pack(fill="x", pady=5)
         self.lbl_total_facturado = ctk.CTkLabel(frame_ganancias, text="Facturación Total: $0.00", font=("Segoe UI", 12, "bold"))
         self.lbl_total_facturado.pack(anchor="w")
@@ -59,7 +59,7 @@ class EstadisticasTab(ctk.CTkFrame):
         self.lbl_total_transferencia = ctk.CTkLabel(frame_ganancias, text="Total Transferencia: $0.00", font=("Segoe UI", 10))
         self.lbl_total_transferencia.pack(anchor="w")
 
-        frame_top_productos = ctk.CTkLabelFrame(frame_resumen_datos, text="Top 5 Productos Vendidos", padding=10)
+        frame_top_productos = ctk.CTkFrame(frame_resumen_datos, text="Top 5 Productos Vendidos", padding=10)
         frame_top_productos.pack(fill="x", pady=10)
         self.tree_top_productos = ttk.Treeview(frame_top_productos, columns=("producto", "cantidad"), show="headings", height=5)
         self.tree_top_productos.heading("producto", text="Producto")
@@ -68,5 +68,5 @@ class EstadisticasTab(ctk.CTkFrame):
         self.tree_top_productos.column("cantidad", width=100, anchor="center")
         self.tree_top_productos.pack(fill="x")
 
-        self.frame_grafico = ctk.CTkLabelFrame(frame_resultados, text="Distribución de Pagos", padding=10)
+        self.frame_grafico = ctk.CTkFrame(frame_resultados, text="Distribución de Pagos", padding=10)
         self.frame_grafico.grid(row=0, column=1, sticky="nsew")

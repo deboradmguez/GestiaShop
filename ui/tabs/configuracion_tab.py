@@ -58,27 +58,17 @@ class ConfiguracionTab(ctk.CTkFrame):
         config = self.controller.get_configuracion()
         
         # --- Frame principal con scrollbar ---
-        main_frame = ctk.CTkFrame(self)
-        main_frame.pack(fill="both", expand=True)
-        canvas = tk.Canvas(main_frame)
-        scrollbar = ctk.CTkScrollbar(main_frame, orient="vertical", command=canvas.yview)
-        scrollable_frame = ctk.CTkFrame(canvas)
-        scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        canvas.bind("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
-        
-        frame_principal = ctk.CTkFrame(scrollable_frame, padding=15)
-        frame_principal.pack(fill="x", expand=True)
+        scrollable_frame = ctk.CTkScrollableFrame(self)
+        scrollable_frame.pack(fill="both", expand=True)
+        frame_principal = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
+        frame_principal.pack(fill="x", expand=True, padx=15, pady=15)
         
         # --- Widgets de Configuración ---
         
         ctk.CTkLabel(frame_principal, text="CONFIGURACIÓN DEL SISTEMA", font=("Segoe UI", 14, "bold")).pack(pady=(0, 15))
         
         # Negocio
-        frame_negocio = ctk.CTkLabelFrame(frame_principal, text="Información del Negocio", padding=10)
+        frame_negocio = ctk.CTkFrame(frame_principal, text="Información del Negocio", padding=10)
         frame_negocio.pack(fill="x", pady=5)
         ctk.CTkLabel(frame_negocio, text="Nombre:", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
         self.entry_nombre_comercio = ctk.CTkEntry(frame_negocio, width=35, font=("Segoe UI", 10))
@@ -86,7 +76,7 @@ class ConfiguracionTab(ctk.CTkFrame):
         self.entry_nombre_comercio.pack(fill="x", pady=2)
         
         # Apariencia
-        frame_tema = ctk.CTkLabelFrame(frame_principal, text="Apariencia", padding=10)
+        frame_tema = ctk.CTkFrame(frame_principal, text="Apariencia", padding=10)
         frame_tema.pack(fill="x", pady=5)
         ctk.CTkLabel(frame_tema, text="Tema:", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
         temas_disponibles = ["superhero", "darkly", "cyborg", "vapor", "sandstone"]
