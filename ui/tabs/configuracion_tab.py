@@ -2,15 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 
 class ConfiguracionTab(ttk.Frame):
-    """
-    Clase que representa la INTERFAZ de la pestaña de Configuración.
-    """
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        # Nota: La UI no se crea en el init. Se crea dinámicamente
-        # con 'recargar_vista' para que siempre esté actualizada.
-
     # --- Funciones de ayuda para crear widgets ---
     def _crear_campo_entry(self, parent, label_text, value):
         ttk.Label(parent, text=label_text).pack(anchor="w")
@@ -64,7 +58,6 @@ class ConfiguracionTab(ttk.Frame):
         config = self.controller.get_configuracion()
         
         # --- Frame principal con scrollbar ---
-        # (La lógica del canvas y scrollbar se mantiene, pero ahora dentro de la clase)
         main_frame = ttk.Frame(self)
         main_frame.pack(fill="both", expand=True)
         canvas = tk.Canvas(main_frame)
@@ -101,6 +94,9 @@ class ConfiguracionTab(ttk.Frame):
         self.combo_tema.set(config.get("tema", "superhero"))
         self.combo_tema.pack(fill="x", pady=2)
         
+        # --- NUEVO: Label informativo ---
+        ttk.Label(frame_tema, text="Nota: Cambiar el tema reiniciará la aplicación.", font=("Segoe UI", 8, "italic")).pack(anchor="w", pady=(5,0))
+        
         # Inventario
         frame_inventario = ttk.LabelFrame(frame_principal, text="Inventario", padding=10)
         frame_inventario.pack(fill="x", pady=5)
@@ -121,5 +117,3 @@ class ConfiguracionTab(ttk.Frame):
         btn_aplicar.pack(side="left", padx=5)
         btn_restaurar = ttk.Button(frame_botones, text="↩️ Restaurar", command=self._restaurar_valores_por_defecto, style="warning.TButton", width=15)
         btn_restaurar.pack(side="left", padx=5)
-
-    

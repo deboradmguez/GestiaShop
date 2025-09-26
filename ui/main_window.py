@@ -33,9 +33,13 @@ class App(Window):
         self.configuracion = config
         super().__init__(themename=self.configuracion.get("tema", "superhero"))
         self.single_instance_lock = single_instance_lock
+        
+        self.is_fullscreen = True # Variable de estado para la pantalla completa
+        
         style = ttk.Style()
         style.configure("Custom.Treeview", font=("Segoe UI", 11), rowheight=30) 
         style.configure("Custom.Treeview.Heading", font=("Segoe UI", 12, "bold"))
+        
         self._configurar_ventana()
         self._configurar_locale()
 
@@ -67,7 +71,7 @@ class App(Window):
     def _configurar_ventana(self):
         """Configura los atributos principales de la ventana."""
         self.title("GestiaShop - Sistema de Gestión")
-        self.attributes("-fullscreen", True)
+        self.attributes("-fullscreen", self.is_fullscreen)
         self.iconphoto(True, tk.PhotoImage(file=ruta_recurso('icons/icono_app.png')))
 
     def _crear_header(self):
@@ -110,7 +114,7 @@ class App(Window):
         self.actualizar_titulo_app()
         self.actualizar_fecha_hora()
         self.app_logic.manejar_apertura_caja_inicial()
-        # Iniciar la primera recarga de las pestañas que lo necesiten
+        self.app_logic.actualizar_alertas_stock()
         self.historial_logic.recargar_historial_ventas()
         self.productos_logic.filtrar_productos_y_recargar()
 
@@ -132,8 +136,22 @@ class App(Window):
         self.bind("<F5>", lambda e: self.notebook.select(4))
         self.bind("<F6>", lambda e: self.notebook.select(5))
         self.bind("<F7>", lambda e: self.notebook.select(6))
-        self.bind("<Escape>", lambda e: self.attributes("-fullscreen", False))
-    
+        
+        # Nuevos bindings para pantalla completa
+        self.bind("<F11>", self.toggle_fullscreen)
+        self.bind("<Escape>", self.salir_de_fullscreen)
+
+    def toggle_fullscreen(self, event=None):
+        """Activa o desactiva el modo de pantalla completa."""
+        self.is_fullscreen = not self.is_fullscreen
+        self.attributes("-fullscreen", self.is_fullscreen)
+
+    def salir_de_fullscreen(self, event=None):
+        """Sale del modo de pantalla completa si está activo."""
+        if self.is_fullscreen:
+            self.is_fullscreen = False
+            self.attributes("-fullscreen", False)
+
     # --- MÉTODOS DE ACTUALIZACIÓN DE UI PRINCIPAL ---
     def actualizar_fecha_hora(self):
        
