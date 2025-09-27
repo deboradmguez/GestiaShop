@@ -239,7 +239,7 @@ class ProductosLogic:
                 for entry in campos_entries.values():
                     entry.delete(0, 'end')
                 
-                lbl_contador.config(text=f"Productos en lista: {len(productos_a_guardar)}")
+                lbl_contador.configure(text=f"Productos en lista: {len(productos_a_guardar)}")
                 campos_entries["Código de Barras"].focus_set()
             except ValueError:
                 self.app.notificar_error("El precio y el stock deben ser números válidos.")

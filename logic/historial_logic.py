@@ -28,9 +28,9 @@ class HistorialLogic:
         
         # 3. Actualizamos los labels de la UI con los totales reales
         tab = self.app.historial_tab
-        tab.lbl_total_efectivo.config(text=f"Efectivo: ${total_efectivo:,.2f}")
-        tab.lbl_total_transferencia.config(text=f"Transferencia: ${total_transferencia:,.2f}")
-        tab.lbl_total_general.config(text=f"Total: ${total_efectivo + total_transferencia:,.2f}")
+        tab.lbl_total_efectivo.configure(text=f"Efectivo: ${total_efectivo:,.2f}")
+        tab.lbl_total_transferencia.configure(text=f"Transferencia: ${total_transferencia:,.2f}")
+        tab.lbl_total_general.configure(text=f"Total: ${total_efectivo + total_transferencia:,.2f}")
 
         # 4. Limpiamos la tabla antes de llenarla
         tab.tree_historial.delete(*tab.tree_historial.get_children())
@@ -113,7 +113,7 @@ class HistorialLogic:
         """Habilita o deshabilita el botón de anular según si hay una selección."""
         tab = self.app.historial_tab
         estado = "normal" if tab.tree_historial.selection() else "disabled"
-        tab.btn_anular_venta.config(state=estado)
+        tab.btn_anular_venta.configure(state=estado)
         
     def deseleccionar_si_clic_vacio(self, event):
         """Si se hace clic en un área vacía del Treeview, deselecciona el ítem."""

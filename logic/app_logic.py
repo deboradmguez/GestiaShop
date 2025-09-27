@@ -99,9 +99,9 @@ class AppLogic:
         tab = self.app.ventas_tab
         # Esto asegura que los widgets existan antes de intentar configurarlos
         if hasattr(tab, 'entry_codigo'):
-            tab.entry_codigo.config(state=estado)
-            tab.btn_buscar_nombre.config(state=estado)
-            tab.btn_prod_comun.config(state=estado)
+            tab.entry_codigo.configure(state=estado)
+            tab.btn_buscar_nombre.configure(state=estado)
+            tab.btn_prod_comun.configure(state=estado)
     
     def cerrar_aplicacion_seguro(self):
         """Verifica el estado de la caja antes de cerrar."""
@@ -122,40 +122,41 @@ class AppLogic:
             self.app.destroy()
     
     def mostrar_ventana_soporte(self):
-        """Muestra la ventana emergente de Soporte Técnico."""
         ventana_soporte = ctk.CTkToplevel(self.app)
         ventana_soporte.title("Soporte Técnico")
         ventana_soporte.transient(self.app)
         ventana_soporte.grab_set()
         ventana_soporte.resizable(False, False)
 
-        frame_principal = ctk.CTkFrame(ventana_soporte, padding=15)
-        frame_principal.pack(fill="both", expand=True)
-        frame_texto = ctk.CTkFrame(frame_principal)
+       
+        frame_principal = ctk.CTkFrame(ventana_soporte)
+        frame_principal.pack(fill="both", expand=True, padx=15, pady=15)
+        
+        frame_texto = ctk.CTkFrame(frame_principal, fg_color="transparent")
         frame_texto.pack(side="left", fill="both", expand=True, padx=(0, 15))
-        frame_qr = ctk.CTkFrame(frame_principal)
+        frame_qr = ctk.CTkFrame(frame_principal, fg_color="transparent")
         frame_qr.pack(side="right")
         
-        ctk.CTkLabel(frame_texto, text="Soporte Técnico", font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(0, 10))
+        ctk.CTkLabel(frame_texto, text="Soporte Técnico", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w", pady=(0, 10))
         ctk.CTkLabel(frame_texto, text="Para consultas o problemas, puedes:", font=("Segoe UI", 10)).pack(anchor="w")
 
-        lbl_email = ctk.CTkLabel(frame_texto, text="Enviar un correo electrónico", font=("Segoe UI", 10, "underline"), foreground="#6495ED", cursor="hand2")
+        lbl_email = ctk.CTkLabel(frame_texto, text="Enviar un correo electrónico", font=ctk.CTkFont(size=10, underline=True), text_color="#6495ED", cursor="hand2")
         lbl_email.pack(anchor="w", pady=5)
         lbl_email.bind("<Button-1>", lambda e: webbrowser.open("mailto:sistema.app.dominguez@gmail.com"))
 
         ctk.CTkLabel(frame_texto, text="o escanear el código para chatear por WhatsApp.", font=("Segoe UI", 10)).pack(anchor="w")
-        ctk.CTkLabel(frame_texto, text="\nVersión del Software: 1.0.0", font=("Segoe UI", 9, "italic")).pack(anchor="w", pady=(10, 0))
+        ctk.CTkLabel(frame_texto, text="\nVersión del Software: 1.0.0", font=ctk.CTkFont(size=9, slant="italic")).pack(anchor="w", pady=(10, 0))
 
         try:
-            # Asumiendo que ruta_recurso ahora es un método del controlador App
             qr_path = self.app.ruta_recurso("icons/whatsapp_qr.png")
-            qr_image_original = ctk.CTkImage(file=qr_path)
-            qr_image = qr_image_original.subsample(3, 3)
-            lbl_qr = ctk.CTkLabel(frame_qr, image=qr_image)
-            lbl_qr.image = qr_image 
+            imagen_original = Image.open(qr_path)
+            qr_image = ctk.CTkImage(light_image=imagen_original, dark_image=imagen_original, size=(150, 150)) 
+            
+            lbl_qr = ctk.CTkLabel(frame_qr, image=qr_image, text="")
             lbl_qr.pack()
-        except tk.TclError:
+        except Exception as e:
             ctk.CTkLabel(frame_qr, text="Error al cargar QR").pack()
+            print(f"Error al cargar imagen QR: {e}")
         
         helpers.centrar_ventana(ventana_soporte, self.app)
 

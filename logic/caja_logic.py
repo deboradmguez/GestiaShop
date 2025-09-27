@@ -30,15 +30,15 @@ class CajaLogic:
         tab.frame_cierre_finalizado.pack_forget()
 
         if estado_caja == 'inexistente' or estado_caja == 'error':
-            tab.lbl_estado_caja.config(text="SIN REGISTRO", foreground="grey")
+            tab.lbl_estado_caja.configure(text="SIN REGISTRO", text_color="grey")
             # Limpiamos todos los labels
-            tab.lbl_ventas_efectivo.config(text="$0.00")
-            tab.lbl_ventas_transferencia.config(text="$0.00")
-            tab.lbl_ventas_total.config(text="$0.00")
-            tab.lbl_caja_fondo.config(text="$0.00")
-            tab.lbl_caja_esperado.config(text="$0.00")
-            tab.btn_reporte_caja.config(state="disabled")
-            tab.btn_ajustar_caja.config(state="disabled")
+            tab.lbl_ventas_efectivo.configure(text="$0.00")
+            tab.lbl_ventas_transferencia.configure(text="$0.00")
+            tab.lbl_ventas_total.configure(text="$0.00")
+            tab.lbl_caja_fondo.configure(text="$0.00")
+            tab.lbl_caja_esperado.configure(text="$0.00")
+            tab.btn_reporte_caja.configure(state="disabled")
+            tab.btn_ajustar_caja.configure(state="disabled")
             return
 
         # Si hay datos de caja, los procesamos
@@ -46,29 +46,29 @@ class CajaLogic:
         total_esperado = fondo_inicial + total_efectivo
 
         # Llenamos los labels de información
-        tab.lbl_ventas_efectivo.config(text=f"${total_efectivo:,.2f}")
-        tab.lbl_ventas_transferencia.config(text=f"${total_transferencia:,.2f}")
-        tab.lbl_ventas_total.config(text=f"${total_efectivo + total_transferencia:,.2f}")
-        tab.lbl_caja_fondo.config(text=f"${fondo_inicial:,.2f}")
-        tab.lbl_caja_esperado.config(text=f"${total_esperado:,.2f}")
+        tab.lbl_ventas_efectivo.configure(text=f"${total_efectivo:,.2f}")
+        tab.lbl_ventas_transferencia.configure(text=f"${total_transferencia:,.2f}")
+        tab.lbl_ventas_total.configure(text=f"${total_efectivo + total_transferencia:,.2f}")
+        tab.lbl_caja_fondo.configure(text=f"${fondo_inicial:,.2f}")
+        tab.lbl_caja_esperado.configure(text=f"${total_esperado:,.2f}")
         
-        tab.btn_reporte_caja.config(state="normal")
-        tab.btn_ajustar_caja.config(state="normal")
+        tab.btn_reporte_caja.configure(state="normal")
+        tab.btn_ajustar_caja.configure(state="normal")
 
         if estado_caja == 'abierta':
-            tab.lbl_estado_caja.config(text="🔓 CAJA ABIERTA", foreground="#d9534f")
+            tab.lbl_estado_caja.configure(text="🔓 CAJA ABIERTA", text_color="#d9534f")
             tab.frame_cierre_abierto.pack(pady=10)
             tab.entry_monto_final.delete(0, 'end')
             # Conectamos el botón de confirmar con la lógica de cierre (que haremos después)
-            tab.btn_confirmar_corte.config(command=lambda: self.procesar_cierre_caja(fecha_db, total_esperado))
+            tab.btn_confirmar_corte.configure(command=lambda: self.procesar_cierre_caja(fecha_db, total_esperado))
         
         elif estado_caja == 'cerrada':
             monto_final = datos_caja.get("contado_final", 0.0)
             diferencia = datos_caja.get("diferencia", 0.0)
-            tab.lbl_estado_caja.config(text="🔒 CAJA CERRADA", foreground="#28a745")
+            tab.lbl_estado_caja.configure(text="🔒 CAJA CERRADA", text_color="#28a745")
             tab.frame_cierre_finalizado.pack(pady=10)
-            tab.lbl_caja_contado.config(text=f"${monto_final:,.2f}")
-            tab.lbl_caja_diferencia.config(text=f"${diferencia:,.2f}")
+            tab.lbl_caja_contado.configure(text=f"${monto_final:,.2f}")
+            tab.lbl_caja_diferencia.configure(text=f"${diferencia:,.2f}")
 
     def ajustar_cierre_de_caja(self, fecha_ui):
         if not self.app.app_logic.solicitar_pin_admin():

@@ -30,6 +30,7 @@ class App(ctk.CTk):
     def __init__(self, config, single_instance_lock=None):
         super().__init__()
         self.configuracion = config
+        self.single_instance_lock = single_instance_lock
         ctk.set_appearance_mode(self.configuracion.get("tema", "dark"))
         ctk.set_default_color_theme("blue")
 
@@ -86,9 +87,9 @@ class App(ctk.CTk):
         
     def _crear_notebook(self):
         """Crea y llena el panel de pestañas."""
-        self.notebook = ctk.CTkTabview(self)
+        self.notebook = ctk.CTkTabview(self, command=self._on_tab_change)
         self.notebook.pack(pady=10, padx=10, fill="both", expand=True)
-        
+       
         # Se crean las pestañas y se añaden
         self.notebook.add("Ventas (F1)")
         self.notebook.add("Productos (F2)")
@@ -138,9 +139,7 @@ class App(ctk.CTk):
             except: print("Advertencia: No se pudo establecer el locale a español.")
     
     def _configurar_bindings_globales(self):
-        self.notebook.bind("<<NotebookTabChanged>>", self._on_tab_change)
-        
-        # Atajos para cambiar de pestaña
+
         self.bind("<F1>", lambda e: self.notebook.select(0))
         self.bind("<F2>", lambda e: self.notebook.select(1))
         self.bind("<F3>", lambda e: self.notebook.select(2))
@@ -174,23 +173,22 @@ class App(ctk.CTk):
     def actualizar_fecha_hora(self):
        
         ahora = datetime.now()
-        self.lbl_hora.config(text=ahora.strftime("%H:%M"))
+        self.lbl_hora.configure(text=ahora.strftime("%H:%M"))
         # Llama directamente a la función importada desde helpers
-        self.lbl_fecha.config(text=helpers.formatear_fecha_es(ahora)) 
+        self.lbl_fecha.configure(text=helpers.formatear_fecha_es(ahora)) 
         self.after(60000, self.actualizar_fecha_hora)
         
     def actualizar_titulo_app(self):
         """Actualiza el título de la ventana y el nombre del comercio."""
         nombre = self.configuracion.get("nombre_comercio", "GestiaShop")
         self.title(f"{nombre} - Sistema de Gestión")
-        self.lbl_nombre_comercio.config(text=nombre)
+        self.lbl_nombre_comercio.configure(text=nombre)
 
-    def _on_tab_change(self, event):
-        """Se ejecuta cuando se cambia de pestaña para recargar vistas dinámicas."""
-        tab_texto = self.notebook.tab(self.notebook.select(), "text")
-        if "Configuración" in tab_texto:
+    def _on_tab_change(self):
+        tab_seleccionada = self.notebook.get() 
+        if "Configuración" in tab_seleccionada:
             self.configuracion_tab.recargar_vista()
-
+    
     # =====================================================================
     # --- MÉTODOS DELEGADOS (La App solo redirige la llamada al especialista)
     # =====================================================================

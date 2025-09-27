@@ -1,4 +1,4 @@
-import customtkinter as ctk
+import customtkinter as ctk, tkinter as tk
 from database import database_manager as db_manager
 
 class InventarioLogic:
@@ -39,10 +39,10 @@ class InventarioLogic:
         entries["nombre_edit"].insert(0, self.producto_actual_original["nombre"])
         entries["precio_edit"].delete(0, tk.END)
         entries["precio_edit"].insert(0, f"{self.producto_actual_original['precio']:.2f}")
-        entries["lbl_stock_actual"].config(text=str(self.producto_actual_original["stock"]))
+        entries["lbl_stock_actual"].configure(text=str(self.producto_actual_original["stock"]))
         entries["stock_agregar"].delete(0, tk.END)
         
-        self.app.inventario_tab.btn_confirmar_cambios.config(state="normal")
+        self.app.inventario_tab.btn_confirmar_cambios.configure(state="normal")
         entries["nombre_edit"].focus()
 
     def guardar_cambios_inventario(self, event=None):
@@ -90,9 +90,9 @@ class InventarioLogic:
         tab.entry_codigo_inv.delete(0, tk.END)
         for clave, widget in tab.entries.items():
             if clave == "lbl_stock_actual":
-                widget.config(text="0")
+                widget.configure(text="0")
             else:
                 widget.delete(0, tk.END)
         
-        tab.btn_confirmar_cambios.config(state="disabled")
+        tab.btn_confirmar_cambios.configure(state="disabled")
         tab.entry_codigo_inv.focus()

@@ -39,16 +39,16 @@ class EstadisticasLogic:
 
         self.ultimos_datos_generados = (fecha_inicio_str, fecha_fin_str, resumen, top_productos)
         
-        tab.lbl_total_facturado.config(text=f"Facturación Total: ${resumen['total']:,.2f}")
-        tab.lbl_total_efectivo.config(text=f"Total Efectivo: ${resumen['efectivo']:,.2f}")
-        tab.lbl_total_transferencia.config(text=f"Total Transferencia: ${resumen['transferencia']:,.2f}")
+        tab.lbl_total_facturado.configure(text=f"Facturación Total: ${resumen['total']:,.2f}")
+        tab.lbl_total_efectivo.configure(text=f"Total Efectivo: ${resumen['efectivo']:,.2f}")
+        tab.lbl_total_transferencia.configure(text=f"Total Transferencia: ${resumen['transferencia']:,.2f}")
         
         tab.tree_top_productos.delete(*tab.tree_top_productos.get_children())
         for producto, cantidad in top_productos:
             tab.tree_top_productos.insert("", "end", values=(producto, f"{cantidad} unidades"))
             
         self._actualizar_grafico_torta(resumen)
-        tab.btn_pdf.config(state="normal")
+        tab.btn_pdf.configure(state="normal")
 
     def _actualizar_grafico_torta(self, datos_resumen):
         """Dibuja o actualiza el gráfico de torta en el canvas de la pestaña."""
