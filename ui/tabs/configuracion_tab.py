@@ -1,6 +1,6 @@
+import tkinter as tk
 import customtkinter as ctk
-
-
+from tkinter import ttk
 class ConfiguracionTab(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -46,10 +46,6 @@ class ConfiguracionTab(ctk.CTkFrame):
             self.recargar_vista()
 
     def recargar_vista(self):
-        """
-        Destruye los widgets existentes y vuelve a crear la interfaz
-        con los datos de configuración más recientes.
-        """
         # Limpiar la pestaña antes de volver a dibujarla
         for widget in self.winfo_children():
             widget.destroy()
@@ -58,52 +54,65 @@ class ConfiguracionTab(ctk.CTkFrame):
         config = self.controller.get_configuracion()
         
         # --- Frame principal con scrollbar ---
-        scrollable_frame = ctk.CTkScrollableFrame(self)
+        scrollable_frame = ctk.CTkScrollableFrame(self, fg_color="transparent")
         scrollable_frame.pack(fill="both", expand=True)
+        
         frame_principal = ctk.CTkFrame(scrollable_frame, fg_color="transparent")
         frame_principal.pack(fill="x", expand=True, padx=15, pady=15)
         
-        # --- Widgets de Configuración ---
+        ctk.CTkLabel(frame_principal, text="CONFIGURACIÓN DEL SISTEMA", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(0, 20))
         
-        ctk.CTkLabel(frame_principal, text="CONFIGURACIÓN DEL SISTEMA", font=("Segoe UI", 14, "bold")).pack(pady=(0, 15))
+        frame_negocio = ctk.CTkFrame(frame_principal, border_width=1)
+        frame_negocio.pack(fill="x", pady=10, padx=10)
+        ctk.CTkLabel(frame_negocio, text="Información del Negocio", font=ctk.CTkFont(weight="bold")).pack(pady=(5, 10))
         
-        # Negocio
-        frame_negocio = ctk.CTkFrame(frame_principal, text="Información del Negocio", padding=10)
-        frame_negocio.pack(fill="x", pady=5)
-        ctk.CTkLabel(frame_negocio, text="Nombre:", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
-        self.entry_nombre_comercio = ctk.CTkEntry(frame_negocio, width=35, font=("Segoe UI", 10))
+        frame_nombre_inner = ctk.CTkFrame(frame_negocio, fg_color="transparent")
+        frame_nombre_inner.pack(fill="x", padx=10, pady=(0, 10))
+        ctk.CTkLabel(frame_nombre_inner, text="Nombre:", font=("Segoe UI", 12)).pack(anchor="w", pady=2)
+        self.entry_nombre_comercio = ctk.CTkEntry(frame_nombre_inner)
         self.entry_nombre_comercio.insert(0, config.get("nombre_comercio", ""))
         self.entry_nombre_comercio.pack(fill="x", pady=2)
         
-        # Apariencia
-        frame_tema = ctk.CTkFrame(frame_principal, text="Apariencia", padding=10)
-        frame_tema.pack(fill="x", pady=5)
-        ctk.CTkLabel(frame_tema, text="Tema:", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
-        temas_disponibles = ["superhero", "darkly", "cyborg", "vapor", "sandstone"]
-        self.combo_tema = ctk.CTkComboBox(frame_tema, values=temas_disponibles, font=("Segoe UI", 10), state="readonly")
-        self.combo_tema.set(config.get("tema", "superhero"))
+        # --- Apariencia (Corregido) ---
+        frame_tema = ctk.CTkFrame(frame_principal, border_width=1)
+        frame_tema.pack(fill="x", pady=10, padx=10)
+        ctk.CTkLabel(frame_tema, text="Apariencia", font=ctk.CTkFont(weight="bold")).pack(pady=(5, 10))
+
+        frame_combo_tema = ctk.CTkFrame(frame_tema, fg_color="transparent")
+        frame_combo_tema.pack(fill="x", padx=10, pady=(0, 5))
+        ctk.CTkLabel(frame_combo_tema, text="Tema:", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
+        temas_disponibles = ["dark", "light", "system"]  # Temas correctos para CustomTkinter
+        self.combo_tema = ctk.CTkComboBox(frame_combo_tema, values=temas_disponibles, command=self._tema_cambiado)
+        self.combo_tema.set(config.get("tema", "dark"))
         self.combo_tema.pack(fill="x", pady=2)
         
-        # --- NUEVO: Label informativo ---
-        ctk.CTkLabel(frame_tema, text="Nota: Cambiar el tema reiniciará la aplicación.", font=("Segoe UI", 8, "italic")).pack(anchor="w", pady=(5,0))
+        ctk.CTkLabel(frame_tema, text="Nota: Cambiar el tema reiniciará la aplicación.", font=ctk.CTkFont(size=10, slant="italic")).pack(anchor="w", pady=(0, 10), padx=10)
         
-        # Inventario
-        frame_inventario = ctk.CTkFrame(frame_principal, text="Inventario", padding=10)
-        frame_inventario.pack(fill="x", pady=5)
+        frame_inventario = ctk.CTkFrame(frame_principal, border_width=1)
+        frame_inventario.pack(fill="x", pady=10, padx=10)
+        ctk.CTkLabel(frame_inventario, text="Inventario", font=ctk.CTkFont(weight="bold")).pack(pady=(5, 10))
+        
         self.var_alertas = tk.BooleanVar(value=config.get("mostrar_alertas_stock", True))
         check_alertas = ctk.CTkCheckBox(frame_inventario, text="Mostrar alertas de stock bajo", variable=self.var_alertas)
-        check_alertas.pack(anchor="w", pady=2)
-        frame_umbral = ctk.CTkFrame(frame_inventario)
-        frame_umbral.pack(fill="x", pady=2)
+        check_alertas.pack(anchor="w", pady=10, padx=10)
+
+        frame_umbral = ctk.CTkFrame(frame_inventario, fg_color="transparent")
+        frame_umbral.pack(fill="x", pady=(0, 10), padx=10)
         ctk.CTkLabel(frame_umbral, text="Umbral alertas:", font=("Segoe UI", 10)).pack(side="left")
         self.spin_umbral = ttk.Spinbox(frame_umbral, from_=1, to=50, width=8, font=("Segoe UI", 10))
         self.spin_umbral.set(config.get("umbral_alerta_stock", 5))
         self.spin_umbral.pack(side="left", padx=(5, 0))
         
-        # Botones de Acción
-        frame_botones = ctk.CTkFrame(frame_principal)
-        frame_botones.pack(fill="x", pady=15)
-        btn_aplicar = ctk.CTkButton(frame_botones, text="💾 Aplicar", command=self._aplicar_configuracion, style="success.TButton", width=15)
+        # --- Botones de Acción (Corregidos) ---
+        frame_botones = ctk.CTkFrame(frame_principal, fg_color="transparent")
+        frame_botones.pack(fill="x", pady=20, padx=10)
+        btn_aplicar = ctk.CTkButton(frame_botones, text="💾 Aplicar", command=self._aplicar_configuracion)
         btn_aplicar.pack(side="left", padx=5)
-        btn_restaurar = ctk.CTkButton(frame_botones, text="↩️ Restaurar", command=self._restaurar_valores_por_defecto, style="warning.TButton", width=15)
+        btn_restaurar = ctk.CTkButton(frame_botones, text="↩️ Restaurar", command=self._restaurar_valores_por_defecto)
         btn_restaurar.pack(side="left", padx=5)
+            
+    def _tema_cambiado(self, tema_seleccionado):
+        # Este método es para el command del ComboBox
+        # Puedes añadir lógica aquí si quieres que algo pase inmediatamente al cambiar el tema,
+        # aunque la lógica principal ya la manejas al guardar.
+        print(f"Tema seleccionado: {tema_seleccionado}")

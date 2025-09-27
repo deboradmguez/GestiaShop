@@ -1,4 +1,8 @@
 import customtkinter as ctk
+from tkinter import ttk
+from PIL import Image
+
+# Esta constante ya no es tan necesaria, pero la podemos mantener si quieres
 FUENTE_GENERAL = ("Segoe UI", 16)
 
 class ProductosTab(ctk.CTkFrame):
@@ -6,74 +10,93 @@ class ProductosTab(ctk.CTkFrame):
         super().__init__(parent)
         self.controller = controller
 
-        self.icono_agregar =ctk.CTkImage(file=self.controller.ruta_recurso("icons/agregar.png"))
-        self.icono_modificar = ctk.CTkImage(file=self.controller.ruta_recurso("icons/lapiz.png"))
-        self.icono_eliminar = ctk.CTkImage(file=self.controller.ruta_recurso("icons/borrar.png"))
+        # --- MANEJO DE IMÁGENES CORREGIDO ---
+        try:
+            self.icono_agregar = ctk.CTkImage(Image.open(self.controller.ruta_recurso("icons/agregar.png")))
+            self.icono_modificar = ctk.CTkImage(Image.open(self.controller.ruta_recurso("icons/lapiz.png")))
+            self.icono_eliminar = ctk.CTkImage(Image.open(self.controller.ruta_recurso("icons/borrar.png")))
+        except Exception as e:
+            print(f"Error al cargar los iconos de productos: {e}")
+            self.icono_agregar = self.icono_modificar = self.icono_eliminar = None
 
-        # Organizamos la creación de widgets en métodos para mayor claridad.
         self._crear_panel_de_controles()
         self._crear_tabla_de_inventario()
 
     def _crear_panel_de_controles(self):
         """Crea el panel superior con filtros, búsqueda y botones de acción."""
         frame_controles = ctk.CTkFrame(self)
-        frame_controles.pack(pady=5, fill="x")
+        frame_controles.pack(pady=10, padx=10, fill="x")
 
-        ctk.CTkLabel(frame_controles, text="Filtrar por:", font=("Segoe UI", 11)).pack(
+        ctk.CTkLabel(frame_controles, text="Filtrar por:", font=("Segoe UI", 12)).pack(
             side="left", padx=(10, 5)
         )
         opciones_filtro = ["Todos los productos", "Productos con stock bajo"]
         self.combo_filtro_productos = ctk.CTkComboBox(
-            frame_controles, values=opciones_filtro, state="readonly", 
-            font=("Segoe UI", 12), width=22
+            frame_controles,
+            values=opciones_filtro,
+            command=self.controller.filtrar_productos_y_recargar
         )
         self.combo_filtro_productos.set(opciones_filtro[0])
         self.combo_filtro_productos.pack(side="left", padx=5)
-        # Los 'binds' ahora llaman a métodos del controller.
-        self.combo_filtro_productos.bind("<<ComboboxSelected>>", self.controller.filtrar_productos_y_recargar)
 
         ctk.CTkLabel(frame_controles, text="Buscar:", font=FUENTE_GENERAL).pack(
-            side="left", padx=5
+            side="left", padx=(10, 5)
         )
         self.entry_buscar_producto = ctk.CTkEntry(frame_controles, font=FUENTE_GENERAL)
         self.entry_buscar_producto.pack(side="left", padx=5, fill="x", expand=True)
         self.entry_buscar_producto.bind("<KeyRelease>", self.controller.filtrar_productos_y_recargar)
         self.entry_buscar_producto.bind("<Return>", self.controller.filtrar_productos_y_recargar)
 
-        # Botones de acción
+        # --- Botones de acción CORREGIDOS ---
         self.btn_agregar_prod = ctk.CTkButton(
-            frame_controles, image=self.icono_agregar,
+            frame_controles, image=self.icono_agregar, text="", width=32,
             command=self.controller.mostrar_ventana_agregar_producto,
-            style="success.TButton"
+            fg_color="#28a745", hover_color="#218838"  # Color "success"
         )
         self.btn_agregar_prod.pack(side="left", padx=5)
 
         self.btn_modificar_prod = ctk.CTkButton(
-            frame_controles, image=self.icono_modificar,
+            frame_controles, image=self.icono_modificar, text="", width=32,
             command=self.controller.modificar_producto,
-            style="warning.TButton"
+            fg_color="#ffc107", hover_color="#e0a800" # Color "warning"
         )
         self.btn_modificar_prod.pack(side="left", padx=5)
 
         self.btn_eliminar_prod = ctk.CTkButton(
-            frame_controles, image=self.icono_eliminar,
+            frame_controles, image=self.icono_eliminar, text="", width=32,
             command=self.controller.eliminar_producto,
-            style="danger.TButton"
+            fg_color="#D32F2F", hover_color="#B71C1C" # Color "danger"
         )
         self.btn_eliminar_prod.pack(side="left", padx=5)
 
         self.btn_carga_rapida = ctk.CTkButton(
             frame_controles, text="Carga Rápida",
-            command=self.controller.abrir_ventana_carga_rapida,
-            style="primary.TButton"
+            command=self.controller.abrir_ventana_carga_rapida
         )
-        self.btn_carga_rapida.pack(side="left", padx=5)
+        self.btn_carga_rapida.pack(side="left", padx=10)
 
     def _crear_tabla_de_inventario(self):
         """Crea la tabla (Treeview) para mostrar el listado de productos."""
+        tree_container = ctk.CTkFrame(self)
+        tree_container.pack(fill="both", expand=True, padx=10, pady=(0,10))
+
+        # Estilo para el Treeview
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Treeview", background="#2b2b2b", foreground="white", fieldbackground="#2b2b2b", borderwidth=0)
+        style.map("Treeview", background=[('selected', '#3470b8')])
+        style.configure("Treeview.Heading", background="#565b5e", foreground="white", font=("Segoe UI", 10, "bold"))
+        
         self.tree_inventario = ttk.Treeview(
-            self, columns=("codigo", "nombre", "precio", "stock"), show="headings", style="Custom.Treeview"
+            tree_container, columns=("codigo", "nombre", "precio", "stock"), show="headings"
         )
+        self.tree_inventario.pack(side="left", fill="both", expand=True)
+
+        # Scrollbar de CustomTkinter
+        scrollbar = ctk.CTkScrollbar(tree_container, command=self.tree_inventario.yview)
+        scrollbar.pack(side="right", fill="y")
+        self.tree_inventario.configure(yscrollcommand=scrollbar.set)
+        
         self.tree_inventario.heading("codigo", text="Código")
         self.tree_inventario.heading("nombre", text="Nombre")
         self.tree_inventario.heading("precio", text="Precio")
@@ -82,11 +105,8 @@ class ProductosTab(ctk.CTkFrame):
         self.tree_inventario.column("nombre", width=400, anchor="w")
         self.tree_inventario.column("precio", width=100, anchor="e")
         self.tree_inventario.column("stock", width=100, anchor="e")
-        self.tree_inventario.pack(fill="both", expand=True)
         
-        # Las configuraciones de estilo y tags se mantienen igual
         self.tree_inventario.tag_configure("alerta_stock", background="#FFAA99", foreground="black")
         self.tree_inventario.tag_configure("mensaje_vacio", font=("Segoe UI", 11, "italic"), foreground="grey")
 
         self.tree_inventario.bind("<Double-1>", self.controller.editar_con_doble_click)
-    

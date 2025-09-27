@@ -1,42 +1,34 @@
 import customtkinter as ctk
 from tkinter import ttk
 
-# Definimos una constante para la fuente, para no repetirla.
+# Esta constante ya no es tan necesaria, pero podemos mantenerla
 FUENTE_GENERAL = ("Segoe UI", 16)
 
 class VentasTab(ctk.CTkFrame):
     
     def __init__(self, parent, controller):
         super().__init__(parent)
-        
         self.controller = controller
 
-        # Llamamos a métodos privados para organizar la creación de la interfaz.
         self._crear_controles_superiores()
         self._crear_vista_carrito()
         self._crear_pie_de_pestana()
 
     def _crear_controles_superiores(self):
         """Crea el área de ingreso de código y los botones de acción."""
-        frame_control_venta = ctk.CTkFrame(self, padding=10)
-        frame_control_venta.pack(fill="x", side="top")
+        frame_control_venta = ctk.CTkFrame(self)
+        frame_control_venta.pack(fill="x", side="top", padx=10, pady=10)
 
-        # Campo para escanear el código
-        frame_codigo = ctk.CTkFrame(frame_control_venta)
+        frame_codigo = ctk.CTkFrame(frame_control_venta, fg_color="transparent")
         frame_codigo.pack(fill="x", pady=3)
 
-        ctk.CTkLabel(frame_codigo, text="Código de Barras:", font=FUENTE_GENERAL).pack(
-            side="left", padx=5
-        )
-        # Los widgets ahora son atributos de la clase (self.entry_codigo)
-        self.entry_codigo = ctk.CTkEntry(frame_codigo, font=("Segoe UI", 12), width=25)
+        ctk.CTkLabel(frame_codigo, text="Código de Barras:", font=FUENTE_GENERAL).pack(side="left", padx=5)
+        self.entry_codigo = ctk.CTkEntry(frame_codigo, font=("Segoe UI", 16))
         self.entry_codigo.pack(side="left", expand=True, fill="x", padx=5)
         self.entry_codigo.focus()
-        # Los comandos ahora llaman a métodos del 'controller'
         self.entry_codigo.bind("<Return>", lambda event: self.controller.buscar_y_agregar_a_carrito())
 
-        # Botones de acceso rápido
-        frame_botones_venta = ctk.CTkFrame(frame_control_venta)
+        frame_botones_venta = ctk.CTkFrame(frame_control_venta, fg_color="transparent")
         frame_botones_venta.pack(fill="x", pady=(10, 0))
 
         self.btn_buscar_nombre = ctk.CTkButton(
@@ -44,44 +36,51 @@ class VentasTab(ctk.CTkFrame):
             text="🔎 Buscar por Nombre (Ctrl + B)",
             command=self.controller.mostrar_ventana_busqueda
         )
-        self.btn_buscar_nombre.pack(side="left", padx=5, ipadx=5)
+        self.btn_buscar_nombre.pack(side="left", padx=5)
 
         self.btn_prod_comun = ctk.CTkButton(
             frame_botones_venta,
             text="➕ Prod. Común (Ctrl + A)",
-            command=self.controller.agregar_producto_comun, # Llama al método en el controller
-            style="warning.TButton",
+            command=self.controller.agregar_producto_comun,
+            fg_color="#ffc107", hover_color="#e0a800" # Color "warning"
         )
-        self.btn_prod_comun.pack(side="left", padx=5, ipadx=5)
+        self.btn_prod_comun.pack(side="left", padx=5)
 
     def _crear_vista_carrito(self):
         """Crea la tabla (Treeview) para mostrar los productos del carrito."""
-        frame_carrito = ctk.CTkFrame(self)
-        frame_carrito.pack(fill="both", expand=True, pady=10)
+        tree_container = ctk.CTkFrame(self)
+        tree_container.pack(fill="both", expand=True, pady=10, padx=10)
         
-        tree_frame = ctk.CTkFrame(frame_carrito)
-        tree_frame.pack(fill="both", expand=True)
-
-        scrollbar = ctk.CTkScrollbar(tree_frame)
-        scrollbar.pack(side="right", fill="y")
-
+        # --- Estilo para el Treeview ---
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Treeview", background="#2b2b2b", foreground="white", fieldbackground="#2b2b2b", borderwidth=0, rowheight=30)
+        style.map("Treeview", background=[('selected', '#3470b8')])
+        style.configure("Treeview.Heading", background="#565b5e", foreground="white", font=("Segoe UI", 10, "bold"))
+        
         self.tree_carrito = ttk.Treeview(
-            tree_frame,
+            tree_container,
             columns=("producto", "cantidad", "precio", "stock", "total"),
             show="headings",
-            yscrollcommand=scrollbar.set,
             height=10
         )
-        scrollbar.config(command=self.tree_carrito.yview)
+        self.tree_carrito.pack(side="left", fill="both", expand=True)
+
+        # --- Scrollbar de CustomTkinter ---
+        scrollbar = ctk.CTkScrollbar(tree_container, command=self.tree_carrito.yview)
+        scrollbar.pack(side="right", fill="y")
+        self.tree_carrito.configure(yscrollcommand=scrollbar.set)
 
         self.tree_carrito.heading("producto", text="Producto")
         self.tree_carrito.heading("cantidad", text="Cantidad")
+        self.tree_carrito.heading("precio", text="Precio")
+        self.tree_carrito.heading("stock", text="Stock")
+        self.tree_carrito.heading("total", text="Total")
         self.tree_carrito.column("producto", width=350, anchor="w")
         self.tree_carrito.column("cantidad", width=80, anchor="e")
         self.tree_carrito.column("precio", width=80, anchor="e")
         self.tree_carrito.column("stock", width=80, anchor="e")
         self.tree_carrito.column("total", width=80, anchor="e")
-        self.tree_carrito.pack(fill="both", expand=True)
         
         self.tree_carrito.bind("<Double-1>", self.controller.modificar_cantidad_carrito)
         self.tree_carrito.bind("<Return>", self.controller.modificar_cantidad_carrito)
@@ -90,38 +89,42 @@ class VentasTab(ctk.CTkFrame):
     def _crear_pie_de_pestana(self):
         """Crea el área inferior con el total y los botones de finalizar venta."""
         frame_pie_ventas = ctk.CTkFrame(self)
-        frame_pie_ventas.pack(fill="x", side="bottom", pady=(10, 0))
+        frame_pie_ventas.pack(fill="x", side="bottom", pady=10, padx=10)
 
         self.lbl_total = ctk.CTkLabel(
             frame_pie_ventas,
             text="Total: $0.00",
             font=("Arial Black", 28),
-            text_color="white", fg_color="green"
+            fg_color="#1E8E3E",  # Un verde bonito
+            text_color="white",
+            corner_radius=8
         )
-        self.lbl_total.pack(side="right", padx=20, pady=10)
+        self.lbl_total.pack(side="right", padx=(20, 10), ipady=5)
 
         self.btn_quitar = ctk.CTkButton(
             frame_pie_ventas, text="Quitar",
             command=self.controller.quitar_producto_del_carrito,
-            style="danger.TButton", state="disabled",
+            state="disabled",
+            fg_color="#D32F2F", hover_color="#B71C1C"
         )
         self.btn_quitar.pack(side="left", padx=(10, 5))
 
         self.btn_vaciar = ctk.CTkButton(
             frame_pie_ventas, text="Vaciar (Ctrl + D)",
             command=self.controller.vaciar_carrito,
-            style="secondary.TButton", state="disabled",
+            state="disabled"
         )
         self.btn_vaciar.pack(side="left", padx=5)
 
         self.btn_finalizar = ctk.CTkButton(
             frame_pie_ventas, text="Finalizar (Ctrl + F)",
             command=self.controller.mostrar_ventana_cobrar,
-            style="success.TButton", state="disabled",
+            state="disabled",
+            fg_color="#28a745", hover_color="#218838"
         )
         self.btn_finalizar.pack(side="left", padx=5)
+
     def actualizar_vista(self, carrito_actualizado, total_actualizado):
-        
         # Limpiamos la vista actual
         for item in self.tree_carrito.get_children():
             self.tree_carrito.delete(item)
@@ -142,15 +145,13 @@ class VentasTab(ctk.CTkFrame):
             )
 
         # Actualizamos el label del total
-        self.lbl_total.config(text=f"Total: ${total_actualizado:,.2f}")
+        self.lbl_total.configure(text=f"Total: ${total_actualizado:,.2f}")
         self._actualizar_estado_botones(carrito_actualizado)
         
     def _actualizar_estado_botones(self, carrito):
-        """Habilita o deshabilita los botones según si el carrito tiene items."""
         estado = "normal" if carrito else "disabled"
         
-        self.btn_quitar.config(state=estado)
-        self.btn_vaciar.config(state=estado)
-        self.btn_finalizar.config(state=estado)
-        
-    
+        # Usamos .configure() para cambiar el estado de los widgets ya creados
+        self.btn_quitar.configure(state=estado)
+        self.btn_vaciar.configure(state=estado)
+        self.btn_finalizar.configure(state=estado)
