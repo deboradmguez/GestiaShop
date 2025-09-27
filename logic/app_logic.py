@@ -169,10 +169,10 @@ class AppLogic:
                 text=f"⚠ {conteo} Alerta{'s' if conteo > 1 else ''}",
                 fg_color="#D32F2F", hover_color="#B71C1C" # Color "danger"
             )
-            self.app.btn_alerta_stock.place(relx=1.0, rely=0, x=-5, y=-5, anchor="ne")
+            self.app.btn_alerta_stock.place(relx=1.0, rely=1.0, x=-10, y=-10, anchor="se")
         elif hasattr(self.app, 'btn_alerta_stock'):
             self.app.btn_alerta_stock.place_forget()
-    
+        
     #notificaciones
     
     def notificar_exito(self, texto):

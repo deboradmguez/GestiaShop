@@ -68,8 +68,7 @@ class App(ctk.CTk):
             print(f"No se pudo cargar el icono de la aplicación: {e}")
 
     def _crear_header(self):
-        """Crea el encabezado de la aplicación."""
-        frame_header = ctk.CTkFrame(self) # Padding se maneja en pack
+        frame_header = ctk.CTkFrame(self, fg_color="transparent")
         frame_header.pack(fill="x", side="top", padx=10, pady=(6, 0))
         
         frame_izquierda = ctk.CTkFrame(frame_header, fg_color="transparent")
@@ -140,13 +139,13 @@ class App(ctk.CTk):
     
     def _configurar_bindings_globales(self):
 
-        self.bind("<F1>", lambda e: self.notebook.select(0))
-        self.bind("<F2>", lambda e: self.notebook.select(1))
-        self.bind("<F3>", lambda e: self.notebook.select(2))
-        self.bind("<F4>", lambda e: self.notebook.select(3))
-        self.bind("<F5>", lambda e: self.notebook.select(4))
-        self.bind("<F6>", lambda e: self.notebook.select(5))
-        self.bind("<F7>", lambda e: self.notebook.select(6))
+        self.bind("<F1>", lambda e: self.notebook.set("Ventas (F1)"))
+        self.bind("<F2>", lambda e: self.notebook.set("Productos (F2)"))
+        self.bind("<F3>", lambda e: self.notebook.set("Inventario (F3)"))
+        self.bind("<F4>", lambda e: self.notebook.set("Historial (F4)"))
+        self.bind("<F5>", lambda e: self.notebook.set("Caja (F5)"))
+        self.bind("<F6>", lambda e: self.notebook.set("Estadísticas (F6)"))
+        self.bind("<F7>", lambda e: self.notebook.set("Configuración (F7)"))
         
         # Atajos para la pestaña de Ventas
         self.bind("<Control-f>", lambda e: self.mostrar_ventana_cobrar())
@@ -193,7 +192,10 @@ class App(ctk.CTk):
     # --- MÉTODOS DELEGADOS (La App solo redirige la llamada al especialista)
     # =====================================================================
     def abrir_caja(self): self.app_logic.dialogo_abrir_caja()
-    def cerrar_app(self): self.app_logic.cerrar_aplicacion_seguro()
+    def cerrar_app(self):
+        if self.single_instance_lock:
+            self.single_instance_lock.release()
+        self.app_logic.cerrar_aplicacion_seguro()
     def mostrar_soporte(self): self.app_logic.mostrar_ventana_soporte()
     def ruta_recurso(self, path): return ruta_recurso(path)
     # -- Delegados de Ventas --

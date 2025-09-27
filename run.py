@@ -4,7 +4,6 @@ from tkinter import messagebox
 ruta_proyecto = os.path.dirname(os.path.abspath(__file__))
 if ruta_proyecto not in sys.path:
     sys.path.insert(0, ruta_proyecto)
-# --- Importaciones de la Aplicación ---
 from ui.main_window import App
 from database import database_manager as db_manager
 from database.queries import inicializar_base_de_datos

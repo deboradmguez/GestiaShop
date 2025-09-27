@@ -15,8 +15,7 @@ class VentasTab(ctk.CTkFrame):
         self._crear_pie_de_pestana()
 
     def _crear_controles_superiores(self):
-        """Crea el área de ingreso de código y los botones de acción."""
-        frame_control_venta = ctk.CTkFrame(self)
+        frame_control_venta = ctk.CTkFrame(self, fg_color="transparent")
         frame_control_venta.pack(fill="x", side="top", padx=10, pady=10)
 
         frame_codigo = ctk.CTkFrame(frame_control_venta, fg_color="transparent")
