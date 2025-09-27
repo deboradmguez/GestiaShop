@@ -1,15 +1,9 @@
-# ui/windows/busqueda_window.py
-
-import tkinter as tk
+import customtkinter as ctk
 from tkinter import ttk
 from utilities import helpers
-class BusquedaWindow(tk.Toplevel):
+
+class BusquedaWindow(ctk.CTkToplevel):
     def __init__(self, parent, controller):
-        """
-        Constructor de la ventana de búsqueda.
-        - 'parent' es la ventana principal de la app.
-        - 'controller' es la instancia de la clase App, nuestro cerebro.
-        """
         super().__init__(parent)
         self.controller = controller
 
@@ -18,48 +12,53 @@ class BusquedaWindow(tk.Toplevel):
         self.attributes('-topmost', True)
         self.grab_set()
 
-        # Llamamos a un método para crear los widgets internos
         self._crear_widgets()
         self._configurar_bindings()
         
         helpers.centrar_ventana(self, parent)
 
     def _crear_widgets(self):
-        """Crea y posiciona todos los widgets de esta ventana."""
-        frame_busqueda = ttk.Frame(self, padding=10)
-        frame_busqueda.pack(fill="both", expand=True)
+        frame_busqueda = ctk.CTkFrame(self)
+        frame_busqueda.pack(fill="both", expand=True, padx=10, pady=10)
 
-        frame_control = ttk.Frame(frame_busqueda)
-        frame_control.pack(pady=10)
+        frame_control = ctk.CTkFrame(frame_busqueda, fg_color="transparent")
+        frame_control.pack(pady=10, fill="x")
 
-        ttk.Label(frame_control, text="Nombre del Producto:", font=("Segoe UI", 12)).pack(side="left", padx=5)
-        self.entry_busqueda = ttk.Entry(frame_control, width=40, font=("Segoe UI", 12))
-        self.entry_busqueda.pack(side="left", padx=5)
+        ctk.CTkLabel(frame_control, text="Nombre del Producto:", font=("Segoe UI", 12)).pack(side="left", padx=5)
+        self.entry_busqueda = ctk.CTkEntry(frame_control, font=("Segoe UI", 12))
+        self.entry_busqueda.pack(side="left", padx=5, fill="x", expand=True)
         self.entry_busqueda.focus_set()
 
-        self.tree_busqueda = ttk.Treeview(
-            frame_busqueda, columns=("nombre", "precio", "stock"), show="headings"
-        )
+        # --- Treeview y Scrollbar ---
+        tree_container = ctk.CTkFrame(frame_busqueda)
+        tree_container.pack(fill="both", expand=True)
+        
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Treeview", background="#2b2b2b", foreground="white", fieldbackground="#2b2b2b")
+        style.map("Treeview", background=[('selected', '#3470b8')])
+        style.configure("Treeview.Heading", background="#565b5e", foreground="white")
+
+        self.tree_busqueda = ttk.Treeview(tree_container, columns=("nombre", "precio", "stock"), show="headings")
+        self.tree_busqueda.pack(side="left", fill="both", expand=True)
+
+        scrollbar = ctk.CTkScrollbar(tree_container, command=self.tree_busqueda.yview)
+        scrollbar.pack(side="right", fill="y")
+        self.tree_busqueda.configure(yscrollcommand=scrollbar.set)
         
         self.tree_busqueda.heading("nombre", text="Nombre")
         self.tree_busqueda.heading("precio", text="Precio")
         self.tree_busqueda.heading("stock", text="Stock")
-        self.tree_busqueda.column("nombre", width=500, anchor="w")
+        self.tree_busqueda.column("nombre", width=400, anchor="w")
         self.tree_busqueda.column("precio", width=100, anchor="e")
         self.tree_busqueda.column("stock", width=100, anchor="e")
-        self.tree_busqueda.pack(fill="both", expand=True)
 
-        self.btn_agregar = ttk.Button(
-            frame_busqueda, text="Agregar a Carrito", style="success.TButton"
-        )
+        self.btn_agregar = ctk.CTkButton(frame_busqueda, text="Agregar a Carrito", fg_color="#28a745", hover_color="#218838")
         self.btn_agregar.pack(pady=10)
 
     def _configurar_bindings(self):
-        """Configura todos los eventos de los widgets."""
-        # Al escribir, la ventana le pide al controlador que realice la búsqueda
         self.entry_busqueda.bind("<KeyRelease>", self._on_realizar_busqueda)
-
-        self.btn_agregar.config(command=self._on_agregar_seleccion)
+        self.btn_agregar.configure(command=self._on_agregar_seleccion)
         self.tree_busqueda.bind("<Double-1>", lambda e: self._on_agregar_seleccion())
         self.bind("<Escape>", lambda e: self.destroy())
     

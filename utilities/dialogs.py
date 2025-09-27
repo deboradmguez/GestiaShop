@@ -8,33 +8,29 @@ class ConfirmacionDialog(ctk.CTkToplevel):
         self.title(title)
         self.transient(parent)
         self.grab_set()
-        self.result = False # El resultado por defecto es False (No)
+        self.result = False
 
-        # --- Creación de la Interfaz ---
-        frame = ctk.CTkFrame(self, padding=20)
-        frame.pack(expand=True, fill="both")
+        frame = ctk.CTkFrame(self)
+        frame.pack(expand=True, fill="both", padx=20, pady=20)
 
         ctk.CTkLabel(frame, text=message, wraplength=300).pack(pady=(0, 20))
 
-        frame_botones = ctk.CTkFrame(frame)
+        frame_botones = ctk.CTkFrame(frame, fg_color="transparent")
         frame_botones.pack()
 
         btn_si = ctk.CTkButton(
-            frame_botones, text="Sí", style="success.TButton",
-            command=self._on_si
+            frame_botones, text="Sí", command=self._on_si,
+            fg_color="#28a745", hover_color="#218838" # Color "success"
         )
         btn_si.pack(side="left", padx=10)
 
         btn_no = ctk.CTkButton(
-            frame_botones, text="No", style="danger.TButton",
-            command=self._on_no
+            frame_botones, text="No", command=self._on_no,
+            fg_color="#D32F2F", hover_color="#B71C1C" # Color "danger"
         )
         btn_no.pack(side="left", padx=10)
         
-        # Centrar la ventana
-        #self.update_idletasks()
         helpers.centrar_ventana(self, parent)
-
 
     def _on_si(self):
         self.result = True
@@ -59,32 +55,28 @@ class PinDialog(ctk.CTkToplevel):
 
         self.PIN_CORRECTO = str(pin_correcto)
         
-        frame = ctk.CTkFrame(self, padding=20)
-        frame.pack(expand=True, fill="both")
+        frame = ctk.CTkFrame(self)
+        frame.pack(expand=True, fill="both", padx=20, pady=20)
 
         ctk.CTkLabel(frame, text="Por favor, ingrese el PIN de administrador:").pack(pady=(0, 10))
         
         self.entry_pin = ctk.CTkEntry(frame, show="*", justify="center", font=("Segoe UI", 12))
         self.entry_pin.pack(pady=5)
 
-        frame_botones = ctk.CTkFrame(frame)
+        frame_botones = ctk.CTkFrame(frame, fg_color="transparent")
         frame_botones.pack(pady=10)
 
-        btn_ok = ctk.CTkButton(frame_botones, text="OK", style="success.TButton", command=self._on_ok)
+        btn_ok = ctk.CTkButton(frame_botones, text="OK", command=self._on_ok)
         btn_ok.pack(side="left", padx=10)
 
-        btn_cancel = ctk.CTkButton(frame_botones, text="Cancelar", style="danger.TButton", command=self._on_cancel)
+        btn_cancel = ctk.CTkButton(frame_botones, text="Cancelar", command=self._on_cancel)
         btn_cancel.pack(side="left", padx=10)
 
         self.bind("<Return>", self._on_ok)
         self.bind("<Escape>", self._on_cancel)
-        
-        # Asigna la acción de cancelar al botón "X" de la ventana
         self.protocol("WM_DELETE_WINDOW", self._on_cancel)
         
         helpers.centrar_ventana(self, parent)
-        
-        # Forzamos el foco DESPUÉS de haber centrado la ventana
         self.entry_pin.focus_force()
 
     def _on_ok(self, event=None):
@@ -92,9 +84,7 @@ class PinDialog(ctk.CTkToplevel):
             self.result = True
             self.destroy()
         else:
-            from tkinter import messagebox
             messagebox.showerror("Error", "PIN incorrecto.", parent=self)
-            # No destruimos la ventana si el PIN es incorrecto, para que pueda reintentar.
             self.result = False
             
     def _on_cancel(self, event=None):

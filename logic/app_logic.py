@@ -1,7 +1,6 @@
-
-import customtkinter as ctk 
-import webbrowser
-
+import customtkinter as ctk
+import webbrowser, tkinter as tk
+from PIL import Image
 from datetime import date
 from utilities import notifications, helpers
 from utilities.dialogs import ConfirmacionDialog, PinDialog
@@ -161,12 +160,14 @@ class AppLogic:
         helpers.centrar_ventana(ventana_soporte, self.app)
 
     def actualizar_alertas_stock(self):
-        
         productos = db_manager.obtener_lista_productos_a_reponer()
         conteo = len(productos)
 
         if conteo > 0 and hasattr(self.app, 'btn_alerta_stock'):
-            self.app.btn_alerta_stock.config(text=f"⚠ {conteo} Alerta{'s' if conteo > 1 else ''}", style="danger.TButton")
+            self.app.btn_alerta_stock.configure(
+                text=f"⚠ {conteo} Alerta{'s' if conteo > 1 else ''}",
+                fg_color="#D32F2F", hover_color="#B71C1C" # Color "danger"
+            )
             self.app.btn_alerta_stock.place(relx=1.0, rely=0, x=-5, y=-5, anchor="ne")
         elif hasattr(self.app, 'btn_alerta_stock'):
             self.app.btn_alerta_stock.place_forget()

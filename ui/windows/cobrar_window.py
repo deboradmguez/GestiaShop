@@ -1,59 +1,60 @@
-import tkinter as tk
+import customtkinter as ctk
 from tkinter import ttk
 from utilities import helpers
+import tkinter as tk
 
-class CobrarWindow(tk.Toplevel):
-    """
-    Clase que representa la ventana emergente para el proceso de cobro.
-    """
+class CobrarWindow(ctk.CTkToplevel):
     def __init__(self, parent, controller, total_a_cobrar):
         super().__init__(parent)
         self.controller = controller
         self.total_a_cobrar = total_a_cobrar
 
-        # --- Configuración de la ventana ---
         self.title("💰 Cobrar Venta")
         self.transient(parent)
         self.attributes('-topmost', True)
         self.resizable(False, False)
         self.grab_set()
 
-        # --- Variables de estado internas ---
         self.metodo_pago = tk.StringVar(value="Efectivo")
         self.monto_efectivo_entry = None
         self.monto_transferencia_entry = None
         self.entry_referencia = None
 
-        # --- Creación de la interfaz ---
         self._crear_widgets()
         self._configurar_bindings()
         self._actualizar_inputs_metodo()
         helpers.centrar_ventana(self, parent)
 
     def _crear_widgets(self):
-        """Crea la estructura de widgets de la ventana."""
-        frame_total = ttk.LabelFrame(self, text="Total a Cobrar", padding=10)
-        frame_total.pack(padx=10, pady=10, fill="x")
-        ttk.Label(frame_total, text=f"${self.total_a_cobrar:,.2f}", font=("Segoe UI", 16, "bold")).pack()
+        main_frame = ctk.CTkFrame(self)
+        main_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        frame_metodos = ttk.Frame(self)
+        frame_total = ctk.CTkFrame(main_frame, border_width=1)
+        frame_total.pack(padx=10, pady=10, fill="x")
+        ctk.CTkLabel(frame_total, text="Total a Cobrar", font=ctk.CTkFont(weight="bold")).pack()
+        ctk.CTkLabel(frame_total, text=f"${self.total_a_cobrar:,.2f}", font=("Segoe UI", 16, "bold")).pack(pady=(0,5))
+
+        frame_metodos = ctk.CTkFrame(main_frame)
         frame_metodos.pack(pady=(0, 5))
         self.opciones_metodo = ["Efectivo", "Transferencia", "Mixto"]
         for op in self.opciones_metodo:
-            radio = ttk.Radiobutton(
+            radio = ctk.CTkRadioButton(
                 frame_metodos, text=op, variable=self.metodo_pago, value=op,
                 command=self._actualizar_inputs_metodo
             )
-            radio.pack(side="left", padx=5)
+            radio.pack(side="left", padx=10, pady=5)
 
-        self.frame_inputs = ttk.LabelFrame(self, text="Detalles de Pago", padding=10)
-        self.frame_inputs.pack(padx=10, pady=5, fill="both", expand=True)
+        self.frame_inputs = ctk.CTkFrame(main_frame, border_width=1)
+        self.frame_inputs.pack(padx=10, pady=5, fill="both", expand=True, ipady=10)
+        ctk.CTkLabel(self.frame_inputs, text="Detalles de Pago", font=ctk.CTkFont(weight="bold")).pack(pady=(0,10))
 
-        frame_finalizar = ttk.Frame(self)
+
+        frame_finalizar = ctk.CTkFrame(main_frame)
         frame_finalizar.pack(pady=20)
-        self.btn_finalizar = ttk.Button(
-            frame_finalizar, text="✅ Finalizar Venta", style="success.TButton",
-            command=self._on_finalizar_venta
+        self.btn_finalizar = ctk.CTkButton(
+            frame_finalizar, text="✅ Finalizar Venta",
+            command=self._on_finalizar_venta,
+            fg_color="#28a745", hover_color="#218838"
         )
         self.btn_finalizar.pack(ipadx=10, ipady=5)
     
@@ -75,54 +76,56 @@ class CobrarWindow(tk.Toplevel):
         self._actualizar_inputs_metodo()
 
     def _actualizar_inputs_metodo(self, *args):
-        """Limpia y redibuja las entradas de texto según el método de pago."""
         for widget in self.frame_inputs.winfo_children():
+            # Dejamos la etiqueta del título
+            if isinstance(widget, ctk.CTkLabel) and "Detalles" in widget.cget("text"):
+                continue
             widget.destroy()
 
         metodo = self.metodo_pago.get()
 
         if metodo == "Efectivo":
-            ttk.Label(self.frame_inputs, text="Monto Recibido:").pack(anchor="w")
-            self.monto_efectivo_entry = ttk.Entry(self.frame_inputs, font=("Segoe UI", 16))
-            self.monto_efectivo_entry.pack(fill="x", pady=(0, 5))
+            ctk.CTkLabel(self.frame_inputs, text="Monto Recibido:").pack(anchor="w", padx=10)
+            self.monto_efectivo_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
+            self.monto_efectivo_entry.pack(fill="x", pady=(0, 5), padx=10)
             self.monto_efectivo_entry.focus_set()
             self.monto_efectivo_entry.insert(0, f"{self.total_a_cobrar:.2f}")
 
-            self.label_vuelto = ttk.Label(self.frame_inputs, text="Vuelto: $0.00", font=("Segoe UI", 12, "bold"))
-            self.label_vuelto.pack(fill="x", pady=5)
+            self.label_vuelto = ctk.CTkLabel(self.frame_inputs, text="Vuelto: $0.00", font=("Segoe UI", 12, "bold"))
+            self.label_vuelto.pack(fill="x", pady=5, padx=10)
             self.monto_efectivo_entry.bind("<KeyRelease>", self._calcular_vuelto)
             self._calcular_vuelto()
 
         elif metodo == "Transferencia":
-            ttk.Label(self.frame_inputs, text="Referencia (opcional):").pack(anchor="w")
-            self.entry_referencia = ttk.Entry(self.frame_inputs, font=("Segoe UI", 16))
-            self.entry_referencia.pack(fill="x")
+            ctk.CTkLabel(self.frame_inputs, text="Referencia (opcional):").pack(anchor="w", padx=10)
+            self.entry_referencia = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
+            self.entry_referencia.pack(fill="x", padx=10)
             self.entry_referencia.focus_set()
 
         elif metodo == "Mixto":
-            ttk.Label(self.frame_inputs, text="Monto Efectivo:").pack(anchor="w")
-            self.monto_efectivo_entry = ttk.Entry(self.frame_inputs, font=("Segoe UI", 16))
-            self.monto_efectivo_entry.pack(fill="x")
+            ctk.CTkLabel(self.frame_inputs, text="Monto Efectivo:").pack(anchor="w", padx=10)
+            self.monto_efectivo_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
+            self.monto_efectivo_entry.pack(fill="x", padx=10)
             self.monto_efectivo_entry.focus_set()
 
-            ttk.Label(self.frame_inputs, text="Monto Transferencia:").pack(anchor="w", pady=(5,0))
-            self.monto_transferencia_entry = ttk.Entry(self.frame_inputs, font=("Segoe UI", 16))
-            self.monto_transferencia_entry.pack(fill="x")
+            ctk.CTkLabel(self.frame_inputs, text="Monto Transferencia:").pack(anchor="w", pady=(5,0), padx=10)
+            self.monto_transferencia_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
+            self.monto_transferencia_entry.pack(fill="x", padx=10)
 
             self.monto_efectivo_entry.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(self.monto_efectivo_entry, self.monto_transferencia_entry))
             self.monto_transferencia_entry.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(self.monto_transferencia_entry, self.monto_efectivo_entry))
 
+
     def _calcular_vuelto(self, event=None):
-        """Calcula y muestra el vuelto para el pago en efectivo."""
         try:
             monto_recibido = float(self.monto_efectivo_entry.get())
             vuelto = monto_recibido - self.total_a_cobrar
             if vuelto >= 0:
-                self.label_vuelto.config(text=f"Vuelto: ${vuelto:,.2f}", foreground="")
+                self.label_vuelto.configure(text=f"Vuelto: ${vuelto:,.2f}", text_color="white")
             else:
-                self.label_vuelto.config(text=f"Falta: ${abs(vuelto):,.2f}", foreground="red")
+                self.label_vuelto.configure(text=f"Falta: ${abs(vuelto):,.2f}", text_color="red")
         except (ValueError, TypeError):
-            self.label_vuelto.config(text="Monto inválido", foreground="red")
+            self.label_vuelto.configure(text="Monto inválido", text_color="red")
 
     def _calcular_monto_restante(self, entry_activa, entry_pasiva):
         """Calcula automáticamente el monto faltante en el pago mixto."""

@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from PIL import Image
+from PIL import Image, ImageTk
 from datetime import datetime
 import locale
 
@@ -26,24 +26,20 @@ from logic.configuracion_logic import ConfigLogic
 from utilities import helpers
 from utilities.helpers import ruta_recurso
 
-
 class App(ctk.CTk):
     def __init__(self, config, single_instance_lock=None):
         super().__init__()
         self.configuracion = config
-        ctk.set_appearance_mode(self.configuracion.get("tema", "dark")) # Opciones: "dark", "light", "system"
-        ctk.set_default_color_theme("blue") # Opciones: "blue", "dark-blue", "green"
+        ctk.set_appearance_mode(self.configuracion.get("tema", "dark"))
+        ctk.set_default_color_theme("blue")
 
         self.is_fullscreen = True
         
         self._configurar_ventana()
         self._configurar_locale()
 
-        # --- Estado Central de la Aplicación ---
         self.carrito = {}
         self.total_venta = 0.0
-        
-        # --- Inicializar todos los controladores de lógica ---
         self.app_logic = AppLogic(self)
         self.ventas_logic = VentasLogic(self)
         self.productos_logic = ProductosLogic(self)
@@ -52,14 +48,10 @@ class App(ctk.CTk):
         self.caja_logic = CajaLogic(self)
         self.estadisticas_logic = EstadisticasLogic(self)
         self.config_logic = ConfigLogic(self)
-        
-        # --- Construcción de la UI ---
         self._crear_header()
         self._crear_notebook()
         self._crear_footer()
         self._crear_widget_notificaciones()
-        
-        # --- Procesos de Inicio y Bindings ---
         self._iniciar_procesos_de_fondo()
         self._configurar_bindings_globales()
         self.protocol("WM_DELETE_WINDOW", self.cerrar_app)
@@ -68,34 +60,59 @@ class App(ctk.CTk):
         """Configura los atributos principales de la ventana."""
         self.title("GestiaShop - Sistema de Gestión")
         self.attributes("-fullscreen", self.is_fullscreen)
-        self.iconphoto(True, ctk.PhotoImage(file=ruta_recurso('icons/icono_app.png')))
+        try:
+            icon_image = ImageTk.PhotoImage(Image.open(ruta_recurso('icons/icono_app.png')))
+            self.iconphoto(True, icon_image)
+        except Exception as e:
+            print(f"No se pudo cargar el icono de la aplicación: {e}")
 
     def _crear_header(self):
-        """Crea el encabezado de la aplicación con nombre, fecha y hora."""
-        frame_header = ctk.CTkFrame(self, padding=(10, 6))
-        frame_header.pack(fill="x", side="top")
+        """Crea el encabezado de la aplicación."""
+        frame_header = ctk.CTkFrame(self) # Padding se maneja en pack
+        frame_header.pack(fill="x", side="top", padx=10, pady=(6, 0))
         
-        frame_izquierda = ctk.CTkFrame(frame_header); frame_izquierda.pack(side="left", anchor="w")
-        self.lbl_nombre_comercio = ctk.CTkLabel(frame_izquierda, font=("Georgia", 22, "bold"))
+        frame_izquierda = ctk.CTkFrame(frame_header, fg_color="transparent")
+        frame_izquierda.pack(side="left", anchor="w", padx=10)
+        self.lbl_nombre_comercio = ctk.CTkLabel(frame_izquierda, text="", font=ctk.CTkFont(family="Georgia", size=22, weight="bold"))
         self.lbl_nombre_comercio.pack(anchor="w")
-        self.lbl_fecha = ctk.CTkLabel(frame_izquierda, font=("Segoe UI", 12)); self.lbl_fecha.pack(anchor="w")
+        self.lbl_fecha = ctk.CTkLabel(frame_izquierda, text="", font=("Segoe UI", 12))
+        self.lbl_fecha.pack(anchor="w")
         
-        frame_derecha = ctk.CTkFrame(frame_header); frame_derecha.pack(side="right", anchor="e", padx=10)
-        self.lbl_hora = ctk.CTkLabel(frame_derecha, font=("Segoe UI", 40, "bold")); self.lbl_hora.pack(anchor="e")
-        self.header_btn_abrir_caja = ctk.CTkButton(frame_derecha, text="☀️ Abrir Caja", command=self.abrir_caja, style="success.TButton")
-
+        frame_derecha = ctk.CTkFrame(frame_header, fg_color="transparent")
+        frame_derecha.pack(side="right", anchor="e", padx=10)
+        self.lbl_hora = ctk.CTkLabel(frame_derecha, text="", font=ctk.CTkFont(size=40, weight="bold"))
+        self.lbl_hora.pack(anchor="e")
+        self.header_btn_abrir_caja = ctk.CTkButton(frame_derecha, text="☀️ Abrir Caja", command=self.abrir_caja, fg_color="#28a745", hover_color="#218838")
+        
     def _crear_notebook(self):
         """Crea y llena el panel de pestañas."""
         self.notebook = ctk.CTkTabview(self)
         self.notebook.pack(pady=10, padx=10, fill="both", expand=True)
         
-        self.ventas_tab = VentasTab(self.notebook, self); self.notebook.add(self.ventas_tab, text="Ventas (F1)")
-        self.productos_tab = ProductosTab(self.notebook, self); self.notebook.add(self.productos_tab, text="Productos (F2)")
-        self.inventario_tab = InventarioTab(self.notebook, self); self.notebook.add(self.inventario_tab, text="Inventario (F3)")
-        self.historial_tab = HistorialTab(self.notebook, self); self.notebook.add(self.historial_tab, text="Historial (F4)")
-        self.caja_tab = CajaTab(self.notebook, self); self.notebook.add(self.caja_tab, text="Caja (F5)")
-        self.estadisticas_tab = EstadisticasTab(self.notebook, self); self.notebook.add(self.estadisticas_tab, text="Estadísticas (F6)")
-        self.configuracion_tab = ConfiguracionTab(self.notebook, self); self.notebook.add(self.configuracion_tab, text="Configuración (F7)")
+        # Se crean las pestañas y se añaden
+        self.notebook.add("Ventas (F1)")
+        self.notebook.add("Productos (F2)")
+        self.notebook.add("Inventario (F3)")
+        self.notebook.add("Historial (F4)")
+        self.notebook.add("Caja (F5)")
+        self.notebook.add("Estadísticas (F6)")
+        self.notebook.add("Configuración (F7)")
+
+        # Se pueblan las pestañas con las clases correspondientes
+        self.ventas_tab = VentasTab(self.notebook.tab("Ventas (F1)"), self)
+        self.ventas_tab.pack(fill="both", expand=True)
+        self.productos_tab = ProductosTab(self.notebook.tab("Productos (F2)"), self)
+        self.productos_tab.pack(fill="both", expand=True)
+        self.inventario_tab = InventarioTab(self.notebook.tab("Inventario (F3)"), self)
+        self.inventario_tab.pack(fill="both", expand=True)
+        self.historial_tab = HistorialTab(self.notebook.tab("Historial (F4)"), self)
+        self.historial_tab.pack(fill="both", expand=True)
+        self.caja_tab = CajaTab(self.notebook.tab("Caja (F5)"), self)
+        self.caja_tab.pack(fill="both", expand=True)
+        self.estadisticas_tab = EstadisticasTab(self.notebook.tab("Estadísticas (F6)"), self)
+        self.estadisticas_tab.pack(fill="both", expand=True)
+        self.configuracion_tab = ConfiguracionTab(self.notebook.tab("Configuración (F7)"), self)
+        self.configuracion_tab.pack(fill="both", expand=True)
 
     def _crear_footer(self):
         """Crea el pie de página con botones de ayuda y alertas."""
@@ -103,8 +120,7 @@ class App(ctk.CTk):
         self.btn_soporte.place(relx=0.0, rely=1.0, x=10, y=-10, anchor="sw")
         self.btn_alerta_stock = ctk.CTkButton(self, text="⚠ Alertas") # La lógica de app_logic lo gestionará
     def _crear_widget_notificaciones(self):
-        """Crea la etiqueta que se usará para todas las notificaciones."""
-        self.lbl_notificacion = ctk.CTkLabel(self, text="", font=("Segoe UI", 12), padding=10)
+        self.lbl_notificacion = ctk.CTkLabel(self, text="", font=("Segoe UI", 12))
     def _iniciar_procesos_de_fondo(self):
         """Inicia tareas recurrentes y la configuración inicial de la UI."""
         self.actualizar_titulo_app()

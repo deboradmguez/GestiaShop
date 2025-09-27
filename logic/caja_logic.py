@@ -70,48 +70,25 @@ class CajaLogic:
             tab.lbl_caja_contado.config(text=f"${monto_final:,.2f}")
             tab.lbl_caja_diferencia.config(text=f"${diferencia:,.2f}")
 
-    def procesar_cierre_caja(self, fecha_db, total_esperado):
-        monto_str = self.app.caja_tab.entry_monto_final.get()
-        
-        try:
-            if not monto_str:
-                self.app.notificar_alerta("Debe ingresar el monto contado.")
-                return
-            
-            monto_final = float(monto_str.replace(',', '.'))
-            diferencia = monto_final - total_esperado
-
-            # 2. Llamamos al database_manager para guardar los datos
-            exito = db_manager.registrar_cierre_caja(fecha_db, monto_final, diferencia)
-
-            if exito:
-                self.app.notificar_exito("Corte de caja registrado con éxito.")
-                # 3. Recargamos la vista para que se actualice a "Caja Cerrada"
-                self.recargar_vista_caja()
-            else:
-                self.app.notificar_error("No se pudo guardar el cierre de caja.")
-
-        except (ValueError, TypeError):
-            self.app.notificar_error("El monto ingresado no es un número válido.")
-
     def ajustar_cierre_de_caja(self, fecha_ui):
-        
         if not self.app.app_logic.solicitar_pin_admin():
             self.app.notificar_alerta("Operación cancelada o PIN incorrecto.")
             return
 
-        dialogo_ajuste = Toplevel(self.app)
+        # --- CORRECCIÓN DE TOPLEVEL Y WIDGETS ---
+        dialogo_ajuste = ctk.CTkToplevel(self.app)
         dialogo_ajuste.title("Corregir Cierre de Caja")
         dialogo_ajuste.transient(self.app)
         dialogo_ajuste.grab_set()
 
-        frame = ctk.CTkFrame(dialogo_ajuste, padding=20)
-        frame.pack(expand=True)
+        frame = ctk.CTkFrame(dialogo_ajuste)
+        frame.pack(expand=True, padx=20, pady=20)
 
         ctk.CTkLabel(frame, text=f"Nuevo monto final para el día {fecha_ui}:").pack(pady=5)
-        entry_monto = ctk.CTkEntry(frame, width=20, font=("Segoe UI", 12))
+        entry_monto = ctk.CTkEntry(frame, width=200, font=("Segoe UI", 12))
         entry_monto.pack(pady=5)
         entry_monto.focus()
+
 
         def confirmar_ajuste():
             try:
@@ -150,8 +127,8 @@ class CajaLogic:
     def ir_a_hoy_caja(self):
         """Pone la fecha actual en el calendario de la caja y recarga la vista."""
         helpers.ir_a_hoy_y_recargar(
-            self.app.caja_tab.cal_caja,      # Le pasamos el calendario de la caja
-            self.recargar_vista_caja        # Le pasamos la función de recarga de la caja
+            self.app.caja_tab.cal_caja,      
+            self.recargar_vista_caja        
         )
         
     def descargar_reporte_caja(self):
