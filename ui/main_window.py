@@ -25,7 +25,8 @@ from logic.configuracion_logic import ConfigLogic
 # --- Utilidades ---
 from utilities import helpers
 from utilities.helpers import ruta_recurso
-from utilities.themes import apply_custom_theme
+# NOTA: apply_custom_theme puede que ya no sea necesario si usamos los temas de CTk
+# from utilities.themes import apply_custom_theme
 
 class App(ctk.CTk):
     def __init__(self, config, single_instance_lock=None):
@@ -34,7 +35,7 @@ class App(ctk.CTk):
         self.single_instance_lock = single_instance_lock
         ctk.set_appearance_mode(self.configuracion.get("tema", "dark"))
         ctk.set_default_color_theme("blue")
-        apply_custom_theme(self) # Aplicar el tema a toda la app
+        # apply_custom_theme(self) # Esto podría ser redundante, lo revisaremos luego
 
         self.is_fullscreen = True
         
@@ -64,25 +65,19 @@ class App(ctk.CTk):
         self.title("GestiaShop - Sistema de Gestión")
         self.attributes("-fullscreen", self.is_fullscreen)
         
-        # Configurar el color de fondo de la ventana principal
-        self.configure(fg_color=("gray95", "gray10"))  # Color adaptativo
+        self.configure(fg_color=("gray95", "gray10"))
         
         try:
-            icon_image = ImageTk.PhotoImage(Image.open(ruta_recurso('icons/icono_app.png')))
-            self.iconphoto(True, icon_image)
+            # CORRECCIÓN: CTkImage maneja las imágenes de forma más robusta
+            icon_image = ctk.CTkImage(Image.open(ruta_recurso('icons/icono_app.png')))
+            # El método para el ícono es diferente
+            self.iconbitmap(ruta_recurso('icons/icono_app.ico'))
         except Exception as e:
             print(f"No se pudo cargar el icono de la aplicación: {e}")
 
-    def cambiar_tema(self, nuevo_tema):
-        """Cambia el tema de la aplicación y actualiza todos los widgets."""
-        ctk.set_appearance_mode(nuevo_tema)
-        apply_custom_theme(self)
-        
-        # Actualizar la configuración
-        self.configuracion["tema"] = nuevo_tema
-        
-        if hasattr(self, 'configuracion_tab'):
-            self.configuracion_tab.recargar_vista()
+   
+
+    
 
     def _crear_header(self):
         frame_header = ctk.CTkFrame(self, fg_color="transparent")
@@ -186,7 +181,10 @@ class App(ctk.CTk):
         if self.is_fullscreen:
             self.is_fullscreen = False
             self.attributes("-fullscreen", False)
-
+    def mostrar_detalles_producto(self, codigo_producto):
+        self.notebook.set("Productos (F2)") 
+        self.productos_logic.buscar_y_seleccionar_producto(codigo_producto)
+        
     # --- MÉTODOS DE ACTUALIZACIÓN DE UI PRINCIPAL ---
     def actualizar_fecha_hora(self):
        

@@ -43,8 +43,8 @@ class AppLogic:
         dialogo.grab_set()
         dialogo.resizable(False, False)
 
-        frame = ctk.CTkFrame(dialogo, padding=20)
-        frame.pack(expand=True, fill="both")
+        frame = ctk.CTkFrame(dialogo)
+        frame.pack(expand=True, fill="both", padx=20, pady=20) 
 
         ctk.CTkLabel(frame, text="¿Quién abre la caja hoy?").pack()
         entry_usuario = ctk.CTkEntry(frame, width=30)

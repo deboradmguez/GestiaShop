@@ -42,8 +42,8 @@ class ProductosLogic:
         ventana_agregar.transient(self.app)
         ventana_agregar.grab_set()
         
-        frame_agregar = ctk.CTkFrame(ventana_agregar, padding=20)
-        frame_agregar.pack()
+        frame_agregar = ctk.CTkFrame(ventana_agregar)
+        frame_agregar.pack(padx=20, pady=20)
 
         entries = {}
         campos = ["Código de Barras", "Nombre del Producto", "Precio", "Stock Inicial"]
@@ -59,7 +59,7 @@ class ProductosLogic:
         umbral_global = self.app.configuracion.get("umbral_alerta_stock", 5)
         ctk.CTkLabel(frame_agregar, text=f"Umbral de alerta por defecto: {umbral_global}", font=("Segoe UI", 9, "italic")).pack(pady=5)
 
-        btn_guardar = ctk.CTkButton(frame_agregar, text="Guardar Producto", style="success.TButton", command=lambda: self._guardar_nuevo_producto(entries, ventana_agregar))
+        btn_guardar = ctk.CTkButton(frame_agregar, text="Guardar Producto", fg_color="#28a745", hover_color="#218838", command=lambda: self._guardar_nuevo_producto(entries, ventana_agregar))
         btn_guardar.pack(pady=10)
         # --- BINDS ---
         entries["Código de Barras"].bind("<Return>", lambda e: entries["Nombre del Producto"].focus_set())
@@ -114,8 +114,8 @@ class ProductosLogic:
         ventana_modificar.transient(self.app)
         ventana_modificar.grab_set()
 
-        frame_modificar = ctk.CTkFrame(ventana_modificar, padding=20)
-        frame_modificar.pack(expand=True)
+        frame_modificar = ctk.CTkFrame(ventana_modificar)
+        frame_modificar.pack(expand=True, padx=20, pady=20)
 
         entries = {}
         campos = {"Nombre": nombre, "Precio": f"{precio:.2f}", "Stock": stock}
@@ -129,7 +129,7 @@ class ProductosLogic:
         btn_guardar = ctk.CTkButton(
             frame_modificar,
             text="Guardar Cambios",
-            style="success.TButton",
+            fg_color="#28a745", hover_color="#218838",
             command=lambda: self._guardar_modificaciones_producto(
                 codigo_barras, entries, ventana_modificar
             )
@@ -192,6 +192,28 @@ class ProductosLogic:
     def editar_con_doble_click(self, event):
         """Manejador para el evento de doble clic que inicia la modificación."""
         self.modificar_producto()
+    def buscar_y_seleccionar_producto(self, codigo_producto):
+        """
+        Busca un producto por su código en la pestaña de productos,
+        lo selecciona y lo enfoca.
+        """
+        tab = self.app.productos_tab
+        tree = tab.tree_inventario
+
+        # 1. Pone el código en el campo de búsqueda y filtra
+        tab.entry_buscar_producto.delete(0, 'end')
+        tab.entry_buscar_producto.insert(0, codigo_producto)
+        self.filtrar_productos_y_recargar()
+
+        # 2. Busca el item en el árbol
+        for item_id in tree.get_children():
+            valores = tree.item(item_id, "values")
+            if valores and valores[0] == codigo_producto:
+                # 3. Lo selecciona y enfoca
+                tree.selection_set(item_id)
+                tree.focus(item_id)
+                tree.see(item_id) # Asegura que el item sea visible
+                break
 
     # --- LÓGICA DE CARGA RÁPIDA ---
 
@@ -205,8 +227,8 @@ class ProductosLogic:
 
         productos_a_guardar = []
 
-        frame_principal = ctk.CTkFrame(ventana_carga, padding=20)
-        frame_principal.pack(fill="both", expand=True)
+        frame_principal = ctk.CTkFrame(ventana_carga)
+        frame_principal.pack(fill="both", expand=True, padx=20, pady=20)
 
         campos_entries = {
             "Código de Barras": ctk.CTkEntry(frame_principal, font=("Segoe UI", 11)),
@@ -250,7 +272,9 @@ class ProductosLogic:
         btn_agregar = ctk.CTkButton(frame_botones, text="Agregar y Siguiente (Enter)", command=agregar_y_siguiente)
         btn_agregar.pack(side="left", padx=10)
 
-        btn_finalizar = ctk.CTkButton(frame_botones, text="Finalizar y Guardar Todo", style="success.TButton", command=lambda: self._finalizar_y_guardar_carga_rapida(productos_a_guardar, ventana_carga))
+        btn_finalizar = ctk.CTkButton(frame_botones, text="Finalizar y Guardar Todo",
+                                      fg_color="#28a745", hover_color="#218838",
+                                      command=lambda: self._finalizar_y_guardar_carga_rapida(productos_a_guardar, ventana_carga))
         btn_finalizar.pack(side="left", padx=10)
         helpers.centrar_ventana(ventana_carga, self.app)
         campos_entries["Stock Inicial"].bind("<Return>", agregar_y_siguiente)

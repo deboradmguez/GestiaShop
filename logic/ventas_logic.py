@@ -104,8 +104,8 @@ class VentasLogic:
         ventana_cantidad.grab_set()
         ventana_cantidad.resizable(False, False)
 
-        frame = ctk.CTkFrame(ventana_cantidad, padding=20)
-        frame.pack(expand=True, fill="both")
+        frame = ctk.CTkFrame(ventana_cantidad)
+        frame.pack(expand=True, fill="both", padx=20, pady=20)
         
         ctk.CTkLabel(frame, text=f"Nueva cantidad para '{nombre}':").pack(pady=5)
         entry_cantidad = ctk.CTkEntry(frame, justify="center")
@@ -138,8 +138,9 @@ class VentasLogic:
             self.app.notificar_error("La cantidad debe ser un número válido.")
 
     def mostrar_ventana_busqueda(self):
-        """Muestra la ventana de búsqueda de productos por nombre."""
-        BusquedaWindow(parent=self.app, controller=self.app)
+        BusquedaWindow(parent=self.app, 
+                       controller=self.app, 
+                       modo_venta_activo=self.app.modo_venta_activo)
 
     def agregar_producto_desde_busqueda(self, codigo_barras):
         """Agrega un producto al carrito desde la ventana de búsqueda."""
@@ -160,8 +161,8 @@ class VentasLogic:
         ventana_comun.transient(self.app)
         ventana_comun.grab_set()
 
-        frame = ctk.CTkFrame(ventana_comun, padding=20)
-        frame.pack()
+        frame = ctk.CTkFrame(ventana_comun)
+        frame.pack(padx=20, pady=20)
 
         campos = {"Nombre": ctk.CTkEntry(frame), "Precio": ctk.CTkEntry(frame), "Cantidad": ctk.CTkEntry(frame)}
         for texto, entry in campos.items():
