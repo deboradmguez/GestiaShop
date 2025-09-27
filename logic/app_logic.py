@@ -95,13 +95,14 @@ class AppLogic:
 
     def _actualizar_estado_controles_venta(self):
         """Activa o desactiva los controles de la pestaña de ventas."""
-        estado = "normal" if self.app.modo_venta_activo else "disabled"
+        estado_venta = "normal" if self.app.modo_venta_activo else "disabled"
         tab = self.app.ventas_tab
-        # Esto asegura que los widgets existan antes de intentar configurarlos
+        
         if hasattr(tab, 'entry_codigo'):
-            tab.entry_codigo.configure(state=estado)
-            tab.btn_buscar_nombre.configure(state=estado)
-            tab.btn_prod_comun.configure(state=estado)
+            # Estos controles sí dependen de si la caja está abierta
+            tab.entry_codigo.configure(state=estado_venta)
+            tab.btn_prod_comun.configure(state=estado_venta)
+            tab.btn_buscar_nombre.configure(state="normal")
     
     def cerrar_aplicacion_seguro(self):
         """Verifica el estado de la caja antes de cerrar."""

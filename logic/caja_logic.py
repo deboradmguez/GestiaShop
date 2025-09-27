@@ -11,6 +11,30 @@ class CajaLogic:
     """
     def __init__(self, app_controller):
         self.app = app_controller
+        
+    def procesar_cierre_caja(self, fecha_db, total_esperado):
+        
+        try:
+            monto_final_str = self.app.caja_tab.entry_monto_final.get().strip()
+            if not monto_final_str:
+                self.app.notificar_alerta("Debe ingresar un monto para el cierre.")
+                return
+
+            monto_final = float(monto_final_str)
+
+            diferencia = monto_final - total_esperado
+
+            exito = db_manager.registrar_cierre_caja(fecha_db, monto_final, diferencia)
+
+            if exito:
+                self.app.notificar_exito("Caja cerrada correctamente.")
+                self.recargar_vista_caja()
+            else:
+                self.app.notificar_error("No se pudo registrar el cierre de caja.")
+
+        except (ValueError, TypeError):
+            self.app.notificar_error("El monto ingresado no es un número válido.")
+            
     def recargar_vista_caja(self):
         
         fecha_ui = self.app.caja_tab.cal_caja.entry.get()
@@ -52,6 +76,7 @@ class CajaLogic:
         tab.lbl_caja_fondo.configure(text=f"${fondo_inicial:,.2f}")
         tab.lbl_caja_esperado.configure(text=f"${total_esperado:,.2f}")
         
+        tab.btn_ajustar_caja.configure(command=lambda: self.ajustar_cierre_de_caja(fecha_ui))
         tab.btn_reporte_caja.configure(state="normal")
         tab.btn_ajustar_caja.configure(state="normal")
 
