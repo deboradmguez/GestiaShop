@@ -5,6 +5,27 @@ class ConfiguracionTab(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent, fg_color="transparent")
         self.controller = controller
+        if ctk.get_appearance_mode().lower() == "dark":
+            self.after(50, self._apply_dark_colors)
+
+    def _apply_dark_colors(self):
+        """Aplica colores oscuros a los Treeview de esta pestaña"""
+        for widget in self.winfo_children():
+            self._apply_dark_to_widget(widget)
+
+    def _apply_dark_to_widget(self, widget):
+        if isinstance(widget, ttk.Treeview):
+            try:
+                widget.configure(
+                    background="#212121",
+                    foreground="#FFFFFF", 
+                    selectbackground="#1F538D",
+                    selectforeground="#FFFFFF"
+                )
+            except:
+                pass
+        for child in widget.winfo_children():
+            self._apply_dark_to_widget(child)
     # --- Funciones de ayuda para crear widgets ---
     def _crear_campo_entry(self, parent, label_text, value):
         ctk.CTkLabel(parent, text=label_text).pack(anchor="w")
@@ -112,4 +133,29 @@ class ConfiguracionTab(ctk.CTkFrame):
         btn_restaurar.pack(side="left", padx=5)
             
     def _tema_cambiado(self, tema_seleccionado):
-        self.controller.cambiar_tema(tema_seleccionado)
+        """Solo guarda el tema seleccionado, no lo aplica hasta reiniciar."""
+        from utilities.themes import save_theme_change_only
+        save_theme_change_only(self.controller, tema_seleccionado)
+
+    def _aplicar_configuracion(self):
+        """Recolecta los nuevos valores y se los pasa al controlador."""
+        tema_anterior = self.controller.configuracion.get("tema", "dark")
+        tema_nuevo = self.combo_tema.get()
+        
+        nuevos_valores = {
+            "nombre_comercio": self.entry_nombre_comercio.get().strip(),
+            "tema": tema_nuevo,
+            "mostrar_alertas_stock": self.var_alertas.get(),
+            "umbral_alerta_stock": int(self.spin_umbral.get())
+        }
+        
+        # Aplicar la configuración
+        self.controller.aplicar_y_guardar_config(nuevos_valores)
+        
+        # Si cambió el tema, mostrar diálogo de reinicio
+        if tema_anterior != tema_nuevo:
+            from utilities.themes import apply_theme_change_and_restart_notification
+            apply_theme_change_and_restart_notification(self.controller, tema_nuevo)
+        else:
+            # Solo mostrar mensaje de éxito si no cambió el tema
+            self.controller.notificar_exito("Configuración aplicada correctamente.")

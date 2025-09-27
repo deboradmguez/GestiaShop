@@ -15,7 +15,27 @@ class EstadisticasTab(ctk.CTkFrame):
 
         self._crear_controles()
         self._crear_panel_resultados()
+        if ctk.get_appearance_mode().lower() == "dark":
+            self.after(50, self._apply_dark_colors)
 
+    def _apply_dark_colors(self):
+        """Aplica colores oscuros a los Treeview de esta pestaña"""
+        for widget in self.winfo_children():
+            self._apply_dark_to_widget(widget)
+
+    def _apply_dark_to_widget(self, widget):
+        if isinstance(widget, ttk.Treeview):
+            try:
+                widget.configure(
+                    background="#212121",
+                    foreground="#FFFFFF", 
+                    selectbackground="#1F538D",
+                    selectforeground="#FFFFFF"
+                )
+            except:
+                pass
+        for child in widget.winfo_children():
+            self._apply_dark_to_widget(child)
     def _crear_controles(self):
         """Crea el panel superior con selectores de fecha y botones."""
         frame_controles = ctk.CTkFrame(self)

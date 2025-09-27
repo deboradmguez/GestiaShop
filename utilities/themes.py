@@ -10,7 +10,8 @@ def apply_custom_theme(app):
     # Obtener los colores actuales del tema de CustomTkinter
     appearance_mode = ctk.get_appearance_mode().lower()
     
-    if appearance_mode == "dark":
+    # IMPORTANTE: Detectar correctamente el tema
+    if appearance_mode in ["dark", "sistema"] and ctk.get_appearance_mode() == "Dark":
         # Colores para tema oscuro
         bg_color = "#212121"  # Fondo principal más oscuro
         fg_color = "#FFFFFF"  # Texto blanco
@@ -30,6 +31,8 @@ def apply_custom_theme(app):
         border_color = "#CCCCCC"
         hover_color = "#E5E5E5"
         entry_bg = "#FFFFFF"
+    
+    print(f"DEBUG: Aplicando tema {appearance_mode}, bg_color: {bg_color}, fg_color: {fg_color}")
 
     style = ttk.Style(app)
     
@@ -207,21 +210,71 @@ def configure_treeview_colors(tree_widget, appearance_mode=None):
     Útil para aplicar después de crear el widget.
     """
     if appearance_mode is None:
-        appearance_mode = ctk.get_appearance_mode().lower()
+        appearance_mode = ctk.get_appearance_mode()
     
-    if appearance_mode == "dark":
+    print(f"DEBUG: Configurando Treeview para modo: {appearance_mode}")
+    
+    # CORREGIR: La detección debe ser exacta
+    if appearance_mode == "Dark":  # Nota: CustomTkinter devuelve "Dark" con mayúscula
         bg_color = "#212121"
         fg_color = "#FFFFFF"
         selected_bg = "#1F538D"
-    else:
+        field_bg = "#2B2B2B"
+        print("DEBUG: Aplicando colores OSCUROS al Treeview")
+    else:  # "Light" o "System" en modo claro
         bg_color = "#FFFFFF"
         fg_color = "#000000"
         selected_bg = "#0078D4"
+        field_bg = "#F0F0F0"
+        print("DEBUG: Aplicando colores CLAROS al Treeview")
+    
+    # Obtener el estilo del widget
+    style = ttk.Style()
+    
+    # Crear un estilo único para este treeview
+    unique_style = f"Custom.{id(tree_widget)}.Treeview"
+    unique_heading_style = f"Custom.{id(tree_widget)}.Treeview.Heading"
+    
+    # Configurar el estilo del Treeview
+    style.configure(
+        unique_style,
+        background=bg_color,
+        foreground=fg_color,
+        fieldbackground=bg_color,
+        selectbackground=selected_bg,
+        selectforeground="#FFFFFF" if appearance_mode == "Dark" else "#000000",
+        borderwidth=0,
+        lightcolor=bg_color,
+        darkcolor=bg_color,
+        relief="flat"
+    )
+    
+    # Configurar el estilo del heading
+    style.configure(
+        unique_heading_style,
+        background=field_bg,
+        foreground=fg_color,
+        borderwidth=0,
+        relief="flat"
+    )
+    
+    # Aplicar el estilo al widget
+    tree_widget.configure(style=unique_style)
+    
+    # Configurar mapeo de estados
+    style.map(
+        unique_style,
+        background=[('selected', selected_bg), ('!selected', bg_color)],
+        foreground=[('selected', '#FFFFFF' if appearance_mode == "Dark" else '#000000'), ('!selected', fg_color)]
+    )
     
     # Configurar tags específicos para diferentes estados
     tree_widget.tag_configure("normal", background=bg_color, foreground=fg_color)
-    tree_widget.tag_configure("selected", background=selected_bg, foreground="#FFFFFF")
+    tree_widget.tag_configure("selected", background=selected_bg, foreground="#FFFFFF" if appearance_mode == "Dark" else "#000000")
     tree_widget.tag_configure("alternate", background=bg_color, foreground=fg_color)
+    
+    # Forzar actualización
+    tree_widget.update_idletasks()
 
 def create_themed_date_entry(parent, **kwargs):
     """
@@ -273,13 +326,167 @@ def create_themed_date_entry(parent, **kwargs):
         except:
             return ttk.Entry(parent, **kwargs)
 
+def apply_dark_theme_to_all_treeviews(parent_widget):
+    """Recorre todos los widgets hijo y aplica tema usando estilos ttk correctos"""
+    
+    # Primero configurar los estilos
+    style = ttk.Style()
+    current_mode = ctk.get_appearance_mode()
+    
+    if current_mode == "Dark":
+        # Configurar estilo para tema oscuro
+        style.configure(
+            "DarkTreeview.Treeview",
+            background="#212121",
+            foreground="#FFFFFF",
+            fieldbackground="#212121",
+            selectbackground="#1F538D",
+            selectforeground="#FFFFFF",
+            borderwidth=0,
+            lightcolor="#212121",
+            darkcolor="#212121"
+        )
+        
+        style.configure(
+            "DarkTreeview.Treeview.Heading",
+            background="#2B2B2B",
+            foreground="#FFFFFF",
+            borderwidth=0,
+            relief="flat"
+        )
+        
+        style.map(
+            "DarkTreeview.Treeview",
+            background=[('selected', '#1F538D'), ('!selected', '#212121')],
+            foreground=[('selected', '#FFFFFF'), ('!selected', '#FFFFFF')]
+        )
+        
+        tree_style = "DarkTreeview.Treeview"
+        print("DEBUG: Configurado estilo OSCURO para Treeview")
+        
+    else:
+        # Configurar estilo para tema claro
+        style.configure(
+            "LightTreeview.Treeview",
+            background="#FFFFFF",
+            foreground="#000000",
+            fieldbackground="#FFFFFF",
+            selectbackground="#0078D4",
+            selectforeground="#FFFFFF",
+            borderwidth=0,
+            lightcolor="#FFFFFF",
+            darkcolor="#FFFFFF"
+        )
+        
+        style.configure(
+            "LightTreeview.Treeview.Heading",
+            background="#F0F0F0",
+            foreground="#000000",
+            borderwidth=0,
+            relief="flat"
+        )
+        
+        style.map(
+            "LightTreeview.Treeview",
+            background=[('selected', '#0078D4'), ('!selected', '#FFFFFF')],
+            foreground=[('selected', '#FFFFFF'), ('!selected', '#000000')]
+        )
+        
+        tree_style = "LightTreeview.Treeview"
+        print("DEBUG: Configurado estilo CLARO para Treeview")
+    
+    def apply_to_widget(widget):
+        if isinstance(widget, ttk.Treeview):
+            try:
+                # Aplicar el estilo correcto
+                widget.configure(style=tree_style)
+                print(f"DEBUG: Aplicado estilo {tree_style} a Treeview exitosamente")
+                
+                # Configurar tags adicionales
+                if current_mode == "Dark":
+                    widget.tag_configure("normal", background="#212121", foreground="#FFFFFF")
+                    widget.tag_configure("selected", background="#1F538D", foreground="#FFFFFF")
+                    widget.tag_configure("alternate", background="#242424", foreground="#FFFFFF")
+                else:
+                    widget.tag_configure("normal", background="#FFFFFF", foreground="#000000")
+                    widget.tag_configure("selected", background="#0078D4", foreground="#FFFFFF")
+                    widget.tag_configure("alternate", background="#F8F8F8", foreground="#000000")
+                    
+            except Exception as e:
+                print(f"DEBUG: Error aplicando estilo a Treeview: {e}")
+        
+        for child in widget.winfo_children():
+            apply_to_widget(child)
+    
+    apply_to_widget(parent_widget)
+
 def update_theme_dynamically(app, new_appearance_mode):
     """
     Actualiza el tema dinámicamente cuando cambia el modo de apariencia.
     """
     # Aplicar el nuevo tema
     ctk.set_appearance_mode(new_appearance_mode)
+    
+    # Aplicar el tema personalizado
     apply_custom_theme(app)
     
-    # Forzar actualización de todos los widgets
-    app.update_idletasks()
+    # Actualizar el título de la aplicación para reflejar el cambio
+    app.actualizar_titulo_app()
+    
+    # Aplicar colores a todos los Treeview existentes
+    app.after(50, lambda: apply_dark_theme_to_all_treeviews(app))
+    
+    # Forzar actualización completa de la interfaz
+    def force_complete_update():
+        # Actualizar todos los frames principales
+        for widget in app.winfo_children():
+            try:
+                widget.update_idletasks()
+                if hasattr(widget, 'configure'):
+                    widget.configure(fg_color="transparent")
+            except:
+                pass
+        
+        # Forzar redibujado completo
+        app.update()
+        app.update_idletasks()
+        
+        # Aplicar tema a Treeviews una vez más después del redibujado
+        apply_dark_theme_to_all_treeviews(app)
+    
+    # Ejecutar la actualización completa después de un breve delay
+    app.after(100, force_complete_update)
+
+def apply_theme_change_and_restart_notification(app, new_theme):
+    """
+    Guarda el cambio de tema en configuración y muestra opción de reiniciar.
+    NO aplica el tema inmediatamente - solo al reiniciar.
+    """
+    from utilities.dialogs import ConfirmacionDialog
+    
+    # SOLO guardar en configuración, NO aplicar visualmente
+    app.configuracion["tema"] = new_theme
+    
+    # Mostrar diálogo para reiniciar
+    dialogo = ConfirmacionDialog(
+        parent=app,
+        title="Cambio de Tema",
+        message=f"Tema configurado como {new_theme}.\n\nPara aplicar los cambios, necesita reiniciar la aplicación.\n\n¿Desea reiniciar ahora?"
+    )
+    
+    respuesta = dialogo.show()
+    if respuesta:
+        # Solo reiniciar SI el usuario dice que sí
+        import sys
+        import os
+        app.destroy()
+        os.execv(sys.executable, ['python'] + sys.argv)
+    # Si dice que no, no hace nada - el tema se aplicará en el próximo reinicio
+
+def save_theme_change_only(app, new_theme):
+    """
+    Solo guarda el cambio de tema sin aplicar cambios visuales.
+    Para usar cuando solo quieres guardar la preferencia.
+    """
+    app.configuracion["tema"] = new_theme
+    print(f"DEBUG: Tema {new_theme} guardado en configuración, se aplicará al reiniciar")
