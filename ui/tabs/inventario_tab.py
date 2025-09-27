@@ -5,7 +5,7 @@ class InventarioTab(ctk.CTkFrame):
     Clase que representa la interfaz de la pestaña 'Inventario'.
     """
     def __init__(self, parent, controller):
-        super().__init__(parent) # Se elimina el argumento 'padding'
+        super().__init__(parent, fg_color="transparent")
         self.controller = controller
 
         # Creamos la interfaz

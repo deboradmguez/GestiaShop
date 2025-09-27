@@ -63,11 +63,26 @@ class App(ctk.CTk):
         """Configura los atributos principales de la ventana."""
         self.title("GestiaShop - Sistema de Gestión")
         self.attributes("-fullscreen", self.is_fullscreen)
+        
+        # Configurar el color de fondo de la ventana principal
+        self.configure(fg_color=("gray95", "gray10"))  # Color adaptativo
+        
         try:
             icon_image = ImageTk.PhotoImage(Image.open(ruta_recurso('icons/icono_app.png')))
             self.iconphoto(True, icon_image)
         except Exception as e:
             print(f"No se pudo cargar el icono de la aplicación: {e}")
+
+    def cambiar_tema(self, nuevo_tema):
+        """Cambia el tema de la aplicación y actualiza todos los widgets."""
+        ctk.set_appearance_mode(nuevo_tema)
+        apply_custom_theme(self)
+        
+        # Actualizar la configuración
+        self.configuracion["tema"] = nuevo_tema
+        
+        if hasattr(self, 'configuracion_tab'):
+            self.configuracion_tab.recargar_vista()
 
     def _crear_header(self):
         frame_header = ctk.CTkFrame(self, fg_color="transparent")
@@ -99,8 +114,8 @@ class App(ctk.CTk):
         self.notebook.add("Caja (F5)")
         self.notebook.add("Estadísticas (F6)")
         self.notebook.add("Configuración (F7)")
-
-        # Se pueblan las pestañas con las clases correspondientes
+        self.notebook.configure(fg_color="transparent")
+    
         self.ventas_tab = VentasTab(self.notebook.tab("Ventas (F1)"), self)
         self.ventas_tab.pack(fill="both", expand=True)
         self.productos_tab = ProductosTab(self.notebook.tab("Productos (F2)"), self)

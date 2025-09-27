@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk
+from utilities.themes import configure_treeview_colors
 
 # Esta constante ya no es tan necesaria, pero podemos mantenerla
 FUENTE_GENERAL = ("Segoe UI", 16)
@@ -7,7 +8,7 @@ FUENTE_GENERAL = ("Segoe UI", 16)
 class VentasTab(ctk.CTkFrame):
     
     def __init__(self, parent, controller):
-        super().__init__(parent)
+        super().__init__(parent, fg_color="transparent")
         self.controller = controller
 
         self._crear_controles_superiores()
@@ -58,7 +59,7 @@ class VentasTab(ctk.CTkFrame):
             height=10
         )
         self.tree_carrito.pack(side="left", fill="both", expand=True)
-
+        configure_treeview_colors(self.tree_carrito)
         # --- Scrollbar de CustomTkinter ---
         scrollbar = ctk.CTkScrollbar(tree_container, command=self.tree_carrito.yview)
         scrollbar.pack(side="right", fill="y")
@@ -81,7 +82,7 @@ class VentasTab(ctk.CTkFrame):
 
     def _crear_pie_de_pestana(self):
         """Crea el área inferior con el total y los botones de finalizar venta."""
-        frame_pie_ventas = ctk.CTkFrame(self)
+        frame_pie_ventas = ctk.CTkFrame(self, fg_color="transparent")
         frame_pie_ventas.pack(fill="x", side="bottom", pady=10, padx=10)
 
         self.lbl_total = ctk.CTkLabel(

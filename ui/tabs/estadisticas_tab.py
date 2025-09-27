@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk
-from ttkbootstrap.widgets import DateEntry
+from utilities.themes import create_themed_date_entry, configure_treeview_colors
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -9,7 +9,7 @@ class EstadisticasTab(ctk.CTkFrame):
     Clase que representa la INTERFAZ de la pestaña de Estadísticas.
     """
     def __init__(self, parent, controller):
-        super().__init__(parent) # Se elimina el argumento 'padding'
+        super().__init__(parent, fg_color="transparent")
         self.controller = controller
         self.canvas_grafico_widget = None
 
@@ -22,11 +22,11 @@ class EstadisticasTab(ctk.CTkFrame):
         frame_controles.pack(fill="x", pady=5, padx=10)
 
         ctk.CTkLabel(frame_controles, text="Desde:", font=("Segoe UI", 11)).pack(side="left", padx=(0, 5))
-        self.cal_desde = DateEntry(frame_controles, dateformat="%d/%m/%Y", width=12)
+        self.cal_desde = create_themed_date_entry(frame_controles, dateformat="%d/%m/%Y", width=12)
         self.cal_desde.pack(side="left")
 
         ctk.CTkLabel(frame_controles, text="Hasta:", font=("Segoe UI", 11)).pack(side="left", padx=(10, 5))
-        self.cal_hasta = DateEntry(frame_controles, dateformat="%d/%m/%Y", width=12)
+        self.cal_hasta = create_themed_date_entry(frame_controles, dateformat="%d/%m/%Y", width=12)
         self.cal_hasta.pack(side="left")
 
         btn_generar = ctk.CTkButton(
@@ -57,6 +57,7 @@ class EstadisticasTab(ctk.CTkFrame):
         # Contenedor para los labels de ganancias
         frame_ganancias_inner = ctk.CTkFrame(frame_ganancias, fg_color="transparent")
         frame_ganancias_inner.pack(fill="x", padx=10)
+        
         self.lbl_total_facturado = ctk.CTkLabel(frame_ganancias_inner, text="Facturación Total: $0.00", font=ctk.CTkFont(size=12, weight="bold"))
         self.lbl_total_facturado.pack(anchor="w")
         self.lbl_total_efectivo = ctk.CTkLabel(frame_ganancias_inner, text="Total Efectivo: $0.00", font=("Segoe UI", 10))
@@ -75,6 +76,7 @@ class EstadisticasTab(ctk.CTkFrame):
         self.tree_top_productos.column("producto", width=300)
         self.tree_top_productos.column("cantidad", width=100, anchor="center")
         self.tree_top_productos.pack(fill="x", padx=10, pady=(0, 10))
+        configure_treeview_colors(self.tree_top_productos)
 
         # --- Gráfico ---
         self.frame_grafico = ctk.CTkFrame(frame_resultados, border_width=1)

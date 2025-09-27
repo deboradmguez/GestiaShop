@@ -3,7 +3,7 @@ import customtkinter as ctk
 from tkinter import ttk
 class ConfiguracionTab(ctk.CTkFrame):
     def __init__(self, parent, controller):
-        super().__init__(parent)
+        super().__init__(parent, fg_color="transparent")
         self.controller = controller
     # --- Funciones de ayuda para crear widgets ---
     def _crear_campo_entry(self, parent, label_text, value):
@@ -112,7 +112,4 @@ class ConfiguracionTab(ctk.CTkFrame):
         btn_restaurar.pack(side="left", padx=5)
             
     def _tema_cambiado(self, tema_seleccionado):
-        # Este método es para el command del ComboBox
-        # Puedes añadir lógica aquí si quieres que algo pase inmediatamente al cambiar el tema,
-        # aunque la lógica principal ya la manejas al guardar.
-        print(f"Tema seleccionado: {tema_seleccionado}")
+        self.controller.cambiar_tema(tema_seleccionado)
