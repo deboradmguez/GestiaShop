@@ -79,14 +79,7 @@ class ProductosTab(ctk.CTkFrame):
         """Crea la tabla (Treeview) para mostrar el listado de productos."""
         tree_container = ctk.CTkFrame(self)
         tree_container.pack(fill="both", expand=True, padx=10, pady=(0,10))
-
-        # Estilo para el Treeview
-        style = ttk.Style()
-        style.theme_use("default")
-        style.configure("Treeview", background="#2b2b2b", foreground="white", fieldbackground="#2b2b2b", borderwidth=0)
-        style.map("Treeview", background=[('selected', '#3470b8')])
-        style.configure("Treeview.Heading", background="#565b5e", foreground="white", font=("Segoe UI", 10, "bold"))
-        
+  
         self.tree_inventario = ttk.Treeview(
             tree_container, columns=("codigo", "nombre", "precio", "stock"), show="headings"
         )

@@ -68,10 +68,6 @@ class EstadisticasTab(ctk.CTkFrame):
         frame_top_productos.pack(fill="x", pady=10, padx=5)
         ctk.CTkLabel(frame_top_productos, text="Top 5 Productos Vendidos", font=ctk.CTkFont(weight="bold")).pack(pady=(5, 10))
 
-        style = ttk.Style()
-        style.configure("Treeview", background="#2b2b2b", foreground="white", fieldbackground="#2b2b2b", borderwidth=0)
-        style.map("Treeview", background=[('selected', '#3470b8')])
-        style.configure("Treeview.Heading", background="#565b5e", foreground="white", font=("Segoe UI", 10, "bold"))
 
         self.tree_top_productos = ttk.Treeview(frame_top_productos, columns=("producto", "cantidad"), show="headings", height=5)
         self.tree_top_productos.heading("producto", text="Producto")

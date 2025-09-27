@@ -64,13 +64,6 @@ class HistorialTab(ctk.CTkFrame):
         tree_container = ctk.CTkFrame(self)
         tree_container.pack(fill="both", expand=True, pady=5, padx=10)
 
-        # --- Estilizado del Treeview para que combine con el tema ---
-        style = ttk.Style()
-        style.theme_use("default")
-        style.configure("Treeview", background="#2b2b2b", foreground="white", fieldbackground="#2b2b2b", borderwidth=0)
-        style.map("Treeview", background=[('selected', '#3470b8')])
-        style.configure("Treeview.Heading", background="#565b5e", foreground="white", font=("Segoe UI", 10, "bold"), borderwidth=0)
-
         self.tree_historial = ttk.Treeview(
             tree_container,
             columns=("fecha", "hora", "desc", "cant", "p_unit", "p_efec", "p_trans", "total"),
