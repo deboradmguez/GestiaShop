@@ -229,36 +229,49 @@ def create_themed_date_entry(parent, **kwargs):
     """
     appearance_mode = ctk.get_appearance_mode().lower()
     
-    if appearance_mode == "dark":
-        # Para tema oscuro
-        themed_kwargs = {
-            "bootstyle": "dark",
-            "foreground": "#FFFFFF",
-            "background": "#2B2B2B",
-            "fieldbackground": "#343638",
-            "selectbackground": "#1F538D",
-            "selectforeground": "#FFFFFF"
-        }
-    else:
-        # Para tema claro
-        themed_kwargs = {
-            "bootstyle": "info",
-            "foreground": "#000000",
-            "background": "#FFFFFF",
-            "fieldbackground": "#FFFFFF",
-            "selectbackground": "#0078D4",
-            "selectforeground": "#FFFFFF"
-        }
-    
-    # Combinar con kwargs proporcionados
-    final_kwargs = {**themed_kwargs, **kwargs}
-    
     try:
         from ttkbootstrap.widgets import DateEntry
-        return DateEntry(parent, **final_kwargs)
+        
+        if appearance_mode == "dark":
+            # Para tema oscuro - solo usar parámetros válidos para DateEntry
+            themed_kwargs = {
+                "bootstyle": "dark"
+            }
+        else:
+            # Para tema claro
+            themed_kwargs = {
+                "bootstyle": "info"
+            }
+        
+        # Combinar con kwargs proporcionados, dando prioridad a los kwargs del usuario
+        final_kwargs = {**themed_kwargs, **kwargs}
+        
+        # Crear el DateEntry
+        date_entry = DateEntry(parent, **final_kwargs)
+        
+        # Aplicar estilos manualmente después de la creación
+        try:
+            if appearance_mode == "dark":
+                date_entry.configure(style="Dark.TEntry")
+            else:
+                date_entry.configure(style="TEntry")
+        except:
+            pass  # Si falla la configuración de estilo, continuar
+            
+        return date_entry
+        
     except ImportError:
         # Fallback si ttkbootstrap no está disponible
-        return ttk.Entry(parent)
+        print("Warning: ttkbootstrap no está disponible, usando Entry estándar")
+        return ttk.Entry(parent, **kwargs)
+    except Exception as e:
+        # Si hay cualquier otro error, usar DateEntry básico
+        print(f"Warning: Error al crear DateEntry temático: {e}")
+        try:
+            from ttkbootstrap.widgets import DateEntry
+            return DateEntry(parent, **kwargs)
+        except:
+            return ttk.Entry(parent, **kwargs)
 
 def update_theme_dynamically(app, new_appearance_mode):
     """

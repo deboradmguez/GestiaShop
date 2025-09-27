@@ -5,7 +5,7 @@ import tkinter as tk
 
 class CobrarWindow(ctk.CTkToplevel):
     def __init__(self, parent, controller, total_a_cobrar):
-        super().__init__(parent, fg_color="transparent")
+        super().__init__(parent)
         self.controller = controller
         self.total_a_cobrar = total_a_cobrar
 

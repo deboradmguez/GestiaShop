@@ -5,7 +5,7 @@ from utilities.themes import configure_treeview_colors
 
 class BusquedaWindow(ctk.CTkToplevel):
     def __init__(self, parent, controller):
-        super().__init__(parent, fg_color="transparent")
+        super().__init__(parent)
         self.controller = controller
 
         self.title("Buscar Productos")
