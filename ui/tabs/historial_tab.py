@@ -10,7 +10,6 @@ class HistorialTab(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.controller = controller
 
-        # --- MANEJO DE IMÁGENES CORREGIDO ---
         try:
             ruta_icono = self.controller.ruta_recurso("icons/descargar.png")
             self.icono_descargar = ctk.CTkImage(Image.open(ruta_icono))
