@@ -204,78 +204,6 @@ def apply_custom_theme(app):
         background=[('active', hover_color), ('pressed', selected_bg)]
     )
 
-def configure_treeview_colors(tree_widget, appearance_mode=None):
-    """
-    Función auxiliar para configurar colores específicos de un Treeview individual.
-    Útil para aplicar después de crear el widget.
-    """
-    if appearance_mode is None:
-        appearance_mode = ctk.get_appearance_mode()
-    
-    print(f"DEBUG: Configurando Treeview para modo: {appearance_mode}")
-    
-    # CORREGIR: La detección debe ser exacta
-    if appearance_mode == "Dark":  # Nota: CustomTkinter devuelve "Dark" con mayúscula
-        bg_color = "#212121"
-        fg_color = "#FFFFFF"
-        selected_bg = "#1F538D"
-        field_bg = "#2B2B2B"
-        print("DEBUG: Aplicando colores OSCUROS al Treeview")
-    else:  # "Light" o "System" en modo claro
-        bg_color = "#FFFFFF"
-        fg_color = "#000000"
-        selected_bg = "#0078D4"
-        field_bg = "#F0F0F0"
-        print("DEBUG: Aplicando colores CLAROS al Treeview")
-    
-    # Obtener el estilo del widget
-    style = ttk.Style()
-    
-    # Crear un estilo único para este treeview
-    unique_style = f"Custom.{id(tree_widget)}.Treeview"
-    unique_heading_style = f"Custom.{id(tree_widget)}.Treeview.Heading"
-    
-    # Configurar el estilo del Treeview
-    style.configure(
-        unique_style,
-        background=bg_color,
-        foreground=fg_color,
-        fieldbackground=bg_color,
-        selectbackground=selected_bg,
-        selectforeground="#FFFFFF" if appearance_mode == "Dark" else "#000000",
-        borderwidth=0,
-        lightcolor=bg_color,
-        darkcolor=bg_color,
-        relief="flat"
-    )
-    
-    # Configurar el estilo del heading
-    style.configure(
-        unique_heading_style,
-        background=field_bg,
-        foreground=fg_color,
-        borderwidth=0,
-        relief="flat"
-    )
-    
-    # Aplicar el estilo al widget
-    tree_widget.configure(style=unique_style)
-    
-    # Configurar mapeo de estados
-    style.map(
-        unique_style,
-        background=[('selected', selected_bg), ('!selected', bg_color)],
-        foreground=[('selected', '#FFFFFF' if appearance_mode == "Dark" else '#000000'), ('!selected', fg_color)]
-    )
-    
-    # Configurar tags específicos para diferentes estados
-    tree_widget.tag_configure("normal", background=bg_color, foreground=fg_color)
-    tree_widget.tag_configure("selected", background=selected_bg, foreground="#FFFFFF" if appearance_mode == "Dark" else "#000000")
-    tree_widget.tag_configure("alternate", background=bg_color, foreground=fg_color)
-    
-    # Forzar actualización
-    tree_widget.update_idletasks()
-
 def create_themed_date_entry(parent, **kwargs):
     """
     Crea un DateEntry con colores que coincidan con el tema actual.
@@ -407,11 +335,12 @@ def apply_dark_theme_to_all_treeviews(parent_widget):
                     widget.tag_configure("normal", background="#212121", foreground="#FFFFFF")
                     widget.tag_configure("selected", background="#1F538D", foreground="#FFFFFF")
                     widget.tag_configure("alternate", background="#242424", foreground="#FFFFFF")
+                    widget.tag_configure("anulada", background="#3c3c3c", foreground="#a8a8a8") 
                 else:
                     widget.tag_configure("normal", background="#FFFFFF", foreground="#000000")
                     widget.tag_configure("selected", background="#0078D4", foreground="#FFFFFF")
                     widget.tag_configure("alternate", background="#F8F8F8", foreground="#000000")
-                    
+                    widget.tag_configure("anulada", background="#E0E0E0", foreground="#757575")
             except Exception as e:
                 print(f"DEBUG: Error aplicando estilo a Treeview: {e}")
         

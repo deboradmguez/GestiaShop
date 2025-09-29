@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk
 from utilities import helpers
-from utilities.themes import configure_treeview_colors
+#from utilities.themes import configure_treeview_colors
 
 class BusquedaWindow(ctk.CTkToplevel):
     def __init__(self, parent, controller, modo_venta_activo):
@@ -32,7 +32,7 @@ class BusquedaWindow(ctk.CTkToplevel):
         
         self.tree_busqueda = ttk.Treeview(tree_container, columns=("nombre", "precio", "stock"), show="headings")
         self.tree_busqueda.pack(side="left", fill="both", expand=True)
-        configure_treeview_colors(self.tree_busqueda)
+        #configure_treeview_colors(self.tree_busqueda)
         scrollbar = ctk.CTkScrollbar(tree_container, command=self.tree_busqueda.yview)
         scrollbar.pack(side="right", fill="y")
         self.tree_busqueda.configure(yscrollcommand=scrollbar.set)

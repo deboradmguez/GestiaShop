@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk
-from utilities.themes import configure_treeview_colors
+#from utilities.themes import configure_treeview_colors
 
 # Esta constante ya no es tan necesaria, pero podemos mantenerla
 FUENTE_GENERAL = ("Segoe UI", 16)
@@ -79,7 +79,7 @@ class VentasTab(ctk.CTkFrame):
             height=10
         )
         self.tree_carrito.pack(side="left", fill="both", expand=True)
-        configure_treeview_colors(self.tree_carrito)
+        #configure_treeview_colors(self.tree_carrito)
         # --- Scrollbar de CustomTkinter ---
         scrollbar = ctk.CTkScrollbar(tree_container, command=self.tree_carrito.yview)
         scrollbar.pack(side="right", fill="y")

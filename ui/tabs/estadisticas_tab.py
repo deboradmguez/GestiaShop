@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk
-from utilities.themes import create_themed_date_entry, configure_treeview_colors
+from utilities.themes import create_themed_date_entry
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -96,7 +96,7 @@ class EstadisticasTab(ctk.CTkFrame):
         self.tree_top_productos.column("producto", width=300)
         self.tree_top_productos.column("cantidad", width=100, anchor="center")
         self.tree_top_productos.pack(fill="x", padx=10, pady=(0, 10))
-        configure_treeview_colors(self.tree_top_productos)
+        #configure_treeview_colors(self.tree_top_productos)
 
         # --- Gráfico ---
         self.frame_grafico = ctk.CTkFrame(frame_resultados, border_width=1)

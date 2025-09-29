@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk
-from utilities.themes import create_themed_date_entry, configure_treeview_colors
+from utilities.themes import create_themed_date_entry
 from PIL import Image
 import tkinter as tk
 
@@ -22,27 +22,7 @@ class HistorialTab(ctk.CTkFrame):
         self._crear_vista_historial()
         self._crear_panel_acciones()
         self._configurar_bindings_globales()
-        if ctk.get_appearance_mode().lower() == "dark":
-            self.after(50, self._apply_dark_colors)
-
-    def _apply_dark_colors(self):
-        """Aplica colores oscuros a los Treeview de esta pestaña"""
-        for widget in self.winfo_children():
-            self._apply_dark_to_widget(widget)
-
-    def _apply_dark_to_widget(self, widget):
-        if isinstance(widget, ttk.Treeview):
-            try:
-                widget.configure(
-                    background="#212121",
-                    foreground="#FFFFFF", 
-                    selectbackground="#1F538D",
-                    selectforeground="#FFFFFF"
-                )
-            except:
-                pass
-        for child in widget.winfo_children():
-            self._apply_dark_to_widget(child)
+    
     def _crear_panel_controles(self):
         """Crea el panel superior para la selección de fecha."""
         frame_controles = ctk.CTkFrame(self)
@@ -89,14 +69,13 @@ class HistorialTab(ctk.CTkFrame):
             show="headings"
         )
         self.tree_historial.pack(side="left", fill="both", expand=True)
-        configure_treeview_colors(self.tree_historial)
+        #configure_treeview_colors(self.tree_historial)
     
         # --- Scrollbar de CustomTkinter ---
         scrollbar = ctk.CTkScrollbar(tree_container, command=self.tree_historial.yview)
         scrollbar.pack(side="right", fill="y")
         self.tree_historial.configure(yscrollcommand=scrollbar.set)
 
-        self.tree_historial.tag_configure("anulada", foreground="#a8a8a8", background="#3c3c3c") 
         self.tree_historial.tag_configure("parent", font=("Segoe UI", 10, "bold"))
         self.tree_historial.tag_configure("child", font=("Segoe UI", 9))
         self.tree_historial.heading("fecha", text="Fecha"); self.tree_historial.column("fecha", width=80)
