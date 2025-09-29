@@ -4,6 +4,8 @@ from datetime import date, datetime
 from database import database_manager as db_manager
 from services import report_generator 
 from utilities import helpers
+from utilities.dialogs import ConfirmacionDialog
+
 
 class CajaLogic:
     """
@@ -13,15 +15,22 @@ class CajaLogic:
         self.app = app_controller
         
     def procesar_cierre_caja(self, fecha_db, total_esperado):
-        
+        monto_final_str = self.app.caja_tab.entry_monto_final.get().strip()
+        if not monto_final_str:
+            self.app.notificar_alerta("Debe ingresar un monto para el cierre.")
+            return
+
+        dialogo = ConfirmacionDialog(
+            parent=self.app,
+            title="Confirmar Cierre de Caja",
+            message=f"¿Está seguro de que desea cerrar la caja con un monto final de ${monto_final_str}?"
+        )
+        if not dialogo.show():
+            self.app.notificar_alerta("Cierre de caja cancelado.")
+            return
+
         try:
-            monto_final_str = self.app.caja_tab.entry_monto_final.get().strip()
-            if not monto_final_str:
-                self.app.notificar_alerta("Debe ingresar un monto para el cierre.")
-                return
-
             monto_final = float(monto_final_str)
-
             diferencia = monto_final - total_esperado
 
             exito = db_manager.registrar_cierre_caja(fecha_db, monto_final, diferencia)
@@ -34,7 +43,7 @@ class CajaLogic:
 
         except (ValueError, TypeError):
             self.app.notificar_error("El monto ingresado no es un número válido.")
-            
+                
     def recargar_vista_caja(self):
         
         fecha_ui = self.app.caja_tab.cal_caja.entry.get()
@@ -103,8 +112,6 @@ class CajaLogic:
         # --- CORRECCIÓN DE TOPLEVEL Y WIDGETS ---
         dialogo_ajuste = ctk.CTkToplevel(self.app)
         dialogo_ajuste.title("Corregir Cierre de Caja")
-        dialogo_ajuste.transient(self.app)
-        dialogo_ajuste.grab_set()
 
         frame = ctk.CTkFrame(dialogo_ajuste)
         frame.pack(expand=True, padx=20, pady=20)
@@ -112,7 +119,7 @@ class CajaLogic:
         ctk.CTkLabel(frame, text=f"Nuevo monto final para el día {fecha_ui}:").pack(pady=5)
         entry_monto = ctk.CTkEntry(frame, width=200, font=("Segoe UI", 12))
         entry_monto.pack(pady=5)
-        entry_monto.focus()
+        
 
 
         def confirmar_ajuste():
@@ -145,7 +152,8 @@ class CajaLogic:
         
         btn_confirmar = ctk.CTkButton(frame, text="Confirmar Ajuste", command=confirmar_ajuste)
         btn_confirmar.pack(pady=10)
-        helpers.centrar_ventana(dialogo_ajuste, self.app)
+        helpers.configurar_dialogo(dialogo_ajuste, self.app, entry_monto
+        )
         entry_monto.bind("<Return>", lambda e: btn_confirmar.invoke())
         dialogo_ajuste.bind("<Escape>", lambda e: dialogo_ajuste.destroy())
 

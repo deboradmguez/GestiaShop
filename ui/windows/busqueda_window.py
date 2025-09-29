@@ -10,14 +10,11 @@ class BusquedaWindow(ctk.CTkToplevel):
         self.modo_venta_activo = modo_venta_activo
 
         self.title("Buscar Productos")
-        self.transient(parent)
         self.attributes('-topmost', True)
-        self.grab_set()
-
         self._crear_widgets()
         self._configurar_bindings()
         
-        helpers.centrar_ventana(self, parent)
+        helpers.configurar_dialogo(self, parent, self.entry_busqueda)
 
     def _crear_widgets(self):
         frame_busqueda = ctk.CTkFrame(self)
@@ -29,8 +26,7 @@ class BusquedaWindow(ctk.CTkToplevel):
         ctk.CTkLabel(frame_control, text="Nombre del Producto:", font=("Segoe UI", 12)).pack(side="left", padx=5)
         self.entry_busqueda = ctk.CTkEntry(frame_control, font=("Segoe UI", 12))
         self.entry_busqueda.pack(side="left", padx=5, fill="x", expand=True)
-        self.entry_busqueda.focus_set()
-
+        
         tree_container = ctk.CTkFrame(frame_busqueda)
         tree_container.pack(fill="both", expand=True)
         
@@ -58,17 +54,15 @@ class BusquedaWindow(ctk.CTkToplevel):
         self.btn_detalles = ctk.CTkButton(frame_botones, text="Ver Detalles", command=self._on_ver_detalles)
         self.btn_detalles.pack(side="left", padx=5)
 
+
     def _configurar_bindings(self):
         self.entry_busqueda.bind("<KeyRelease>", self._on_realizar_busqueda)
         self.btn_agregar.configure(command=self._on_agregar_seleccion)
         self.tree_busqueda.bind("<Double-1>", self._on_double_click)
         self.bind("<Escape>", lambda e: self.destroy())
     
-    # --- Métodos que comunican con el controlador ---
-
     def _on_realizar_busqueda(self, event=None):
         termino = self.entry_busqueda.get()
-        # Le pasa el término y el widget que debe actualizar
         self.controller.realizar_busqueda_productos(termino, self.tree_busqueda)
 
     def _on_double_click(self, event=None):

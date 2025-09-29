@@ -166,6 +166,7 @@ class CajaTab(ctk.CTkFrame):
             corner_radius=8
         )
         self.btn_ajustar_caja.pack(side="left")
+        self.entry_monto_final.bind("<Return>", lambda e: self.btn_confirmar_corte.invoke())
 
     def _crear_fila_info(self, parent, texto, valor_inicial, bold=False):
         """Función de ayuda para crear filas de etiquetas mejoradas."""

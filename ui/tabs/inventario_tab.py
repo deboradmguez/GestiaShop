@@ -12,8 +12,10 @@ class InventarioTab(ctk.CTkFrame):
         # Creamos la interfaz
         self._crear_widgets()
         self._configurar_bindings()
+        self.after(100, lambda: self.entry_codigo_inv.focus())
         if ctk.get_appearance_mode().lower() == "dark":
             self.after(50, self._apply_dark_colors)
+        
 
     def _apply_dark_colors(self):
         """Aplica colores oscuros a los Treeview de esta pestaña"""
@@ -39,7 +41,6 @@ class InventarioTab(ctk.CTkFrame):
 
         self.entry_codigo_inv = ctk.CTkEntry(self, font=("Segoe UI", 16))
         self.entry_codigo_inv.pack(padx=20, pady=5, fill="x")
-        self.entry_codigo_inv.focus()
 
         # Frame para los datos del producto
         frame_datos = ctk.CTkFrame(self) 

@@ -156,25 +156,30 @@ class VentasLogic:
 
     def agregar_producto_comun(self):
         """Muestra una ventana para agregar un producto no inventariado."""
+        if not self.app.modo_venta_activo:
+            self.app.notificar_alerta("La caja está cerrada. No se pueden registrar ventas.")
+            return
+
         ventana_comun = ctk.CTkToplevel(self.app)
         ventana_comun.title("Agregar Producto Común")
-        ventana_comun.transient(self.app)
-        ventana_comun.grab_set()
 
         frame = ctk.CTkFrame(ventana_comun)
         frame.pack(padx=20, pady=20)
 
         campos = {"Nombre": ctk.CTkEntry(frame), "Precio": ctk.CTkEntry(frame), "Cantidad": ctk.CTkEntry(frame)}
         for texto, entry in campos.items():
-            ctk.CTkLabel(frame, text=f"{texto}:").pack()
-            entry.pack(pady=5)
-        campos["Nombre"].focus()
-
+            ctk.CTkLabel(frame, text=f"{texto}:").pack(anchor="w", padx=5) # Alineamos labels
+            entry.pack(fill="x", padx=5, pady=(0, 10)) # Hacemos expandibles los entries
+        
         btn_confirmar = ctk.CTkButton(frame, text="Agregar", command=lambda: self._confirmar_y_agregar_comun(campos, ventana_comun))
         btn_confirmar.pack(pady=10)
         
+        helpers.configurar_dialogo(ventana_comun, self.app, campos["Nombre"])
+        
+        # Binds para la navegación con "Enter"
+        campos["Nombre"].bind("<Return>", lambda e: campos["Precio"].focus())
+        campos["Precio"].bind("<Return>", lambda e: campos["Cantidad"].focus())
         campos["Cantidad"].bind("<Return>", lambda e: btn_confirmar.invoke())
-        helpers.centrar_ventana(ventana_comun, self.app)
         ventana_comun.bind("<Escape>", lambda e: ventana_comun.destroy())
 
     def _confirmar_y_agregar_comun(self, entries, ventana):

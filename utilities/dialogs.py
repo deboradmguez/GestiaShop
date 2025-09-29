@@ -49,8 +49,6 @@ class PinDialog(ctk.CTkToplevel):
     def __init__(self, parent, pin_correcto):
         super().__init__(parent)
         self.title("Acceso Restringido")
-        self.transient(parent)
-        self.grab_set()
         self.result = False
 
         self.PIN_CORRECTO = str(pin_correcto)
@@ -76,8 +74,7 @@ class PinDialog(ctk.CTkToplevel):
         self.bind("<Escape>", self._on_cancel)
         self.protocol("WM_DELETE_WINDOW", self._on_cancel)
         
-        helpers.centrar_ventana(self, parent)
-        self.entry_pin.focus_force()
+        helpers.configurar_dialogo(self, parent, self.entry_pin)
 
     def _on_ok(self, event=None):
         if self.entry_pin.get() == self.PIN_CORRECTO:

@@ -97,7 +97,7 @@ class HistorialTab(ctk.CTkFrame):
         scrollbar.pack(side="right", fill="y")
         self.tree_historial.configure(yscrollcommand=scrollbar.set)
 
-        self.tree_historial.tag_configure("anulada", foreground="#ff5555")
+        self.tree_historial.tag_configure("anulada", foreground="#a8a8a8", background="#3c3c3c") 
         self.tree_historial.tag_configure("parent", font=("Segoe UI", 10, "bold"))
         self.tree_historial.tag_configure("child", font=("Segoe UI", 9))
         self.tree_historial.heading("fecha", text="Fecha"); self.tree_historial.column("fecha", width=80)

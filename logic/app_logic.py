@@ -39,21 +39,17 @@ class AppLogic:
     def dialogo_abrir_caja(self):
         dialogo = ctk.CTkToplevel(self.app)
         dialogo.title("Apertura de Caja")
-        dialogo.transient(self.app)
-        dialogo.grab_set()
-        dialogo.resizable(False, False)
 
         frame = ctk.CTkFrame(dialogo)
-        frame.pack(expand=True, fill="both", padx=20, pady=20) 
+        frame.pack(expand=True, fill="both", padx=20, pady=20)
 
-        ctk.CTkLabel(frame, text="¿Quién abre la caja hoy?").pack()
-        entry_usuario = ctk.CTkEntry(frame, width=30)
-        entry_usuario.pack(pady=5)
-        entry_usuario.focus()
+        ctk.CTkLabel(frame, text="¿Quién abre la caja hoy?").pack(anchor="w", padx=5)
+        entry_usuario = ctk.CTkEntry(frame)
+        entry_usuario.pack(fill="x", padx=5, pady=(0, 10))
 
-        ctk.CTkLabel(frame, text="¿Con cuánto fondo inicial?").pack()
-        entry_fondo = ctk.CTkEntry(frame, width=30)
-        entry_fondo.pack(pady=5)
+        ctk.CTkLabel(frame, text="¿Con cuánto fondo inicial?").pack(anchor="w", padx=5)
+        entry_fondo = ctk.CTkEntry(frame)
+        entry_fondo.pack(fill="x", padx=5, pady=(0, 10))
 
         def confirmar_apertura():
             usuario = entry_usuario.get().strip()
@@ -85,9 +81,12 @@ class AppLogic:
 
         btn_confirmar = ctk.CTkButton(frame, text="Confirmar y Empezar", command=confirmar_apertura)
         btn_confirmar.pack(pady=10)
-        helpers.centrar_ventana(dialogo, self.app)
+        helpers.configurar_dialogo(dialogo, self.app, entry_usuario)
+
+        entry_usuario.bind("<Return>", lambda e: entry_fondo.focus())
         entry_fondo.bind("<Return>", lambda e: btn_confirmar.invoke())
         dialogo.bind("<Escape>", lambda e: dialogo.destroy())
+        
     def solicitar_pin_admin(self):
         pin_guardado = self.app.configuracion.get("pin_admin", "0000") 
         dialogo_pin = PinDialog(self.app, pin_guardado)
@@ -160,6 +159,7 @@ class AppLogic:
             print(f"Error al cargar imagen QR: {e}")
         
         helpers.centrar_ventana(ventana_soporte, self.app)
+        ventana_soporte.bind("<Escape>", lambda e: ventana_soporte.destroy())
 
     def actualizar_alertas_stock(self):
         productos = db_manager.obtener_lista_productos_a_reponer()

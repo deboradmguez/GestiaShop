@@ -15,8 +15,6 @@ class InventarioLogic:
         codigo = self.app.inventario_tab.entry_codigo_inv.get().strip()
         if not codigo:
             return
-
-        # --- Lógica de Base de Datos (simulada por ahora) ---
         producto = db_manager.obtener_producto_por_codigo(codigo)
         
         if not producto:
@@ -43,7 +41,7 @@ class InventarioLogic:
         entries["stock_agregar"].delete(0, tk.END)
         
         self.app.inventario_tab.btn_confirmar_cambios.configure(state="normal")
-        entries["nombre_edit"].focus()
+        self.app.after(50, lambda: entries["nombre_edit"].focus())
 
     def guardar_cambios_inventario(self, event=None):
         if not self.producto_actual_original:

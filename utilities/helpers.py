@@ -10,13 +10,31 @@ MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "ago
 
 def centrar_ventana(ventana_a_centrar, ventana_referencia):
     """Centra una ventana emergente en relación a una ventana de referencia."""
-    ventana_a_centrar.update_idletasks()
-    ancho = ventana_a_centrar.winfo_width()
-    alto = ventana_a_centrar.winfo_height()
-    x = (ventana_referencia.winfo_screenwidth() // 2) - (ancho // 2)
-    y = (ventana_referencia.winfo_screenheight() // 2) - (alto // 2)
-    ventana_a_centrar.geometry(f"+{x}+{y}")
+    
+    # --- CORRECCIÓN: Usamos un método más robusto para centrar ---
 
+    def centrar():
+        ventana_a_centrar.update_idletasks()
+        ancho = ventana_a_centrar.winfo_width()
+        alto = ventana_a_centrar.winfo_height()
+        
+        
+        ref_x = ventana_referencia.winfo_x()
+        ref_y = ventana_referencia.winfo_y()
+        ref_ancho = ventana_referencia.winfo_width()
+        ref_alto = ventana_referencia.winfo_height()
+
+        x = ref_x + (ref_ancho // 2) - (ancho // 2)
+        y = ref_y + (ref_alto // 2) - (alto // 2)
+        
+        ventana_a_centrar.geometry(f"+{x}+{y}")
+
+    # Forzamos a la ventana a ser visible pero fuera de la pantalla
+    ventana_a_centrar.geometry("+5000+5000") 
+    ventana_a_centrar.deiconify() # Aseguramos que sea visible
+    
+    # Usamos after() para ejecutar el centrado justo después de que la ventana se haya dibujado
+    ventana_a_centrar.after(10, centrar)
 def ruta_recurso(ruta_relativa):
     """Obtiene la ruta absoluta al recurso, funciona para desarrollo y para PyInstaller."""
     try:
@@ -52,3 +70,13 @@ def ir_a_hoy_y_recargar(calendario_widget, funcion_recarga):
     
     # Llama a la función de recarga específica de la pestaña
     funcion_recarga()
+        
+def configurar_dialogo(dialogo, parent_app, widget_a_enfocar):
+    dialogo.transient(parent_app)
+    dialogo.grab_set()
+    dialogo.resizable(False, False)
+    
+    centrar_ventana(dialogo, parent_app)
+    
+    # Usamos 'after' para asegurar que el foco se establezca correctamente
+    dialogo.after(50, lambda: widget_a_enfocar.focus())

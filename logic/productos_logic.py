@@ -39,8 +39,6 @@ class ProductosLogic:
         """Muestra la ventana emergente para agregar un nuevo producto."""
         ventana_agregar = ctk.CTkToplevel(self.app)
         ventana_agregar.title("Agregar Nuevo Producto")
-        ventana_agregar.transient(self.app)
-        ventana_agregar.grab_set()
         
         frame_agregar = ctk.CTkFrame(ventana_agregar)
         frame_agregar.pack(padx=20, pady=20)
@@ -54,7 +52,7 @@ class ProductosLogic:
             entries[campo] = entry
 
         entries["Código de Barras"].insert(0, codigo_previo)
-        entries["Código de Barras"].focus_set()
+       
 
         umbral_global = self.app.configuracion.get("umbral_alerta_stock", 5)
         ctk.CTkLabel(frame_agregar, text=f"Umbral de alerta por defecto: {umbral_global}", font=("Segoe UI", 9, "italic")).pack(pady=5)
@@ -67,7 +65,8 @@ class ProductosLogic:
         entries["Precio"].bind("<Return>", lambda e: entries["Stock Inicial"].focus_set())
         entries["Stock Inicial"].bind("<Return>", lambda e: btn_guardar.invoke())
         ventana_agregar.bind("<Escape>", lambda e: ventana_agregar.destroy())
-        helpers.centrar_ventana(ventana_agregar, self.app)
+        helpers.configurar_dialogo(ventana_agregar, self.app, entries["Código de Barras"])
+        
         
     def _guardar_nuevo_producto(self, entries, ventana):
         """Valida y guarda los datos del nuevo producto."""
@@ -111,9 +110,6 @@ class ProductosLogic:
 
         ventana_modificar = ctk.CTkToplevel(self.app)
         ventana_modificar.title(f"Modificar Producto: {codigo_barras}")
-        ventana_modificar.transient(self.app)
-        ventana_modificar.grab_set()
-
         frame_modificar = ctk.CTkFrame(ventana_modificar)
         frame_modificar.pack(expand=True, padx=20, pady=20)
 
@@ -125,7 +121,6 @@ class ProductosLogic:
             entry.insert(0, valor)
             entry.pack(fill="x", padx=5, pady=(0, 10))
             entries[campo] = entry
-        entries["Nombre"].focus_set()
         btn_guardar = ctk.CTkButton(
             frame_modificar,
             text="Guardar Cambios",
@@ -141,7 +136,7 @@ class ProductosLogic:
         entries["Stock"].bind("<Return>", lambda e: btn_guardar.invoke())
         ventana_modificar.bind("<Escape>", lambda e: ventana_modificar.destroy())
         
-        helpers.centrar_ventana(ventana_modificar, self.app)
+        helpers.configurar_dialogo(ventana_modificar, self.app, entries["Nombre"])
 
     def _guardar_modificaciones_producto(self, codigo, entries, ventana):
         
@@ -222,8 +217,6 @@ class ProductosLogic:
         ventana_carga = ctk.CTkToplevel(self.app)
         ventana_carga.title("Carga Rápida de Inventario")
         ventana_carga.transient(self.app)
-        ventana_carga.grab_set()
-        ventana_carga.resizable(False, False)
 
         productos_a_guardar = []
 
@@ -239,8 +232,7 @@ class ProductosLogic:
         for i, (texto, entry) in enumerate(campos_entries.items()):
             ctk.CTkLabel(frame_principal, text=texto, font=("Segoe UI", 10)).grid(row=i, column=0, sticky="w", pady=2)
             entry.grid(row=i, column=1, sticky="ew", pady=2, padx=5)
-        
-        campos_entries["Código de Barras"].focus_set()
+    
         lbl_contador = ctk.CTkLabel(frame_principal, text="Productos en lista: 0", font=("Segoe UI", 10, "italic"))
         lbl_contador.grid(row=len(campos_entries), column=0, columnspan=2, pady=10)
 
@@ -262,7 +254,6 @@ class ProductosLogic:
                     entry.delete(0, 'end')
                 
                 lbl_contador.configure(text=f"Productos en lista: {len(productos_a_guardar)}")
-                campos_entries["Código de Barras"].focus_set()
             except ValueError:
                 self.app.notificar_error("El precio y el stock deben ser números válidos.")
 
@@ -276,7 +267,7 @@ class ProductosLogic:
                                       fg_color="#28a745", hover_color="#218838",
                                       command=lambda: self._finalizar_y_guardar_carga_rapida(productos_a_guardar, ventana_carga))
         btn_finalizar.pack(side="left", padx=10)
-        helpers.centrar_ventana(ventana_carga, self.app)
+        helpers.configurar_dialogo(ventana_carga, self.app, campos_entries["Código de Barras"])
         campos_entries["Stock Inicial"].bind("<Return>", agregar_y_siguiente)
         ventana_carga.bind("<Escape>", lambda e: ventana_carga.destroy())
 

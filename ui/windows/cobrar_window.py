@@ -88,9 +88,8 @@ class CobrarWindow(ctk.CTkToplevel):
             ctk.CTkLabel(self.frame_inputs, text="Monto Recibido:").pack(anchor="w", padx=10)
             self.monto_efectivo_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
             self.monto_efectivo_entry.pack(fill="x", pady=(0, 5), padx=10)
-            self.monto_efectivo_entry.focus_set()
             self.monto_efectivo_entry.insert(0, f"{self.total_a_cobrar:.2f}")
-
+            self.after(50, lambda: self.monto_efectivo_entry.focus())
             self.label_vuelto = ctk.CTkLabel(self.frame_inputs, text="Vuelto: $0.00", font=("Segoe UI", 12, "bold"))
             self.label_vuelto.pack(fill="x", pady=5, padx=10)
             self.monto_efectivo_entry.bind("<KeyRelease>", self._calcular_vuelto)
@@ -100,21 +99,19 @@ class CobrarWindow(ctk.CTkToplevel):
             ctk.CTkLabel(self.frame_inputs, text="Referencia (opcional):").pack(anchor="w", padx=10)
             self.entry_referencia = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
             self.entry_referencia.pack(fill="x", padx=10)
-            self.entry_referencia.focus_set()
-
+            self.after(50, lambda: self.entry_referencia.focus())
         elif metodo == "Mixto":
             ctk.CTkLabel(self.frame_inputs, text="Monto Efectivo:").pack(anchor="w", padx=10)
             self.monto_efectivo_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
             self.monto_efectivo_entry.pack(fill="x", padx=10)
-            self.monto_efectivo_entry.focus_set()
 
             ctk.CTkLabel(self.frame_inputs, text="Monto Transferencia:").pack(anchor="w", pady=(5,0), padx=10)
             self.monto_transferencia_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
             self.monto_transferencia_entry.pack(fill="x", padx=10)
-
+            self.after(50, lambda: self.monto_efectivo_entry.focus())
             self.monto_efectivo_entry.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(self.monto_efectivo_entry, self.monto_transferencia_entry))
             self.monto_transferencia_entry.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(self.monto_transferencia_entry, self.monto_efectivo_entry))
-
+            
 
     def _calcular_vuelto(self, event=None):
         try:
