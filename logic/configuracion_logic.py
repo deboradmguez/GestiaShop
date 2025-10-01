@@ -1,5 +1,6 @@
 import sys, os
 from utilities.dialogs import ConfirmacionDialog
+from utilities.themes import update_theme_dynamically 
 from database import database_manager as db_manager
 import time
 
@@ -21,42 +22,26 @@ class ConfigLogic:
 
     def aplicar_y_guardar_config(self, nuevos_valores):
         config_anterior = self.app.configuracion.copy()
-        
+
+        if not db_manager.guardar_configuracion(nuevos_valores):
+            self.app.notificar_error("No se pudo guardar la configuración.")
+            return
+
+        self.app.configuracion.update(nuevos_valores)
+
         tema_cambiado = config_anterior.get("tema") != nuevos_valores.get("tema")
 
         if tema_cambiado:
-            # 2. Si el tema cambió, el diálogo es específico y advierte del reinicio
-            dialogo = ConfirmacionDialog(
-                parent=self.app,
-                title="Confirmar y Reiniciar",
-                message="Ha cambiado el tema. Para aplicar este cambio, la aplicación se reiniciará.\n¿Desea guardar y reiniciar ahora?"
-            )
-            if dialogo.show():
-                # Si el usuario acepta, guardamos y reiniciamos
-                if db_manager.guardar_configuracion(nuevos_valores):
-                    self._reiniciar_aplicacion()
-                else:
-                    self.app.notificar_error("No se pudo guardar la configuración.")
-            else:
-                # Si cancela, no hacemos nada y notificamos
-                self.app.notificar_alerta("Cambios no guardados.")
+            update_theme_dynamically(self.app, nuevos_valores.get("tema"))
+
+            self.app.after(150, self.app.configuracion_tab.recargar_vista)
+            
+            self.app.notificar_exito("Tema actualizado correctamente.")
         else:
-            # 3. Si el tema no cambió, es un guardado normal
-            dialogo = ConfirmacionDialog(
-                parent=self.app,
-                title="Confirmar Cambios",
-                message="¿Está seguro de que desea guardar los nuevos ajustes?"
-            )
-            if dialogo.show():
-                if db_manager.guardar_configuracion(nuevos_valores):
-                    self.app.configuracion.update(nuevos_valores)
-                    self.app.actualizar_titulo_app()
-                    self.app.app_logic.actualizar_alertas_stock()
-                    self.app.notificar_exito("Configuración guardada correctamente.")
-                else:
-                    self.app.notificar_error("No se pudo guardar la configuración.")
-            else:
-                self.app.notificar_alerta("Cambios no guardados.")
+            self.app.notificar_exito("Configuración guardada correctamente.")
+
+        self.app.actualizar_titulo_app()
+        self.app.app_logic.actualizar_alertas_stock()
 
 
     def restaurar_config_default(self):

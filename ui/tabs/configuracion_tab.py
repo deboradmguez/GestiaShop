@@ -82,7 +82,7 @@ class ConfiguracionTab(ctk.CTkFrame):
         frame_combo_tema.pack(fill="x", padx=10, pady=(0, 5))
         ctk.CTkLabel(frame_combo_tema, text="Tema:", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
         temas_disponibles = ["dark", "light", "system"]  # Temas correctos para CustomTkinter
-        self.combo_tema = ctk.CTkComboBox(frame_combo_tema, values=temas_disponibles, command=self._tema_cambiado)
+        self.combo_tema = ctk.CTkComboBox(frame_combo_tema, values=temas_disponibles)
         self.combo_tema.set(config.get("tema", "dark"))
         self.combo_tema.pack(fill="x", pady=2)
         
@@ -110,31 +110,19 @@ class ConfiguracionTab(ctk.CTkFrame):
         btn_aplicar.pack(side="left", padx=5)
         btn_restaurar = ctk.CTkButton(frame_botones, text="↩️ Restaurar", command=self._restaurar_valores_por_defecto)
         btn_restaurar.pack(side="left", padx=5)
-            
-    def _tema_cambiado(self, tema_seleccionado):
-        """Solo guarda el tema seleccionado, no lo aplica hasta reiniciar."""
-        from utilities.themes import save_theme_change_only
-        save_theme_change_only(self.controller, tema_seleccionado)
 
     def _aplicar_configuracion(self):
         """Recolecta los nuevos valores y se los pasa al controlador."""
-        tema_anterior = self.controller.configuracion.get("tema", "dark")
-        tema_nuevo = self.combo_tema.get()
-        
-        nuevos_valores = {
-            "nombre_comercio": self.entry_nombre_comercio.get().strip(),
-            "tema": tema_nuevo,
-            "mostrar_alertas_stock": self.var_alertas.get(),
-            "umbral_alerta_stock": int(self.spin_umbral.get())
-        }
-        
-        # Aplicar la configuración
-        self.controller.aplicar_y_guardar_config(nuevos_valores)
-        
-        # Si cambió el tema, mostrar diálogo de reinicio
-        if tema_anterior != tema_nuevo:
-            from utilities.themes import apply_theme_change_and_restart_notification
-            apply_theme_change_and_restart_notification(self.controller, tema_nuevo)
-        else:
-            # Solo mostrar mensaje de éxito si no cambió el tema
-            self.controller.notificar_exito("Configuración aplicada correctamente.")
+        try:
+            # Asegúrate de incluir todos los valores de configuración para no perderlos
+            nuevos_valores = {
+                "nombre_comercio": self.entry_nombre_comercio.get().strip(),
+                "tema": self.combo_tema.get(),
+                "mostrar_alertas_stock": self.var_alertas.get(),
+                "umbral_alerta_stock": int(self.spin_umbral.get()),
+                "pin_admin": self.controller.configuracion.get("pin_admin") # Mantenemos el PIN
+            }
+            # El controlador ahora se encarga de toda la lógica
+            self.controller.aplicar_y_guardar_config(nuevos_valores)
+        except (ValueError, TypeError):
+            self.controller.notificar_error("El umbral de stock debe ser un número válido.")
