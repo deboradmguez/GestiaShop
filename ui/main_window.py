@@ -148,7 +148,7 @@ class App(ctk.CTk):
             self, 
             exclude_widgets=[self.historial_tab.tree_historial]
         ))
-        #self.after(250, lambda: self.historial_tab.configurar_tags_treeview())
+        self.after(250, lambda: self.historial_tab.configurar_tags_treeview())
     def _configurar_locale(self):
         """Configura el idioma para fechas y formatos."""
         try: locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')

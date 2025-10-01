@@ -21,9 +21,6 @@ class HistorialTab(ctk.CTkFrame):
         self._crear_vista_historial()
         self._crear_panel_acciones()
         self._configurar_bindings_globales()
-        
-        # NUEVO: Configurar tags después de crear el Treeview
-        self.configurar_tags_treeview()
     
     def configurar_tags_treeview(self):
         """Configura los tags del Treeview según el tema actual."""
@@ -103,9 +100,6 @@ class HistorialTab(ctk.CTkFrame):
             show="headings"
         )
         self.tree_historial.pack(side="left", fill="both", expand=True)
-        
-        # IMPORTANTE: Primero aplicar el tema general
-        apply_dark_theme_to_all_treeviews(self)
         
         # Configurar headings
         self.tree_historial.heading("fecha", text="Fecha"); self.tree_historial.column("fecha", width=80)

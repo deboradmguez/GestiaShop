@@ -255,100 +255,67 @@ def create_themed_date_entry(parent, **kwargs):
             return ttk.Entry(parent, **kwargs)
 
 def apply_dark_theme_to_all_treeviews(parent_widget, exclude_widgets=None):
-    
     if exclude_widgets is None:
         exclude_widgets = []
-        
+
     style = ttk.Style()
     current_mode = ctk.get_appearance_mode()
-    
+
     if current_mode == "Dark":
-        # Configurar estilo para tema oscuro
-        style.configure(
-            "DarkTreeview.Treeview",
-            background="#212121",
-            foreground="#FFFFFF",
-            fieldbackground="#212121",
-            selectbackground="#1F538D",
-            selectforeground="#FFFFFF",
-            borderwidth=0,
-            lightcolor="#212121",
-            darkcolor="#212121"
-        )
-        
-        style.configure(
-            "DarkTreeview.Treeview.Heading",
-            background="#2B2B2B",
-            foreground="#FFFFFF",
-            borderwidth=0,
-            relief="flat"
-        )
-        
-        style.map(
-            "DarkTreeview.Treeview",
-            background=[('selected', '#1F538D'), ('!selected', '#212121')],
-            foreground=[('selected', '#FFFFFF'), ('!selected', '#FFFFFF')]
-        )
-        
-        tree_style = "DarkTreeview.Treeview"
-        print("DEBUG: Configurado estilo OSCURO para Treeview")
-        
+        # Colores para el tema oscuro
+        bg_color = "#2B2B2B"
+        fg_color = "#FFFFFF"
+        field_bg = "#2B2B2B"
+        select_bg = "#1F538D"
+        header_bg = "#343638"
+        anulada_bg = "#3c3c3c"
+        anulada_fg = "#ff6b6b"
     else:
-        # Configurar estilo para tema claro
-        style.configure(
-            "LightTreeview.Treeview",
-            background="#FFFFFF",
-            foreground="#000000",
-            fieldbackground="#FFFFFF",
-            selectbackground="#0078D4",
-            selectforeground="#FFFFFF",
-            borderwidth=0,
-            lightcolor="#FFFFFF",
-            darkcolor="#FFFFFF"
-        )
-        
-        style.configure(
-            "LightTreeview.Treeview.Heading",
-            background="#F0F0F0",
-            foreground="#000000",
-            borderwidth=0,
-            relief="flat"
-        )
-        
-        style.map(
-            "LightTreeview.Treeview",
-            background=[('selected', '#0078D4'), ('!selected', '#FFFFFF')],
-            foreground=[('selected', '#FFFFFF'), ('!selected', '#000000')]
-        )
-        
-        tree_style = "LightTreeview.Treeview"
-        print("DEBUG: Configurado estilo CLARO para Treeview")
-    
+        # Colores para el tema claro
+        bg_color = "#FFFFFF"
+        fg_color = "#000000"
+        field_bg = "#FFFFFF"
+        select_bg = "#0078D4"
+        header_bg = "#F0F0F0"
+        anulada_bg = "#ffebee"
+        anulada_fg = "#c62828"
+
+    # Configuración base del Treeview y su cabecera
+    style.configure(
+        "Treeview",
+        background=bg_color,
+        foreground=fg_color,
+        fieldbackground=field_bg,
+        rowheight=25
+    )
+    style.configure(
+        "Treeview.Heading",
+        background=header_bg,
+        foreground=fg_color,
+        font=("Segoe UI", 10, "bold")
+    )
+
+    # Mapeo de colores para la selección
+    style.map('Treeview',
+              background=[('selected', select_bg)],
+              foreground=[('selected', 'white')])
+
     def apply_to_widget(widget):
         if isinstance(widget, ttk.Treeview) and widget not in exclude_widgets:
             try:
-                # Aplicar el estilo correcto
-                widget.configure(style=tree_style)
-                print(f"DEBUG: Aplicado estilo {tree_style} a Treeview exitosamente")
+                # Configuramos los tags específicos directamente en el widget
+                # Esto le da más prioridad que la configuración de estilo general
+                widget.tag_configure("anulada", background=anulada_bg, foreground=anulada_fg)
+                widget.tag_configure("parent", font=("Segoe UI", 10, "bold"))
+                widget.tag_configure("child", font=("Segoe UI", 9))
+                print(f"DEBUG: Tags configurados para el Treeview en modo {current_mode}")
 
-                if current_mode == "Dark":
-                    widget.tag_configure("normal", background="#212121", foreground="#FFFFFF")
-                    widget.tag_configure("selected", background="#1F538D", foreground="#FFFFFF")
-                    widget.tag_configure("alternate", background="#242424", foreground="#FFFFFF")
-                    # MEJORADO: Color más visible y consistente
-                    widget.tag_configure("anulada", background="#3c3c3c", foreground="#ff6b6b") 
-                else:
-                    widget.tag_configure("normal", background="#FFFFFF", foreground="#000000")
-                    widget.tag_configure("selected", background="#0078D4", foreground="#FFFFFF")
-                    widget.tag_configure("alternate", background="#F8F8F8", foreground="#000000")
-                    # MEJORADO: Fondo más distintivo
-                    widget.tag_configure("anulada", background="#ffebee", foreground="#c62828")
             except Exception as e:
-                print(f"DEBUG: Error aplicando estilo a Treeview: {e}")
-        
+                print(f"DEBUG: Error aplicando tags a Treeview: {e}")
+
         for child in widget.winfo_children():
             apply_to_widget(child)
-    
+
     apply_to_widget(parent_widget)
 
 def update_theme_dynamically(app, new_appearance_mode):
