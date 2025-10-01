@@ -1,9 +1,7 @@
 import uuid, customtkinter as ctk
-
-# Importamos las ventanas emergentes que son parte de la UI de esta lógica
 from ui.windows.busqueda_window import BusquedaWindow
 from ui.windows.cobrar_window import CobrarWindow
-from utilities.dialogs import ConfirmacionDialog
+from CTkMessagebox import CTkMessagebox
 from database import database_manager as db_manager
 from utilities import helpers
 
@@ -53,16 +51,17 @@ class VentasLogic:
         """Limpia todos los productos del carrito previa confirmación."""
         if not self.app.carrito: return
         
-        dialogo = ConfirmacionDialog(
-            parent=self.app, 
+        dialogo = CTkMessagebox(
             title="Confirmar Acción", 
-            message="¿Desea vaciar el carrito por completo?"
+            message="¿Desea vaciar el carrito por completo?",
+            icon="warning",
+            option_1="No",
+            option_2="Sí",
+            sound=True
         )
         
-        # 3. Mostramos el diálogo y esperamos la respuesta
-        respuesta = dialogo.show()
-
-        if respuesta:
+        if dialogo.get() == "Sí":
+        
             self.app.carrito.clear()
             self._recalcular_total_carrito()
             self.app.ventas_tab.actualizar_vista(self.app.carrito, self.app.total_venta)
@@ -237,4 +236,3 @@ class VentasLogic:
         else:
             self.app.notificar_error("No se pudo registrar la venta.")
             return False
-

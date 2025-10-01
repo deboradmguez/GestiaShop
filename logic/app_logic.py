@@ -1,16 +1,12 @@
-import customtkinter as ctk
 import webbrowser, tkinter as tk
 from PIL import Image
 from datetime import date
 from utilities import notifications, helpers
-from utilities.dialogs import ConfirmacionDialog, PinDialog
+from CTkMessagebox import CTkMessagebox 
 from database import database_manager as db_manager
+import customtkinter as ctk
 
 class AppLogic:
-    """
-    Controlador para la lógica global de la aplicación que no pertenece
-    a una pestaña específica.
-    """
     def __init__(self, app_controller):
         self.app = app_controller
         self.app.modo_venta_activo = False
@@ -37,60 +33,64 @@ class AppLogic:
         self._actualizar_estado_controles_venta()
 
     def dialogo_abrir_caja(self):
-        dialogo = ctk.CTkToplevel(self.app)
-        dialogo.title("Apertura de Caja")
+        dialogo = ctk.CTkInputDialog(
+            title="Apertura de Caja",
+            text="¿Quién abre la caja hoy?"
+        )
+        usuario = dialogo.get_input()
 
-        frame = ctk.CTkFrame(dialogo)
-        frame.pack(expand=True, fill="both", padx=20, pady=20)
+        if not usuario:
+            return
 
-        ctk.CTkLabel(frame, text="¿Quién abre la caja hoy?").pack(anchor="w", padx=5)
-        entry_usuario = ctk.CTkEntry(frame)
-        entry_usuario.pack(fill="x", padx=5, pady=(0, 10))
+        dialogo_fondo = ctk.CTkInputDialog(
+            title="Apertura de Caja",
+            text="¿Con cuánto fondo inicial?"
+        )
+        fondo_str = dialogo_fondo.get_input()
 
-        ctk.CTkLabel(frame, text="¿Con cuánto fondo inicial?").pack(anchor="w", padx=5)
-        entry_fondo = ctk.CTkEntry(frame)
-        entry_fondo.pack(fill="x", padx=5, pady=(0, 10))
-
-        def confirmar_apertura():
-            usuario = entry_usuario.get().strip()
-            fondo_str = entry_fondo.get().strip()
-
-            if not all([usuario, fondo_str]):
-                self.app.notificar_error("Ambos campos son obligatorios.")
-                return
+        if not fondo_str:
+            return
             
-            try:
-                fondo = float(fondo_str)
-                hoy_db = date.today().strftime("%Y-%m-%d")
-                
-                exito = db_manager.registrar_apertura_caja(hoy_db, fondo, usuario)
+        try:
+            fondo = float(fondo_str)
+            hoy_db = date.today().strftime("%Y-%m-%d")
+            
+            exito = db_manager.registrar_apertura_caja(hoy_db, fondo, usuario)
 
-                if exito:
-                    self.app.modo_venta_activo = True
-                    self.app.usuario_actual = usuario
-                    self.app.header_btn_abrir_caja.pack_forget()
-                    self._actualizar_estado_controles_venta()
-                    self.app.caja_logic.recargar_vista_caja() # Avisa a la pestaña de caja que recargue
-                    self.app.notificar_exito(f"Caja abierta por {usuario}.")
-                    dialogo.destroy()
-                else:
-                    self.app.notificar_error("No se pudo registrar la apertura de caja.")
+            if exito:
+                self.app.modo_venta_activo = True
+                self.app.usuario_actual = usuario
+                self.app.header_btn_abrir_caja.pack_forget()
+                self._actualizar_estado_controles_venta()
+                self.app.caja_logic.recargar_vista_caja() # Avisa a la pestaña de caja que recargue
+                self.app.notificar_exito(f"Caja abierta por {usuario}.")
+            else:
+                self.app.notificar_error("No se pudo registrar la apertura de caja.")
 
-            except (ValueError, TypeError):
-                self.app.notificar_error("El fondo inicial debe ser un número válido.")
+        except (ValueError, TypeError):
+            self.app.notificar_error("El fondo inicial debe ser un número válido.")
 
-        btn_confirmar = ctk.CTkButton(frame, text="Confirmar y Empezar", command=confirmar_apertura)
-        btn_confirmar.pack(pady=10)
-        helpers.configurar_dialogo(dialogo, self.app, entry_usuario)
-
-        entry_usuario.bind("<Return>", lambda e: entry_fondo.focus())
-        entry_fondo.bind("<Return>", lambda e: btn_confirmar.invoke())
-        dialogo.bind("<Escape>", lambda e: dialogo.destroy())
-        
     def solicitar_pin_admin(self):
+       
         pin_guardado = self.app.configuracion.get("pin_admin", "0000") 
-        dialogo_pin = PinDialog(self.app, pin_guardado)
-        return dialogo_pin.show()
+        
+        dialogo_pin = ctk.CTkInputDialog(
+            title="Acceso Restringido",
+            text="Por favor, ingrese el PIN de administrador:"
+        )
+        
+        pin_ingresado = dialogo_pin.get_input()
+
+        if pin_ingresado is None: # El usuario cerró o canceló la ventana
+            return None
+        
+        if pin_ingresado == str(pin_guardado):
+            return True
+        else:
+            
+            CTkMessagebox(title="Error", message="PIN incorrecto.", icon="cancel")
+            return False
+
 
     def _actualizar_estado_controles_venta(self):
         """Activa o desactiva los controles de la pestaña de ventas."""
@@ -109,14 +109,13 @@ class AppLogic:
         caja_abierta, _ = db_manager.consultar_estado_caja(hoy_db) # Lógica de DB real
         if caja_abierta and self.app.modo_venta_activo:
             
-            dialogo = ConfirmacionDialog(
-                parent=self.app,
+            dialogo = CTkMessagebox(
                 title="Confirmar Cierre",
-                message="La caja del día aún está abierta.\n¿Desea cerrar de todos modos?"
+                message="La caja del día aún está abierta.\n¿Desea cerrar de todos modos?",
+                icon="question", option_1="No", option_2="Sí", sound=True
             )
             
-            respuesta = dialogo.show()
-            if respuesta:
+            if dialogo.get() == "Sí":
                 self.app.destroy()
         else:
             self.app.destroy()

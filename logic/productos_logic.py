@@ -1,4 +1,4 @@
-from utilities.dialogs import ConfirmacionDialog
+from CTkMessagebox import CTkMessagebox 
 from database import database_manager as db_manager
 from utilities import helpers
 import customtkinter as ctk
@@ -8,7 +8,7 @@ class ProductosLogic:
     Controlador especializado para toda la lógica de la pestaña de Productos.
     """
     def __init__(self, app_controller):
-        self.app = app_controller # Referencia a la App principal para acceder a las vistas y al estado
+        self.app = app_controller 
 
     # --- LÓGICA DE VISUALIZACIÓN Y FILTROS ---
 
@@ -170,14 +170,21 @@ class ProductosLogic:
 
         values = self.app.productos_tab.tree_inventario.item(item_seleccionado, "values")
         codigo, nombre = values[0], values[1]
-        dialogo = ConfirmacionDialog(
-            parent=self.app,
-            title="Confirmar Eliminación",
-            message=f"¿Estás seguro de que querés eliminar '{nombre}'?"
-        )
-        respuesta = dialogo.show()
         
-        if respuesta:
+       
+        dialogo = CTkMessagebox(
+            title="Confirmar Eliminación",
+            message=f"¿Estás seguro de que querés eliminar '{nombre}'?",
+            icon="warning", 
+            option_1="Cancelar",
+            option_2="Eliminar",
+            sound=True,
+            button_color="#D32F2F", 
+            button_hover_color="#B71C1C"
+        )
+        
+        if dialogo.get() == "Eliminar":
+        
             exito = db_manager.eliminar_producto_existente(codigo)
             if exito:
                 self.app.notificar_exito(f"Producto '{nombre}' eliminado correctamente.")
@@ -188,6 +195,7 @@ class ProductosLogic:
     def editar_con_doble_click(self, event):
         """Manejador para el evento de doble clic que inicia la modificación."""
         self.modificar_producto()
+
     def buscar_y_seleccionar_producto(self, codigo_producto):
         """
         Busca un producto por su código en la pestaña de productos,
@@ -196,19 +204,19 @@ class ProductosLogic:
         tab = self.app.productos_tab
         tree = tab.tree_inventario
 
-        # 1. Pone el código en el campo de búsqueda y filtra
+        
         tab.entry_buscar_producto.delete(0, 'end')
         tab.entry_buscar_producto.insert(0, codigo_producto)
         self.filtrar_productos_y_recargar()
 
-        # 2. Busca el item en el árbol
+        
         for item_id in tree.get_children():
             valores = tree.item(item_id, "values")
             if valores and valores[0] == codigo_producto:
-                # 3. Lo selecciona y enfoca
+                
                 tree.selection_set(item_id)
                 tree.focus(item_id)
-                tree.see(item_id) # Asegura que el item sea visible
+                tree.see(item_id) 
                 break
 
     # --- LÓGICA DE CARGA RÁPIDA ---
@@ -278,15 +286,18 @@ class ProductosLogic:
             self.app.notificar_alerta("No hay productos en la lista para guardar.")
             return
 
-        dialogo = ConfirmacionDialog(
-                parent=ventana, # Es importante que el diálogo sea "hijo" de la ventana de carga
+        dialogo = CTkMessagebox(
                 title="Confirmar Guardado",
-                message=f"¿Desea guardar {len(productos)} productos en la base de datos?"
+                message=f"¿Desea guardar {len(productos)} productos en la base de datos?",
+                icon="question",
+                option_1="Cancelar",
+                option_2="Guardar",
+                sound=True
             )
-        respuesta = dialogo.show()
-
-            # La lógica es la misma: si la respuesta NO es True, retorna.
-        if not respuesta: return
+        
+        if dialogo.get() != "Guardar":
+            return
+        
 
         agregados, errores = db_manager.agregar_productos_en_lote(productos)
         
@@ -298,6 +309,7 @@ class ProductosLogic:
         
         ventana.destroy()
         self.filtrar_productos_y_recargar()
+
     def realizar_busqueda_productos(self, termino_busqueda, tree_widget):
         """
         Busca productos por nombre y actualiza un Treeview con los resultados.

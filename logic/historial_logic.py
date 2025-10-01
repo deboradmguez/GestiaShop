@@ -1,12 +1,9 @@
 from datetime import date, datetime
-from utilities.dialogs import ConfirmacionDialog
+from CTkMessagebox import CTkMessagebox
 from database import database_manager as db_manager
 from services import report_generator
 
 class HistorialLogic:
-    """
-    Controlador especializado para la lógica de la pestaña de Historial de Ventas.
-    """
     def __init__(self, app_controller):
         self.app = app_controller
 
@@ -72,13 +69,18 @@ class HistorialLogic:
             self.app.notificar_alerta("Esta venta ya ha sido anulada.")
             return
 
-        dialogo_confirmacion = ConfirmacionDialog(
-            parent=self.app, 
+        dialogo_confirmacion = CTkMessagebox(
             title="Confirmar Anulación", 
-            message=f"¿Desea anular la venta seleccionada?\n\nEsta acción devolverá los productos al stock."
+            message="¿Desea anular la venta seleccionada?\n\nEsta acción devolverá los productos al stock.",
+            icon="warning",
+            option_1="Cancelar",
+            option_2="Anular Venta",
+            sound=True,
+            button_color="#D32F2F",
+            button_hover_color="#B71C1C"
         )
         
-        if not dialogo_confirmacion.show():
+        if dialogo_confirmacion.get() != "Anular Venta":
             self.app.notificar_alerta("Anulación cancelada.")
             return
 
@@ -118,9 +120,9 @@ class HistorialLogic:
             
     def ir_a_hoy_historial(self):
         hoy_str = date.today().strftime("%d/%m/%Y")
-        self.app.historial_tab.cal_fecha_historial.delete(0, "end")
-        self.app.historial_tab.cal_fecha_historial.insert(0, hoy_str)
+        self.app.historial_tab.cal_fecha_historial.set(hoy_str) # Usamos .set()
         self.recargar_historial_ventas()
+
     def descargar_reporte_historial(self):
         fecha_ui = self.app.historial_tab.cal_fecha_historial.get()
         try:
