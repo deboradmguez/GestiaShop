@@ -28,7 +28,7 @@ class ConfigLogic:
             return
 
         self.app.configuracion.update(nuevos_valores)
-
+        
         tema_cambiado = config_anterior.get("tema") != nuevos_valores.get("tema")
 
         if tema_cambiado:
@@ -59,7 +59,7 @@ class ConfigLogic:
                 self.app.configuracion = db_manager.cargar_configuracion_completa()
                 self.app.notificar_exito("La configuración ha sido restaurada.")
                 self.app.configuracion_tab.recargar_vista()
-                
+                self.app.app_logic.actualizar_alertas_stock()
                 # Si el tema cambió, solo notificamos
                 if tema_anterior != self.app.configuracion.get("tema"):
                     self.app.notificar_alerta("El tema por defecto se aplicará en el próximo reinicio.")

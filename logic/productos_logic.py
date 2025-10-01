@@ -155,6 +155,7 @@ class ProductosLogic:
                 self.app.notificar_exito(f"Producto '{nuevo_nombre}' modificado.")
                 ventana.destroy()
                 self.filtrar_productos_y_recargar()
+                self.app.app_logic.actualizar_alertas_stock()
             else:
                 self.app.notificar_error("No se pudo actualizar el producto.")
         except (ValueError, TypeError):

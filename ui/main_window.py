@@ -130,7 +130,7 @@ class App(ctk.CTk):
         """Crea el pie de página con botones de ayuda y alertas."""
         self.btn_soporte = ctk.CTkButton(self, text="⛑️ Ayuda", command=self.mostrar_soporte)
         self.btn_soporte.place(relx=0.0, rely=1.0, x=10, y=-10, anchor="sw")
-        self.btn_alerta_stock = ctk.CTkButton(self, text="⚠ Alertas") # La lógica de app_logic lo gestionará
+        self.btn_alerta_stock = ctk.CTkButton(self, text="⚠ Alertas", command=self.app_logic.mostrar_alertas_de_stock)
     def _crear_widget_notificaciones(self):
         self.lbl_notificacion = ctk.CTkLabel(self, text="", font=("Segoe UI", 12))
     def _iniciar_procesos_de_fondo(self):

@@ -160,6 +160,13 @@ class AppLogic:
         
         helpers.centrar_ventana(ventana_soporte, self.app)
         ventana_soporte.bind("<Escape>", lambda e: ventana_soporte.destroy())
+    def mostrar_alertas_de_stock(self):
+        """Navega a la pestaña de productos y filtra por stock bajo."""
+        self.app.notebook.set("Productos (F2)")
+        
+        self.app.productos_tab.combo_filtro_productos.set("Productos con stock bajo")
+        
+        self.app.productos_logic.filtrar_productos_y_recargar()
 
     def actualizar_alertas_stock(self):
         productos = db_manager.obtener_lista_productos_a_reponer()

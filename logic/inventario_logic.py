@@ -75,8 +75,8 @@ class InventarioLogic:
         if exito:
             self.app.notificar_exito("Producto actualizado correctamente.")
             self._limpiar_campos()
-            # Avisamos a la pestaña de productos que sus datos pueden haber cambiado
             self.app.productos_logic.filtrar_productos_y_recargar()
+            self.app.app_logic.actualizar_alertas_stock()
         else:
             self.app.notificar_error("No se pudo actualizar el producto.")
         

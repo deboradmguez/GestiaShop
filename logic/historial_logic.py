@@ -106,6 +106,7 @@ class HistorialLogic:
             self.recargar_historial_ventas()
             self.app.productos_logic.filtrar_productos_y_recargar()
             self.app.caja_logic.recargar_vista_caja()
+            self.app.app_logic.actualizar_alertas_stock()
         else:
             self.app.notificar_error("No se pudo anular la venta en la base de datos.")
 

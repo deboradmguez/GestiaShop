@@ -230,6 +230,8 @@ class VentasLogic:
             if hasattr(self.app, 'caja_logic'):
                 self.app.caja_logic.recargar_vista_caja()
             
+            self.app.app_logic.actualizar_alertas_stock()
+            
             self.app.notificar_exito("Venta realizada correctamente.")
             return True
         else:
