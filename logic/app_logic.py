@@ -175,7 +175,7 @@ class AppLogic:
         if conteo > 0 and hasattr(self.app, 'btn_alerta_stock'):
             self.app.btn_alerta_stock.configure(
                 text=f"⚠ {conteo} Alerta{'s' if conteo > 1 else ''}",
-                fg_color="#D32F2F", hover_color="#B71C1C" # Color "danger"
+                fg_color="#D32F2F", hover_color="#B71C1C", text_color="white" 
             )
             self.app.btn_alerta_stock.place(relx=1.0, rely=1.0, x=-10, y=-10, anchor="se")
         elif hasattr(self.app, 'btn_alerta_stock'):

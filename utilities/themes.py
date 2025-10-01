@@ -338,7 +338,7 @@ def update_theme_dynamically(app, new_appearance_mode):
     def force_complete_update():
         # Actualizar todos los frames principales
         for widget in app.winfo_children():
-            if widget == app.lbl_notificacion:
+            if widget in (app.lbl_notificacion, app.btn_soporte, app.btn_alerta_stock):
                 continue
             
             try:
