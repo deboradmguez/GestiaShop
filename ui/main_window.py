@@ -25,8 +25,7 @@ from logic.configuracion_logic import ConfigLogic
 # --- Utilidades ---
 from utilities import helpers
 from utilities.helpers import ruta_recurso
-# NOTA: apply_custom_theme puede que ya no sea necesario si usamos los temas de CTk
-# from utilities.themes import apply_custom_theme
+from utilities.themes import apply_custom_theme
 
 class App(ctk.CTk):
     def __init__(self, config, single_instance_lock=None):
@@ -35,7 +34,7 @@ class App(ctk.CTk):
         self.single_instance_lock = single_instance_lock
         ctk.set_appearance_mode(self.configuracion.get("tema", "dark"))
         ctk.set_default_color_theme("blue")
-        # apply_custom_theme(self) # Esto podría ser redundante, lo revisaremos luego
+        apply_custom_theme(self) # Esto podría ser redundante, lo revisaremos luego
 
         self.is_fullscreen = True
         

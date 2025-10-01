@@ -207,53 +207,20 @@ def apply_dark_theme_to_all_treeviews(parent_widget, exclude_widgets=None):
     if exclude_widgets is None:
         exclude_widgets = []
 
-    style = ttk.Style()
+    # Ya no necesitamos llamar a ttk.Style() aquí
     current_mode = ctk.get_appearance_mode()
 
     if current_mode == "Dark":
-        # Colores para el tema oscuro
-        bg_color = "#2B2B2B"
-        fg_color = "#FFFFFF"
-        field_bg = "#2B2B2B"
-        select_bg = "#1F538D"
-        header_bg = "#343638"
         anulada_bg = "#3c3c3c"
         anulada_fg = "#ff6b6b"
     else:
-        # Colores para el tema claro
-        bg_color = "#FFFFFF"
-        fg_color = "#000000"
-        field_bg = "#FFFFFF"
-        select_bg = "#0078D4"
-        header_bg = "#F0F0F0"
         anulada_bg = "#ffebee"
         anulada_fg = "#c62828"
-
-    # Configuración base del Treeview y su cabecera
-    style.configure(
-        "Treeview",
-        background=bg_color,
-        foreground=fg_color,
-        fieldbackground=field_bg,
-        rowheight=25
-    )
-    style.configure(
-        "Treeview.Heading",
-        background=header_bg,
-        foreground=fg_color,
-        font=("Segoe UI", 10, "bold")
-    )
-
-    # Mapeo de colores para la selección
-    style.map('Treeview',
-              background=[('selected', select_bg)],
-              foreground=[('selected', 'white')])
 
     def apply_to_widget(widget):
         if isinstance(widget, ttk.Treeview) and widget not in exclude_widgets:
             try:
-                # Configuramos los tags específicos directamente en el widget
-                # Esto le da más prioridad que la configuración de estilo general
+                # La única responsabilidad de esta función ahora es configurar los tags.
                 widget.tag_configure("anulada", background=anulada_bg, foreground=anulada_fg)
                 widget.tag_configure("parent", font=("Segoe UI", 10, "bold"))
                 widget.tag_configure("child", font=("Segoe UI", 9))
@@ -301,8 +268,7 @@ def update_theme_dynamically(app, new_appearance_mode):
         app.update()
         app.update_idletasks()
         
-        # Aplicar tema a Treeviews una vez más después del redibujado
-        apply_dark_theme_to_all_treeviews(app)
+        app.after(50, lambda: apply_dark_theme_to_all_treeviews(app))
     
     # Ejecutar la actualización completa después de un breve delay
     app.after(100, force_complete_update)
