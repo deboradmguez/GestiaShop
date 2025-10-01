@@ -143,7 +143,12 @@ class App(ctk.CTk):
         self.productos_logic.filtrar_productos_y_recargar()
         self.caja_logic.recargar_vista_caja()
         from utilities.themes import apply_dark_theme_to_all_treeviews
-        self.after(200, lambda: apply_dark_theme_to_all_treeviews(self))
+        # Excluir el Treeview de historial
+        self.after(200, lambda: apply_dark_theme_to_all_treeviews(
+            self, 
+            exclude_widgets=[self.historial_tab.tree_historial]
+        ))
+        #self.after(250, lambda: self.historial_tab.configurar_tags_treeview())
     def _configurar_locale(self):
         """Configura el idioma para fechas y formatos."""
         try: locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')

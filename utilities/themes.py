@@ -254,10 +254,11 @@ def create_themed_date_entry(parent, **kwargs):
         except:
             return ttk.Entry(parent, **kwargs)
 
-def apply_dark_theme_to_all_treeviews(parent_widget):
-    """Recorre todos los widgets hijo y aplica tema usando estilos ttk correctos"""
+def apply_dark_theme_to_all_treeviews(parent_widget, exclude_widgets=None):
     
-    # Primero configurar los estilos
+    if exclude_widgets is None:
+        exclude_widgets = []
+        
     style = ttk.Style()
     current_mode = ctk.get_appearance_mode()
     
@@ -324,23 +325,24 @@ def apply_dark_theme_to_all_treeviews(parent_widget):
         print("DEBUG: Configurado estilo CLARO para Treeview")
     
     def apply_to_widget(widget):
-        if isinstance(widget, ttk.Treeview):
+        if isinstance(widget, ttk.Treeview) and widget not in exclude_widgets:
             try:
                 # Aplicar el estilo correcto
                 widget.configure(style=tree_style)
                 print(f"DEBUG: Aplicado estilo {tree_style} a Treeview exitosamente")
-                
-                # Configurar tags adicionales
+
                 if current_mode == "Dark":
                     widget.tag_configure("normal", background="#212121", foreground="#FFFFFF")
                     widget.tag_configure("selected", background="#1F538D", foreground="#FFFFFF")
                     widget.tag_configure("alternate", background="#242424", foreground="#FFFFFF")
-                    widget.tag_configure("anulada", background="#3c3c3c", foreground="#a8a8a8") 
+                    # MEJORADO: Color más visible y consistente
+                    widget.tag_configure("anulada", background="#3c3c3c", foreground="#ff6b6b") 
                 else:
                     widget.tag_configure("normal", background="#FFFFFF", foreground="#000000")
                     widget.tag_configure("selected", background="#0078D4", foreground="#FFFFFF")
                     widget.tag_configure("alternate", background="#F8F8F8", foreground="#000000")
-                    widget.tag_configure("anulada", background="#E0E0E0", foreground="#757575")
+                    # MEJORADO: Fondo más distintivo
+                    widget.tag_configure("anulada", background="#ffebee", foreground="#c62828")
             except Exception as e:
                 print(f"DEBUG: Error aplicando estilo a Treeview: {e}")
         

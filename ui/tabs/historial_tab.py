@@ -1,8 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk
-from utilities.themes import create_themed_date_entry
+from utilities.themes import create_themed_date_entry, apply_dark_theme_to_all_treeviews
 from PIL import Image
-import tkinter as tk
 
 class HistorialTab(ctk.CTkFrame):
 
@@ -22,6 +21,41 @@ class HistorialTab(ctk.CTkFrame):
         self._crear_vista_historial()
         self._crear_panel_acciones()
         self._configurar_bindings_globales()
+        
+        # NUEVO: Configurar tags después de crear el Treeview
+        self.configurar_tags_treeview()
+    
+    def configurar_tags_treeview(self):
+        """Configura los tags del Treeview según el tema actual."""
+        # Este método puede ser llamado cuando cambie el tema
+        if ctk.get_appearance_mode() == "Dark":
+            self.tree_historial.tag_configure(
+                "anulada", 
+                background="#3c3c3c", 
+                foreground="#ff6b6b"  # Rojo más visible en modo oscuro
+            )
+            self.tree_historial.tag_configure(
+                "parent", 
+                font=("Segoe UI", 10, "bold")
+            )
+            self.tree_historial.tag_configure(
+                "child", 
+                font=("Segoe UI", 9)
+            )
+        else:
+            self.tree_historial.tag_configure(
+                "anulada", 
+                background="#ffebee",  # Fondo rojo muy claro
+                foreground="#c62828"   # Texto rojo oscuro
+            )
+            self.tree_historial.tag_configure(
+                "parent", 
+                font=("Segoe UI", 10, "bold")
+            )
+            self.tree_historial.tag_configure(
+                "child", 
+                font=("Segoe UI", 9)
+            )
     
     def _crear_panel_controles(self):
         """Crea el panel superior para la selección de fecha."""
@@ -69,15 +103,11 @@ class HistorialTab(ctk.CTkFrame):
             show="headings"
         )
         self.tree_historial.pack(side="left", fill="both", expand=True)
-        #configure_treeview_colors(self.tree_historial)
-    
-        # --- Scrollbar de CustomTkinter ---
-        scrollbar = ctk.CTkScrollbar(tree_container, command=self.tree_historial.yview)
-        scrollbar.pack(side="right", fill="y")
-        self.tree_historial.configure(yscrollcommand=scrollbar.set)
-
-        self.tree_historial.tag_configure("parent", font=("Segoe UI", 10, "bold"))
-        self.tree_historial.tag_configure("child", font=("Segoe UI", 9))
+        
+        # IMPORTANTE: Primero aplicar el tema general
+        apply_dark_theme_to_all_treeviews(self)
+        
+        # Configurar headings
         self.tree_historial.heading("fecha", text="Fecha"); self.tree_historial.column("fecha", width=80)
         self.tree_historial.heading("hora", text="Hora"); self.tree_historial.column("hora", width=60)
         self.tree_historial.heading("desc", text="Descripción"); self.tree_historial.column("desc", width=300)
@@ -87,7 +117,6 @@ class HistorialTab(ctk.CTkFrame):
         self.tree_historial.heading("p_trans", text="Transf."); self.tree_historial.column("p_trans", width=80, anchor="e")
         self.tree_historial.heading("total", text="Total"); self.tree_historial.column("total", width=80, anchor="e")
 
-
     def _crear_panel_acciones(self):
         """Crea los botones de acción en la parte inferior."""
         frame_acciones = ctk.CTkFrame(self, fg_color="transparent")
@@ -96,7 +125,7 @@ class HistorialTab(ctk.CTkFrame):
         self.btn_generar_pdf = ctk.CTkButton(
             frame_acciones, text="Descargar PDF", image=self.icono_descargar,
             command=self.controller.descargar_reporte_historial,
-            fg_color="#28a745", hover_color="#218838" # Color "success"
+            fg_color="#28a745", hover_color="#218838"
         )
         self.btn_generar_pdf.pack(side="left", padx=5)
 
@@ -104,7 +133,7 @@ class HistorialTab(ctk.CTkFrame):
             frame_acciones, text="Anular Venta Seleccionada",
             state="disabled",
             command=self.controller.anular_venta_seleccionada,
-            fg_color="#D32F2F", hover_color="#B71C1C" # Color "danger"
+            fg_color="#D32F2F", hover_color="#B71C1C"
         )
         self.btn_anular_venta.pack(side="left", padx=5)
 

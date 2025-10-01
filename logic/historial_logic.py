@@ -58,6 +58,9 @@ class HistorialLogic:
             child_tags = ['child', 'anulada'] if venta['estado'] == 'Anulada' else ['child']
             for nom, cant, prec, total_f in venta['detalles']:
                 tab.tree_historial.insert(id_t, "end", values=("", "", nom, cant, f"${prec or 0:.2f}", "", "", f"${total_f or 0:.2f}"), tags=child_tags)
+            if 'anulada' in tags:
+                print(f"DEBUG: Item {id_t} insertado con tags: {tags}")
+                print(f"DEBUG: Configuración actual del tag 'anulada': {tab.tree_historial.tag_configure('anulada')}")
 
     def anular_venta_seleccionada(self):
         tab = self.app.historial_tab
@@ -71,8 +74,6 @@ class HistorialLogic:
         parent_id = tab.tree_historial.parent(item_seleccionado)
         id_transaccion = parent_id if parent_id else item_seleccionado
         
-        # --- NUEVA VERIFICACIÓN AÑADIDA ---
-        # Verificamos si la venta ya está anulada antes de continuar
         item_actual = tab.tree_historial.item(id_transaccion)
         if 'anulada' in item_actual['tags']:
             self.app.notificar_alerta("Esta venta ya ha sido anulada.")
