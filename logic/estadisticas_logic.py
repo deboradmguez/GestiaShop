@@ -16,8 +16,8 @@ class EstadisticasLogic:
 
     def generar_estadisticas(self):
         tab = self.app.estadisticas_tab
-        fecha_inicio_str = tab.cal_desde.entry.get()
-        fecha_fin_str = tab.cal_hasta.entry.get()
+        fecha_inicio_str = tab.cal_desde.get()
+        fecha_fin_str = tab.cal_hasta.get()
 
         try:
             # 1. Validamos y convertimos las fechas

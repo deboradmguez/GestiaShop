@@ -1,7 +1,6 @@
 from datetime import date, datetime
 from utilities.dialogs import ConfirmacionDialog
 from database import database_manager as db_manager
-from utilities import helpers
 from services import report_generator
 
 class HistorialLogic:
@@ -12,7 +11,7 @@ class HistorialLogic:
         self.app = app_controller
 
     def recargar_historial_ventas(self):
-        fecha_ui = self.app.historial_tab.cal_fecha_historial.entry.get()
+        fecha_ui = self.app.historial_tab.cal_fecha_historial.get()
         
         try:
             fecha_db = datetime.strptime(fecha_ui, "%d/%m/%Y").strftime("%Y-%m-%d")
@@ -22,21 +21,16 @@ class HistorialLogic:
         resumen_dia = db_manager.obtener_resumen_ventas_del_dia(fecha_db)
         historial = db_manager.obtener_historial_por_fecha(fecha_db)
         
-        # 2. Calculamos los totales a partir de los datos reales
         total_efectivo = sum(t for m, t in resumen_dia if m == "Efectivo")
         total_transferencia = sum(t for m, t in resumen_dia if m == "Transferencia")
         
-        # 3. Actualizamos los labels de la UI con los totales reales
         tab = self.app.historial_tab
         tab.lbl_total_efectivo.configure(text=f"Efectivo: ${total_efectivo:,.2f}")
         tab.lbl_total_transferencia.configure(text=f"Transferencia: ${total_transferencia:,.2f}")
         tab.lbl_total_general.configure(text=f"Total: ${total_efectivo + total_transferencia:,.2f}")
 
-        # 4. Limpiamos la tabla antes de llenarla
         tab.tree_historial.delete(*tab.tree_historial.get_children())
         
-        
-        # Lógica para agrupar y mostrar los datos en la tabla (sin cambios)
         ventas_agrupadas = {}
         for id_t, fecha_h, nom, cant, prec, p_ef, p_tr, total_f, est, tick in historial:
             if id_t not in ventas_agrupadas:
@@ -70,7 +64,6 @@ class HistorialLogic:
             return
 
         item_seleccionado = seleccion[0]
-        # Nos aseguramos de obtener el ID del elemento padre (la venta en sí)
         parent_id = tab.tree_historial.parent(item_seleccionado)
         id_transaccion = parent_id if parent_id else item_seleccionado
         
@@ -124,13 +117,12 @@ class HistorialLogic:
             self.app.historial_tab.tree_historial.selection_set('')
             
     def ir_a_hoy_historial(self):
-        helpers.ir_a_hoy_y_recargar(
-            self.app.historial_tab.cal_fecha_historial,
-            self.recargar_historial_ventas             
-        )
-
+        hoy_str = date.today().strftime("%d/%m/%Y")
+        self.app.historial_tab.cal_fecha_historial.delete(0, "end")
+        self.app.historial_tab.cal_fecha_historial.insert(0, hoy_str)
+        self.recargar_historial_ventas()
     def descargar_reporte_historial(self):
-        fecha_ui = self.app.historial_tab.cal_fecha_historial.entry.get()
+        fecha_ui = self.app.historial_tab.cal_fecha_historial.get()
         try:
             fecha_db = datetime.strptime(fecha_ui, "%d/%m/%Y").strftime("%Y-%m-%d")
         except ValueError:

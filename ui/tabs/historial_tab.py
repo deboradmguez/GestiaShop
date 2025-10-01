@@ -1,8 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk
-from utilities.themes import create_themed_date_entry, apply_dark_theme_to_all_treeviews
 from PIL import Image
-
+from datetime import datetime
 class HistorialTab(ctk.CTkFrame):
 
     def __init__(self, parent, controller):
@@ -60,8 +59,9 @@ class HistorialTab(ctk.CTkFrame):
         frame_controles.pack(fill="x", pady=5, padx=10)
 
         ctk.CTkLabel(frame_controles, text="Ver ventas del:", font=("Segoe UI", 12)).pack(side="left", padx=5)
-        self.cal_fecha_historial = create_themed_date_entry(frame_controles, dateformat="%d/%m/%Y")
+        self.cal_fecha_historial = ctk.CTkEntry(frame_controles, placeholder_text="dd/mm/aaaa")
         self.cal_fecha_historial.pack(side="left", padx=5)
+        self.cal_fecha_historial.insert(0, datetime.now().strftime("%d/%m/%Y"))
         
         btn_recargar = ctk.CTkButton(
             frame_controles, text="Cargar Historial",

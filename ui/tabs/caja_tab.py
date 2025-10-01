@@ -1,6 +1,5 @@
 import customtkinter as ctk
-from tkinter import ttk 
-from utilities.themes import create_themed_date_entry
+from datetime import datetime
 
 class CajaTab(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -39,7 +38,8 @@ class CajaTab(ctk.CTkFrame):
             font=ctk.CTkFont(size=11)
         ).pack(side="left", padx=(10, 5), pady=10)
         
-        self.cal_caja = create_themed_date_entry(frame_fecha, dateformat="%d/%m/%Y")
+        self.cal_caja = ctk.CTkEntry(frame_fecha, placeholder_text="dd/mm/aaaa")
+        self.cal_caja.insert(0, datetime.now().strftime("%d/%m/%Y"))
         self.cal_caja.pack(side="left", padx=5, pady=10)
         
         ctk.CTkButton(

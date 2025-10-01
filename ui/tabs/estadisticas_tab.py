@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk
-from utilities.themes import create_themed_date_entry
+from datetime import datetime
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -21,13 +21,16 @@ class EstadisticasTab(ctk.CTkFrame):
         frame_controles = ctk.CTkFrame(self)
         frame_controles.pack(fill="x", pady=5, padx=10)
 
+        
         ctk.CTkLabel(frame_controles, text="Desde:", font=("Segoe UI", 11)).pack(side="left", padx=(0, 5))
-        self.cal_desde = create_themed_date_entry(frame_controles, dateformat="%d/%m/%Y", width=12)
+        self.cal_desde = ctk.CTkEntry(frame_controles, placeholder_text="dd/mm/aaaa", width=100)
         self.cal_desde.pack(side="left")
+        self.cal_desde.insert(0, datetime.now().strftime("%d/%m/%Y"))
 
         ctk.CTkLabel(frame_controles, text="Hasta:", font=("Segoe UI", 11)).pack(side="left", padx=(10, 5))
-        self.cal_hasta = create_themed_date_entry(frame_controles, dateformat="%d/%m/%Y", width=12)
+        self.cal_hasta = ctk.CTkEntry(frame_controles, placeholder_text="dd/mm/aaaa", width=100)
         self.cal_hasta.pack(side="left")
+        self.cal_hasta.insert(0, datetime.now().strftime("%d/%m/%Y"))
 
         btn_generar = ctk.CTkButton(
             frame_controles, text="📈 Generar Reporte",

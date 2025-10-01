@@ -60,16 +60,6 @@ def formatear_fecha_es(dt: datetime):
     mes = MESES_ES[dt.month - 1]
     año = dt.year
     return f"{dia_sem}, {dia} de {mes} de {año}"
-def ir_a_hoy_y_recargar(calendario_widget, funcion_recarga):
-    
-    hoy_str = date.today().strftime("%d/%m/%Y")
-    
-    # Actualiza el widget del calendario
-    calendario_widget.entry.delete(0, tk.END)
-    calendario_widget.entry.insert(0, hoy_str)
-    
-    # Llama a la función de recarga específica de la pestaña
-    funcion_recarga()
         
 def configurar_dialogo(dialogo, parent_app, widget_a_enfocar):
     dialogo.transient(parent_app)
@@ -78,5 +68,4 @@ def configurar_dialogo(dialogo, parent_app, widget_a_enfocar):
     
     centrar_ventana(dialogo, parent_app)
     
-    # Usamos 'after' para asegurar que el foco se establezca correctamente
     dialogo.after(50, lambda: widget_a_enfocar.focus())

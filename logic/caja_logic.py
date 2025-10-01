@@ -1,5 +1,4 @@
-import customtkinter as ctk 
-from tkinter import Toplevel
+import customtkinter as ctk
 from datetime import date, datetime
 from database import database_manager as db_manager
 from services import report_generator 
@@ -46,7 +45,7 @@ class CajaLogic:
                 
     def recargar_vista_caja(self):
         
-        fecha_ui = self.app.caja_tab.cal_caja.entry.get()
+        fecha_ui = self.app.caja_tab.cal_caja.get()
         try:
             fecha_db = datetime.strptime(fecha_ui, "%d/%m/%Y").strftime("%Y-%m-%d")
         except ValueError:
@@ -158,14 +157,14 @@ class CajaLogic:
         dialogo_ajuste.bind("<Escape>", lambda e: dialogo_ajuste.destroy())
 
     def ir_a_hoy_caja(self):
-        """Pone la fecha actual en el calendario de la caja y recarga la vista."""
-        helpers.ir_a_hoy_y_recargar(
-            self.app.caja_tab.cal_caja,      
-            self.recargar_vista_caja        
-        )
-        
+        hoy_str = date.today().strftime("%d/%m/%Y")
+        calendario_widget = self.app.caja_tab.cal_caja
+        calendario_widget.delete(0, "end")
+        calendario_widget.insert(0, hoy_str)
+        self.recargar_vista_caja()
+            
     def descargar_reporte_caja(self):
-        fecha_ui = self.app.caja_tab.cal_caja.entry.get()
+        fecha_ui = self.app.caja_tab.cal_caja.get()
         try:
             fecha_db = datetime.strptime(fecha_ui, "%d/%m/%Y").strftime("%Y-%m-%d")
         except ValueError:

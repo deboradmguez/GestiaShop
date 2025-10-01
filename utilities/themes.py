@@ -1,4 +1,3 @@
-import tkinter as tk
 from tkinter import ttk
 import customtkinter as ctk
 
@@ -101,7 +100,6 @@ def apply_custom_theme(app):
     style.configure(
         "TEntry",
         fieldbackground=entry_bg,
-        background=entry_bg,
         foreground=fg_color,
         borderwidth=1,
         relief="flat",
@@ -109,7 +107,7 @@ def apply_custom_theme(app):
         selectbackground=selected_bg,
         selectforeground="#FFFFFF"
     )
-    
+
     style.map(
         "TEntry",
         fieldbackground=[('focus', entry_bg), ('!focus', entry_bg)],
@@ -204,55 +202,6 @@ def apply_custom_theme(app):
         background=[('active', hover_color), ('pressed', selected_bg)]
     )
 
-def create_themed_date_entry(parent, **kwargs):
-    """
-    Crea un DateEntry con colores que coincidan con el tema actual.
-    """
-    appearance_mode = ctk.get_appearance_mode().lower()
-    
-    try:
-        from ttkbootstrap.widgets import DateEntry
-        
-        if appearance_mode == "dark":
-            # Para tema oscuro - solo usar parámetros válidos para DateEntry
-            themed_kwargs = {
-                "bootstyle": "dark"
-            }
-        else:
-            # Para tema claro
-            themed_kwargs = {
-                "bootstyle": "info"
-            }
-        
-        # Combinar con kwargs proporcionados, dando prioridad a los kwargs del usuario
-        final_kwargs = {**themed_kwargs, **kwargs}
-        
-        # Crear el DateEntry
-        date_entry = DateEntry(parent, **final_kwargs)
-        
-        # Aplicar estilos manualmente después de la creación
-        try:
-            if appearance_mode == "dark":
-                date_entry.configure(style="Dark.TEntry")
-            else:
-                date_entry.configure(style="TEntry")
-        except:
-            pass  # Si falla la configuración de estilo, continuar
-            
-        return date_entry
-        
-    except ImportError:
-        # Fallback si ttkbootstrap no está disponible
-        print("Warning: ttkbootstrap no está disponible, usando Entry estándar")
-        return ttk.Entry(parent, **kwargs)
-    except Exception as e:
-        # Si hay cualquier otro error, usar DateEntry básico
-        print(f"Warning: Error al crear DateEntry temático: {e}")
-        try:
-            from ttkbootstrap.widgets import DateEntry
-            return DateEntry(parent, **kwargs)
-        except:
-            return ttk.Entry(parent, **kwargs)
 
 def apply_dark_theme_to_all_treeviews(parent_widget, exclude_widgets=None):
     if exclude_widgets is None:

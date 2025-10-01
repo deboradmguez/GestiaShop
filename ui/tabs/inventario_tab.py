@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from tkinter import ttk
 
 class InventarioTab(ctk.CTkFrame):
     """
@@ -12,7 +11,7 @@ class InventarioTab(ctk.CTkFrame):
         # Creamos la interfaz
         self._crear_widgets()
         self._configurar_bindings()
-        self.after(100, lambda: self.entry_codigo_inv.focus())
+        self.after(300, lambda: self.entry_codigo_inv.focus_set())
         
     def _crear_widgets(self):
         """Crea y posiciona todos los widgets de esta pestaña."""
