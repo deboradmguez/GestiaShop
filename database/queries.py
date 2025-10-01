@@ -52,7 +52,11 @@ def eliminar_producto(conexion, codigo):
 def obtener_productos_para_reponer(conexion):
     cursor = conexion.cursor()
     cursor.execute(
-        "SELECT codigo_barras, nombre, stock FROM productos WHERE stock <= umbral_alerta"
+        """
+        SELECT codigo_barras, nombre, stock 
+        FROM productos 
+        WHERE stock <= (SELECT CAST(valor AS INTEGER) FROM configuracion WHERE clave = 'umbral_alerta_stock')
+        """
     )
     return cursor.fetchall()
 def buscar_producto(conexion, codigo):
@@ -77,23 +81,23 @@ def buscar_productos_por_nombre(conexion, nombre_producto):
     cursor.execute("SELECT codigo_barras, nombre, precio, stock, umbral_alerta FROM productos WHERE nombre LIKE ?", (f'%{nombre_producto}%',))
     return cursor.fetchall()
 
+# Dentro de database/queries.py
+
 def buscar_productos_filtrados(conexion, filtro_stock, texto_busqueda):
     cursor = conexion.cursor()
     
-    # Preparamos los parámetros de búsqueda
     texto_like = f"%{texto_busqueda}%"
     
-    # Construimos la consulta base
     query = """
-        SELECT codigo_barras, nombre, precio, stock, umbral_alerta
+        SELECT codigo_barras, nombre, precio, stock, 
+               (SELECT CAST(valor AS INTEGER) FROM configuracion WHERE clave = 'umbral_alerta_stock') as umbral_alerta
         FROM productos
     """
     
     params = []
     
-    # Añadimos las condiciones WHERE
     if filtro_stock == 'bajo':
-        query += " WHERE stock <= umbral_alerta"
+        query += " WHERE stock <= (SELECT CAST(valor AS INTEGER) FROM configuracion WHERE clave = 'umbral_alerta_stock')"
         if texto_busqueda:
             query += " AND (LOWER(nombre) LIKE ? OR codigo_barras LIKE ?)"
             params.extend([texto_like, texto_like])

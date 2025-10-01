@@ -6,7 +6,7 @@ import time
 
 CONFIG_DEFAULT = {
     "nombre_comercio": "GestiaShop",
-    "tema": "superhero",
+    "tema": "dark",
     "mostrar_alertas_stock": True,
     "umbral_alerta_stock": 5,
     "pin_admin": "7114"
@@ -33,15 +33,15 @@ class ConfigLogic:
 
         if tema_cambiado:
             update_theme_dynamically(self.app, nuevos_valores.get("tema"))
-
             self.app.after(150, self.app.configuracion_tab.recargar_vista)
-            
             self.app.notificar_exito("Tema actualizado correctamente.")
         else:
             self.app.notificar_exito("Configuración guardada correctamente.")
 
         self.app.actualizar_titulo_app()
         self.app.app_logic.actualizar_alertas_stock()
+        
+        self.app.productos_logic.filtrar_productos_y_recargar()
 
 
     def restaurar_config_default(self):
@@ -51,23 +51,32 @@ class ConfigLogic:
             message="¿Está seguro de que desea restaurar todos los ajustes a sus valores por defecto?"
         )
         
-        if dialogo.show():
-            tema_anterior = self.app.configuracion.get("tema")
-            exito = db_manager.restaurar_configuracion()
+        if not dialogo.show():
+            self.app.notificar_alerta("Restauración cancelada.")
+            return False
+
+        tema_anterior = self.app.configuracion.get("tema")
+        exito = db_manager.restaurar_configuracion()
+        
+        if exito:
+            self.app.configuracion = db_manager.cargar_configuracion_completa()
             
-            if exito:
-                self.app.configuracion = db_manager.cargar_configuracion_completa()
-                self.app.notificar_exito("La configuración ha sido restaurada.")
-                self.app.configuracion_tab.recargar_vista()
-                self.app.app_logic.actualizar_alertas_stock()
-                # Si el tema cambió, solo notificamos
-                if tema_anterior != self.app.configuracion.get("tema"):
-                    self.app.notificar_alerta("El tema por defecto se aplicará en el próximo reinicio.")
-                return True
-            else:
-                self.app.notificar_error("No se pudo restaurar la configuración.")
-                return False
-        return False
+            self.app.notificar_exito("La configuración ha sido restaurada.")
+            
+            tema_nuevo = self.app.configuracion.get("tema")
+            if tema_anterior != tema_nuevo:
+                update_theme_dynamically(self.app, tema_nuevo)
+            
+            self.app.configuracion_tab.recargar_vista()
+            self.app.actualizar_titulo_app()
+            self.app.app_logic.actualizar_alertas_stock()
+            self.app.productos_logic.filtrar_productos_y_recargar()
+            
+            return True
+        else:
+            self.app.notificar_error("No se pudo restaurar la configuración.")
+            return False
+
 
     def _reiniciar_aplicacion(self):
         if self.app.single_instance_lock:
