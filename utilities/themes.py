@@ -57,11 +57,11 @@ def apply_custom_theme(app):
         relief="flat"
     )
     
-    # Mapeo de estados para Treeview
+    # Mapeo de estados para Treeview (CORREGIDO)
     style.map(
         "Treeview",
-        background=[('selected', selected_bg), ('!selected', bg_color)],
-        foreground=[('selected', '#FFFFFF'), ('!selected', fg_color)]
+        background=[('selected', selected_bg)],
+        foreground=[('selected', '#FFFFFF')]
     )
     
     # Configuración del header del Treeview

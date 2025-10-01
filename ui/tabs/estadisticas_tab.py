@@ -3,7 +3,7 @@ from tkinter import ttk
 from datetime import datetime
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
+from ui.widgets.date_entry import DateEntry
 class EstadisticasTab(ctk.CTkFrame):
     """
     Clase que representa la INTERFAZ de la pestaña de Estadísticas.
@@ -23,12 +23,12 @@ class EstadisticasTab(ctk.CTkFrame):
 
         
         ctk.CTkLabel(frame_controles, text="Desde:", font=("Segoe UI", 11)).pack(side="left", padx=(0, 5))
-        self.cal_desde = ctk.CTkEntry(frame_controles, placeholder_text="dd/mm/aaaa", width=100)
+        self.cal_desde = DateEntry(frame_controles)
         self.cal_desde.pack(side="left")
         self.cal_desde.insert(0, datetime.now().strftime("%d/%m/%Y"))
 
         ctk.CTkLabel(frame_controles, text="Hasta:", font=("Segoe UI", 11)).pack(side="left", padx=(10, 5))
-        self.cal_hasta = ctk.CTkEntry(frame_controles, placeholder_text="dd/mm/aaaa", width=100)
+        self.cal_hasta = DateEntry(frame_controles)
         self.cal_hasta.pack(side="left")
         self.cal_hasta.insert(0, datetime.now().strftime("%d/%m/%Y"))
 

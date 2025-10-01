@@ -2,6 +2,8 @@ import customtkinter as ctk
 from tkinter import ttk
 from PIL import Image
 from datetime import datetime
+from ui.widgets.date_entry import DateEntry
+
 class HistorialTab(ctk.CTkFrame):
 
     def __init__(self, parent, controller):
@@ -59,7 +61,8 @@ class HistorialTab(ctk.CTkFrame):
         frame_controles.pack(fill="x", pady=5, padx=10)
 
         ctk.CTkLabel(frame_controles, text="Ver ventas del:", font=("Segoe UI", 12)).pack(side="left", padx=5)
-        self.cal_fecha_historial = ctk.CTkEntry(frame_controles, placeholder_text="dd/mm/aaaa")
+        
+        self.cal_fecha_historial = DateEntry(frame_controles)
         self.cal_fecha_historial.pack(side="left", padx=5)
         self.cal_fecha_historial.insert(0, datetime.now().strftime("%d/%m/%Y"))
         
