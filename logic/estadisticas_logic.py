@@ -6,12 +6,9 @@ from database import database_manager as db_manager
 from services import report_generator
 
 class EstadisticasLogic:
-    """
-    Controlador especializado para la lógica de la pestaña de Estadísticas.
-    """
+    
     def __init__(self, app_controller):
         self.app = app_controller
-        # Guardamos el estado de los últimos datos generados para el PDF
         self.ultimos_datos_generados = None
 
     def generar_estadisticas(self):
@@ -20,7 +17,6 @@ class EstadisticasLogic:
         fecha_fin_str = tab.cal_hasta.get()
 
         try:
-            # 1. Validamos y convertimos las fechas
             fecha_inicio_obj = datetime.strptime(fecha_inicio_str, "%d/%m/%Y")
             fecha_fin_obj = datetime.strptime(fecha_fin_str, "%d/%m/%Y")
             if fecha_inicio_obj > fecha_fin_obj:
@@ -53,14 +49,15 @@ class EstadisticasLogic:
     def _actualizar_grafico_torta(self, datos_resumen):
         """Dibuja o actualiza el gráfico de torta en el canvas de la pestaña."""
         tab = self.app.estadisticas_tab
-        # Si ya existe un gráfico, lo destruimos para crear uno nuevo
-        if tab.canvas_grafico_widget:
-            tab.canvas_grafico_widget.destroy()
+        
+        for widget in tab.frame_grafico.winfo_children():
+            if isinstance(widget, ctk.CTkLabel) and "Distribución" in widget.cget("text"):
+                continue
+            widget.destroy()
 
         labels = ['Efectivo', 'Transferencia']
         sizes = [datos_resumen.get('efectivo', 0), datos_resumen.get('transferencia', 0)]
         
-        # Si no hay datos, mostramos un mensaje en lugar del gráfico
         if all(s == 0 for s in sizes):
             ctk.CTkLabel(tab.frame_grafico, text="No hay datos para mostrar.").pack(expand=True)
             return
@@ -76,17 +73,15 @@ class EstadisticasLogic:
         canvas.draw()
         widget_grafico = canvas.get_tk_widget()
         widget_grafico.pack(fill="both", expand=True)
-        tab.canvas_grafico_widget = widget_grafico # Guardamos la referencia
+        tab.canvas_grafico_widget = widget_grafico
 
     def descargar_reporte_estadisticas(self):
         if not self.ultimos_datos_generados:
             self.app.notificar_alerta("Primero debe generar un reporte en pantalla.")
             return
             
-        # 1. Desempaquetamos los datos que guardamos previamente
         fecha_inicio, fecha_fin, resumen, top_productos = self.ultimos_datos_generados
         
-        # 2. Llamamos al servicio para que genere el PDF con esos datos
         exito, error_msg = report_generator.generar_reporte_estadisticas(
             fecha_inicio, fecha_fin, resumen, top_productos
         )

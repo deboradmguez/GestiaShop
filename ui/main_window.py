@@ -34,7 +34,7 @@ class App(ctk.CTk):
         self.single_instance_lock = single_instance_lock
         ctk.set_appearance_mode(self.configuracion.get("tema", "dark"))
         ctk.set_default_color_theme("blue")
-        apply_custom_theme(self) # Esto podría ser redundante, lo revisaremos luego
+        apply_custom_theme(self)
 
         self.is_fullscreen = True
         
@@ -66,10 +66,8 @@ class App(ctk.CTk):
         
         self.configure(fg_color=("gray95", "gray10"))
         
-        try:
-            # CORRECCIÓN: CTkImage maneja las imágenes de forma más robusta
+        try: 
             icon_image = ctk.CTkImage(Image.open(ruta_recurso('icons/icono_app.png')))
-            # El método para el ícono es diferente
             self.iconbitmap(ruta_recurso('icons/icono_app.ico'))
         except Exception as e:
             print(f"No se pudo cargar el icono de la aplicación: {e}")
@@ -96,11 +94,9 @@ class App(ctk.CTk):
         self.header_btn_abrir_caja = ctk.CTkButton(frame_derecha, text="☀️ Abrir Caja", command=self.abrir_caja, fg_color="#28a745", hover_color="#218838")
         
     def _crear_notebook(self):
-        """Crea y llena el panel de pestañas."""
         self.notebook = ctk.CTkTabview(self, command=self._on_tab_change)
-        self.notebook.pack(pady=10, padx=10, fill="both", expand=True)
+        self.notebook.pack(pady=(10, 5), padx=10, fill="both", expand=True)
        
-        # Se crean las pestañas y se añaden
         self.notebook.add("Ventas (F1)")
         self.notebook.add("Productos (F2)")
         self.notebook.add("Inventario (F3)")
@@ -125,15 +121,24 @@ class App(ctk.CTk):
         self.configuracion_tab = ConfiguracionTab(self.notebook.tab("Configuración (F7)"), self)
         self.configuracion_tab.pack(fill="both", expand=True)
 
+
     def _crear_footer(self):
-        """Crea el pie de página con botones de ayuda y alertas."""
-        self.btn_soporte = ctk.CTkButton(self, text="⛑️ Ayuda", command=self.mostrar_soporte)
-        self.btn_soporte.place(relx=0.0, rely=1.0, x=10, y=-10, anchor="sw")
-        self.btn_alerta_stock = ctk.CTkButton(self, text="⚠ Alertas", command=self.app_logic.mostrar_alertas_de_stock)
+        footer_frame = ctk.CTkFrame(self, fg_color="transparent")
+        footer_frame.pack(side="bottom", fill="x", padx=10, pady=(5, 10))
+
+        footer_frame.grid_columnconfigure(0, weight=0)
+        footer_frame.grid_columnconfigure(1, weight=1) 
+        footer_frame.grid_columnconfigure(2, weight=0)
+
+        self.btn_soporte = ctk.CTkButton(footer_frame, text="⛑️ Ayuda", command=self.mostrar_soporte)
+        self.btn_soporte.grid(row=0, column=0, sticky="w") 
+
+        self.btn_alerta_stock = ctk.CTkButton(footer_frame, text="⚠ Alertas", command=self.app_logic.mostrar_alertas_de_stock)
+        self.btn_alerta_stock.grid(row=0, column=2, sticky="e") 
+        self.btn_alerta_stock.grid_remove()
     def _crear_widget_notificaciones(self):
         self.lbl_notificacion = ctk.CTkLabel(self, text="", font=("Segoe UI", 12))
     def _iniciar_procesos_de_fondo(self):
-        """Inicia tareas recurrentes y la configuración inicial de la UI."""
         self.actualizar_titulo_app()
         self.actualizar_fecha_hora()
         self.app_logic.manejar_apertura_caja_inicial()
@@ -149,7 +154,7 @@ class App(ctk.CTk):
         ))
         self.after(250, lambda: self.historial_tab.configurar_tags_treeview())
     def _configurar_locale(self):
-        """Configura el idioma para fechas y formatos."""
+        
         try: locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
         except: 
             try: locale.setlocale(locale.LC_TIME, 'Spanish_Spain.1252')
@@ -165,23 +170,19 @@ class App(ctk.CTk):
         self.bind("<F6>", lambda e: self.notebook.set("Estadísticas (F6)"))
         self.bind("<F7>", lambda e: self.notebook.set("Configuración (F7)"))
         
-        # Atajos para la pestaña de Ventas
         self.bind("<Control-f>", lambda e: self.mostrar_ventana_cobrar())
         self.bind("<Control-b>", lambda e: self.mostrar_ventana_busqueda())
         self.bind("<Control-a>", lambda e: self.agregar_producto_comun())
         self.bind("<Control-d>", lambda e: self.vaciar_carrito())
 
-        # Nuevos bindings para pantalla completa
         self.bind("<F11>", self.toggle_fullscreen)
         self.bind("<Escape>", self.salir_de_fullscreen)
 
     def toggle_fullscreen(self, event=None):
-        """Activa o desactiva el modo de pantalla completa."""
         self.is_fullscreen = not self.is_fullscreen
         self.attributes("-fullscreen", self.is_fullscreen)
 
     def salir_de_fullscreen(self, event=None):
-        """Sale del modo de pantalla completa si está activo."""
         if self.is_fullscreen:
             self.is_fullscreen = False
             self.attributes("-fullscreen", False)
@@ -194,7 +195,6 @@ class App(ctk.CTk):
        
         ahora = datetime.now()
         self.lbl_hora.configure(text=ahora.strftime("%H:%M"))
-        # Llama directamente a la función importada desde helpers
         self.lbl_fecha.configure(text=helpers.formatear_fecha_es(ahora)) 
         self.after(60000, self.actualizar_fecha_hora)
         
@@ -209,9 +209,7 @@ class App(ctk.CTk):
         if "Configuración" in tab_seleccionada:
             self.configuracion_tab.recargar_vista()
     
-    # =====================================================================
-    # --- MÉTODOS DELEGADOS (La App solo redirige la llamada al especialista)
-    # =====================================================================
+
     def abrir_caja(self): self.app_logic.dialogo_abrir_caja()
     def cerrar_app(self):
         if self.single_instance_lock:

@@ -1,7 +1,7 @@
 import webbrowser, tkinter as tk
 from PIL import Image
 from datetime import date
-from utilities import notifications, helpers
+from utilities import helpers
 from ui.dialogs.pin_dialog import PinDialog
 from CTkMessagebox import CTkMessagebox 
 from database import database_manager as db_manager
@@ -179,16 +179,16 @@ class AppLogic:
                 text=f"⚠ {conteo} Alerta{'s' if conteo > 1 else ''}",
                 fg_color="#D32F2F", hover_color="#B71C1C", text_color="white" 
             )
-            self.app.btn_alerta_stock.place(relx=1.0, rely=1.0, x=-10, y=-10, anchor="se")
+            self.app.btn_alerta_stock.grid(row=0, column=2, sticky="e")
         elif hasattr(self.app, 'btn_alerta_stock'):
-            self.app.btn_alerta_stock.place_forget()
+            self.app.btn_alerta_stock.grid_remove()
         
     #notificaciones
     
     def notificar_exito(self, texto):
         CTkNotification(master=self.app, 
                         message=texto, 
-                        icon="✅", # Usamos el emoji como icono
+                        icon="✅",
                         duration=3000, 
                         position="top-right",
                         sound=True,
