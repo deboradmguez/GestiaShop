@@ -5,7 +5,7 @@ from utilities import notifications, helpers
 from CTkMessagebox import CTkMessagebox 
 from database import database_manager as db_manager
 import customtkinter as ctk
-
+from utilities.ctk_components.ctk_notification import CTkNotification
 class AppLogic:
     def __init__(self, app_controller):
         self.app = app_controller
@@ -183,10 +183,10 @@ class AppLogic:
     #notificaciones
     
     def notificar_exito(self, texto):
-        notifications.mostrar_mensaje_exito(self.app.lbl_notificacion, texto)
+        CTkNotification(master=self.app, title="Éxito", message=texto, duration=3000, sound=True)
 
     def notificar_alerta(self, texto):
-        notifications.mostrar_mensaje_alerta(self.app.lbl_notificacion, texto)
+        CTkNotification(master=self.app, title="Alerta", message=texto, duration=3000, sound=True)
 
     def notificar_error(self, texto):
-        notifications.mostrar_mensaje_error(self.app.lbl_notificacion, texto)
+        CTkNotification(master=self.app, title="Error", message=texto, duration=3000, sound=True)

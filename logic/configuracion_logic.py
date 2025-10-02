@@ -1,5 +1,5 @@
 import sys, os
-from utilities.dialogs import ConfirmacionDialog
+from CTkMessagebox import CTkMessagebox # <-- 1. Importamos la nueva biblioteca
 from utilities.themes import update_theme_dynamically 
 from database import database_manager as db_manager
 import time
@@ -45,15 +45,20 @@ class ConfigLogic:
 
 
     def restaurar_config_default(self):
-        dialogo = ConfirmacionDialog(
-            parent=self.app,
+        # --- INICIO DE LA MODIFICACIÓN ---
+        dialogo = CTkMessagebox(
             title="Confirmar Restauración",
-            message="¿Está seguro de que desea restaurar todos los ajustes a sus valores por defecto?"
+            message="¿Está seguro de que desea restaurar todos los ajustes a sus valores por defecto?",
+            icon="question",
+            option_1="No",
+            option_2="Sí",
+            sound=True
         )
         
-        if not dialogo.show():
+        if dialogo.get() != "Sí":
             self.app.notificar_alerta("Restauración cancelada.")
             return False
+        # --- FIN DE LA MODIFICACIÓN ---
 
         tema_anterior = self.app.configuracion.get("tema")
         exito = db_manager.restaurar_configuracion()
