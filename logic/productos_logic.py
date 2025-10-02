@@ -84,7 +84,10 @@ class ProductosLogic:
             exito = db_manager.agregar_producto_nuevo(codigo, nombre, precio, stock, umbral_global)
             if exito:
                 self.app.notificar_exito(f"Producto '{nombre}' agregado correctamente.")
-                ventana.destroy()
+    
+                ventana.withdraw()
+                ventana.after(100, ventana.destroy)
+    
                 self.filtrar_productos_y_recargar()
             else: 
                 self.app.notificar_error("No se pudo agregar el producto.")
@@ -139,7 +142,6 @@ class ProductosLogic:
         helpers.configurar_dialogo(ventana_modificar, self.app, entries["Nombre"])
 
     def _guardar_modificaciones_producto(self, codigo, entries, ventana):
-        
         """Valida y guarda las modificaciones de un producto."""
         try:
             nuevo_nombre = entries["Nombre"].get().strip()
@@ -153,14 +155,16 @@ class ProductosLogic:
             exito = db_manager.actualizar_producto_existente(codigo, nuevo_nombre, nuevo_precio, nuevo_stock)
             if exito:
                 self.app.notificar_exito(f"Producto '{nuevo_nombre}' modificado.")
-                ventana.destroy()
+    
+                ventana.withdraw()
+                ventana.after(100, ventana.destroy)
+    
                 self.filtrar_productos_y_recargar()
                 self.app.app_logic.actualizar_alertas_stock()
             else:
                 self.app.notificar_error("No se pudo actualizar el producto.")
         except (ValueError, TypeError):
             self.app.notificar_error("El precio y el stock deben ser números válidos.")
-
     def eliminar_producto(self):
         """Elimina el producto seleccionado previa confirmación."""
         item_seleccionado = self.app.productos_tab.tree_inventario.selection()
@@ -297,7 +301,6 @@ class ProductosLogic:
         
         if dialogo.get() != "Guardar":
             return
-        
 
         agregados, errores = db_manager.agregar_productos_en_lote(productos)
         
@@ -305,9 +308,10 @@ class ProductosLogic:
         if errores:
             self.app.notificar_alerta(f"{mensaje_final}\n\nNo se pudieron agregar {len(errores)} productos.")
         else:
-            self.app.notificar_exito("Éxito", mensaje_final)
+            self.app.notificar_exito(mensaje_final)
         
-        ventana.destroy()
+        ventana.withdraw()
+        ventana.after(100, ventana.destroy)
         self.filtrar_productos_y_recargar()
 
     def realizar_busqueda_productos(self, termino_busqueda, tree_widget):

@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from tkinter import ttk
 from utilities import helpers
 import tkinter as tk
 
@@ -19,11 +18,20 @@ class CobrarWindow(ctk.CTkToplevel):
         self.monto_efectivo_entry = None
         self.monto_transferencia_entry = None
         self.entry_referencia = None
+        
+        self.focus_after_id = None
 
         self._crear_widgets()
         self._configurar_bindings()
         self._actualizar_inputs_metodo()
         helpers.centrar_ventana(self, parent)
+
+
+    def destroy(self):
+        if self.focus_after_id:
+            self.after_cancel(self.focus_after_id)
+            self.focus_after_id = None
+        super().destroy()
 
     def _crear_widgets(self):
         main_frame = ctk.CTkFrame(self)
@@ -57,16 +65,14 @@ class CobrarWindow(ctk.CTkToplevel):
             fg_color="#28a745", hover_color="#218838"
         )
         self.btn_finalizar.pack(ipadx=10, ipady=5)
-    
+
     def _configurar_bindings(self):
-        """Configura los atajos de teclado para la ventana."""
         self.bind("<Escape>", lambda e: self.destroy())
         self.bind("<Return>", lambda e: self._on_finalizar_venta())
         self.bind("<Left>", self._navegar_metodos_pago)
         self.bind("<Right>", self._navegar_metodos_pago)
 
     def _navegar_metodos_pago(self, event):
-        """Permite cambiar de método de pago con las flechas."""
         indice_actual = self.opciones_metodo.index(self.metodo_pago.get())
         if event.keysym == "Right":
             nuevo_indice = (indice_actual + 1) % len(self.opciones_metodo)
@@ -75,9 +81,19 @@ class CobrarWindow(ctk.CTkToplevel):
         self.metodo_pago.set(self.opciones_metodo[nuevo_indice])
         self._actualizar_inputs_metodo()
 
+    def _safe_focus(self, widget):
+        try:
+            if widget and widget.winfo_exists():
+                widget.focus()
+        except tk.TclError:
+            pass
+            
     def _actualizar_inputs_metodo(self, *args):
+        if self.focus_after_id:
+            self.after_cancel(self.focus_after_id)
+            self.focus_after_id = None
+
         for widget in self.frame_inputs.winfo_children():
-            # Dejamos la etiqueta del título
             if isinstance(widget, ctk.CTkLabel) and "Detalles" in widget.cget("text"):
                 continue
             widget.destroy()
@@ -89,7 +105,7 @@ class CobrarWindow(ctk.CTkToplevel):
             self.monto_efectivo_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
             self.monto_efectivo_entry.pack(fill="x", pady=(0, 5), padx=10)
             self.monto_efectivo_entry.insert(0, f"{self.total_a_cobrar:.2f}")
-            self.after(50, lambda: self.monto_efectivo_entry.focus())
+            self.focus_after_id = self.after(50, lambda: self._safe_focus(self.monto_efectivo_entry))
             self.label_vuelto = ctk.CTkLabel(self.frame_inputs, text="Vuelto: $0.00", font=("Segoe UI", 12, "bold"))
             self.label_vuelto.pack(fill="x", pady=5, padx=10)
             self.monto_efectivo_entry.bind("<KeyRelease>", self._calcular_vuelto)
@@ -99,7 +115,8 @@ class CobrarWindow(ctk.CTkToplevel):
             ctk.CTkLabel(self.frame_inputs, text="Referencia (opcional):").pack(anchor="w", padx=10)
             self.entry_referencia = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
             self.entry_referencia.pack(fill="x", padx=10)
-            self.after(50, lambda: self.entry_referencia.focus())
+            self.focus_after_id = self.after(50, lambda: self._safe_focus(self.entry_referencia))
+            
         elif metodo == "Mixto":
             ctk.CTkLabel(self.frame_inputs, text="Monto Efectivo:").pack(anchor="w", padx=10)
             self.monto_efectivo_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
@@ -108,10 +125,9 @@ class CobrarWindow(ctk.CTkToplevel):
             ctk.CTkLabel(self.frame_inputs, text="Monto Transferencia:").pack(anchor="w", pady=(5,0), padx=10)
             self.monto_transferencia_entry = ctk.CTkEntry(self.frame_inputs, font=("Segoe UI", 16))
             self.monto_transferencia_entry.pack(fill="x", padx=10)
-            self.after(50, lambda: self.monto_efectivo_entry.focus())
+            self.focus_after_id = self.after(50, lambda: self._safe_focus(self.monto_efectivo_entry))
             self.monto_efectivo_entry.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(self.monto_efectivo_entry, self.monto_transferencia_entry))
             self.monto_transferencia_entry.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(self.monto_transferencia_entry, self.monto_efectivo_entry))
-            
 
     def _calcular_vuelto(self, event=None):
         try:
@@ -125,12 +141,10 @@ class CobrarWindow(ctk.CTkToplevel):
             self.label_vuelto.configure(text="Monto inválido", text_color="red")
 
     def _calcular_monto_restante(self, entry_activa, entry_pasiva):
-        """Calcula automáticamente el monto faltante en el pago mixto."""
         try:
             monto_ingresado = float(entry_activa.get() or 0)
             monto_restante = self.total_a_cobrar - monto_ingresado
             
-            # Desvincula temporalmente para evitar bucles
             entry_pasiva.unbind("<KeyRelease>")
             entry_pasiva.delete(0, tk.END)
 
@@ -138,14 +152,12 @@ class CobrarWindow(ctk.CTkToplevel):
                 entry_pasiva.insert(0, f"{monto_restante:.2f}")
             else:
                 entry_pasiva.insert(0, "0.00")
-            # Vuelve a vincular
             entry_pasiva.bind("<KeyRelease>", lambda e: self._calcular_monto_restante(entry_pasiva, entry_activa))
 
         except (ValueError, TypeError):
             entry_pasiva.delete(0, tk.END)
 
     def _on_finalizar_venta(self):
-        """Recolecta los datos de la UI y los envía al controlador."""
         payment_data = {"metodo": self.metodo_pago.get()}
         try:
             if payment_data["metodo"] == "Efectivo":
@@ -171,6 +183,8 @@ class CobrarWindow(ctk.CTkToplevel):
             venta_exitosa = self.controller.finalizar_venta(payment_data)
             
             if venta_exitosa:
-                self.destroy()
+                self.withdraw()
+                self.after(100, self.destroy)
+
         except (ValueError, TypeError):
             self.controller.notificar_error("Monto inválido.")

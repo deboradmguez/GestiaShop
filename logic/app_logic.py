@@ -33,13 +33,15 @@ class AppLogic:
         self._actualizar_estado_controles_venta()
 
     def dialogo_abrir_caja(self):
-        dialogo = ctk.CTkInputDialog(
+        # Usamos CTkInputDialog para simplificar
+        dialogo_usuario = ctk.CTkInputDialog(
             title="Apertura de Caja",
             text="¿Quién abre la caja hoy?"
         )
-        usuario = dialogo.get_input()
+        usuario = dialogo_usuario.get_input()
 
         if not usuario:
+            self.app.notificar_alerta("Apertura cancelada.")
             return
 
         dialogo_fondo = ctk.CTkInputDialog(
@@ -49,6 +51,7 @@ class AppLogic:
         fondo_str = dialogo_fondo.get_input()
 
         if not fondo_str:
+            self.app.notificar_alerta("Apertura cancelada.")
             return
             
         try:
@@ -62,7 +65,7 @@ class AppLogic:
                 self.app.usuario_actual = usuario
                 self.app.header_btn_abrir_caja.pack_forget()
                 self._actualizar_estado_controles_venta()
-                self.app.caja_logic.recargar_vista_caja() # Avisa a la pestaña de caja que recargue
+                self.app.caja_logic.recargar_vista_caja()
                 self.app.notificar_exito(f"Caja abierta por {usuario}.")
             else:
                 self.app.notificar_error("No se pudo registrar la apertura de caja.")
@@ -183,10 +186,31 @@ class AppLogic:
     #notificaciones
     
     def notificar_exito(self, texto):
-        CTkNotification(master=self.app, title="Éxito", message=texto, duration=3000, sound=True)
+        CTkNotification(master=self.app, 
+                        message=texto, 
+                        icon="✅", # Usamos el emoji como icono
+                        duration=3000, 
+                        position="top-right",
+                        sound=True,
+                        fg_color="#28a745",
+                        text_color="white")
 
     def notificar_alerta(self, texto):
-        CTkNotification(master=self.app, title="Alerta", message=texto, duration=3000, sound=True)
+        CTkNotification(master=self.app, 
+                        message=texto, 
+                        position="top-right",
+                        icon="⚠️",
+                        duration=3000, 
+                        sound=True,
+                        fg_color="#ffc107",
+                        text_color="black")
 
     def notificar_error(self, texto):
-        CTkNotification(master=self.app, title="Error", message=texto, duration=3000, sound=True)
+        CTkNotification(master=self.app, 
+                        message=texto, 
+                        position="top-right",
+                        icon="❌",
+                        duration=3000, 
+                        sound=True,
+                        fg_color="#D32F2F",
+                        text_color="white")

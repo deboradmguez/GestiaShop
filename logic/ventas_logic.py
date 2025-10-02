@@ -193,7 +193,10 @@ class VentasLogic:
 
             codigo_comun = f"PROD_COMUN-{uuid.uuid4()}"
             self._agregar_a_carrito((codigo_comun, nombre, precio, cantidad), None)
-            ventana.destroy()
+            
+            ventana.withdraw()
+            ventana.after(100, ventana.destroy)
+
         except (ValueError, TypeError):
             self.app.notificar_error("Precio y cantidad deben ser números válidos.")
 

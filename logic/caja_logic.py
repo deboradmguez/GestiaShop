@@ -15,7 +15,6 @@ class CajaLogic:
             self.app.notificar_alerta("Debe ingresar un monto para el cierre.")
             return
 
-        # --- INICIO DE LA MODIFICACIÓN ---
         
         dialogo = CTkMessagebox(
             title="Confirmar Cierre de Caja",
@@ -29,7 +28,6 @@ class CajaLogic:
             self.app.notificar_alerta("Cierre de caja cancelado.")
             return
             
-        # --- FIN DE LA MODIFICACIÓN ---
 
         try:
             monto_final = float(monto_final_str)
