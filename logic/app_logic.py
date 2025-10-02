@@ -2,6 +2,7 @@ import webbrowser, tkinter as tk
 from PIL import Image
 from datetime import date
 from utilities import notifications, helpers
+from ui.dialogs.pin_dialog import PinDialog
 from CTkMessagebox import CTkMessagebox 
 from database import database_manager as db_manager
 import customtkinter as ctk
@@ -74,23 +75,22 @@ class AppLogic:
             self.app.notificar_error("El fondo inicial debe ser un número válido.")
 
     def solicitar_pin_admin(self):
-       
         pin_guardado = self.app.configuracion.get("pin_admin", "0000") 
         
-        dialogo_pin = ctk.CTkInputDialog(
+        dialogo_pin = PinDialog(
+            parent=self.app,
             title="Acceso Restringido",
             text="Por favor, ingrese el PIN de administrador:"
         )
         
         pin_ingresado = dialogo_pin.get_input()
 
-        if pin_ingresado is None: # El usuario cerró o canceló la ventana
+        if pin_ingresado is None:
             return None
         
         if pin_ingresado == str(pin_guardado):
             return True
         else:
-            
             CTkMessagebox(title="Error", message="PIN incorrecto.", icon="cancel")
             return False
 

@@ -43,12 +43,10 @@ class ConfiguracionTab(ctk.CTkFrame):
         main_container = ctk.CTkFrame(self, fg_color="transparent")
         main_container.grid(row=0, column=1, pady=20, padx=20, sticky="n")
 
-        # --- ENCABEZADO (Solo Título) ---
         header_frame = ctk.CTkFrame(main_container, fg_color="transparent")
         header_frame.pack(fill="x", pady=(0, 20))
         ctk.CTkLabel(header_frame, text="CONFIGURACIÓN DEL SISTEMA", font=ctk.CTkFont(size=16, weight="bold")).pack(side="left")
         
-        # --- SECCIONES DE CONTENIDO ---
         frame_negocio = ctk.CTkFrame(main_container, border_width=1)
         frame_negocio.pack(fill="x", pady=10, ipady=10)
         ctk.CTkLabel(frame_negocio, text="Información del Negocio", font=ctk.CTkFont(weight="bold")).pack(pady=10, padx=15)
@@ -81,18 +79,14 @@ class ConfiguracionTab(ctk.CTkFrame):
         self.spin_umbral.set(config.get("umbral_alerta_stock", 5))
         self.spin_umbral.pack(side="left", padx=10)
 
-        # --- INICIO DE LA MODIFICACIÓN ---
-
-        # 1. Creamos un frame para los botones que se alineará a la derecha
         frame_botones = ctk.CTkFrame(main_container, fg_color="transparent")
         frame_botones.pack(fill="x", pady=20, padx=0)
 
-        # 2. Creamos los botones con colores diferenciados
         btn_restaurar = ctk.CTkButton(
             frame_botones, 
             text="↩️ Restaurar", 
             command=self._restaurar_valores_por_defecto,
-            fg_color="transparent", # Color de "peligro" o secundario
+            fg_color="transparent",
             border_width=2,
             text_color=("gray10", "#DCE4EE")
         )
@@ -102,8 +96,6 @@ class ConfiguracionTab(ctk.CTkFrame):
             frame_botones, 
             text="💾 Guardar Cambios", 
             command=self._aplicar_configuracion,
-            fg_color="#28a745" # Color de "éxito" o principal
+            fg_color="#28a745" 
         )
         btn_aplicar.pack(side="right", padx=(0, 10))
-        
-        # --- FIN DE LA MODIFICACIÓN ---

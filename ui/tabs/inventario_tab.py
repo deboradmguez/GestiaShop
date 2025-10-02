@@ -58,8 +58,6 @@ class InventarioTab(ctk.CTkFrame):
         """Configura todos los atajos de teclado y comandos."""
         self.entry_codigo_inv.bind("<Return>", self.controller.buscar_producto_para_inventario)
         self.btn_confirmar_cambios.configure(command=self.controller.guardar_cambios_inventario)
-
-        # Navegación entre campos con Enter
         self.entries["nombre_edit"].bind("<Return>", lambda e: self.entries["precio_edit"].focus_set())
         self.entries["precio_edit"].bind("<Return>", lambda e: self.entries["stock_agregar"].focus_set())
         self.entries["stock_agregar"].bind("<Return>", self.controller.guardar_cambios_inventario)
